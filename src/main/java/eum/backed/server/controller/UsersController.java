@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -33,5 +30,19 @@ public class UsersController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         return usersService.signIn(signIn);
+    }
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(@RequestBody @Validated UsersRequestDTO.Reissue reissue, Errors errors){
+        if(errors.hasErrors()){
+            return response.invalidFields(Helper.refineErrors(errors));
+        }
+        return usersService.reissue(reissue);
+    }
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody @Validated UsersRequestDTO.Logout logout, Errors errors){
+        if (errors.hasErrors()) {
+            return response.invalidFields(Helper.refineErrors(errors));
+        }
+        return usersService.logout(logout);
     }
 }
