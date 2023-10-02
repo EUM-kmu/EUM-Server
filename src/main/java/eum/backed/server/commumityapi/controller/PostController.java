@@ -2,6 +2,7 @@ package eum.backed.server.commumityapi.controller;
 
 import eum.backed.server.common.DataResponse;
 import eum.backed.server.commumityapi.controller.dto.request.PostRequestDTO;
+import eum.backed.server.commumityapi.controller.dto.response.PostResponseDTO;
 import eum.backed.server.commumityapi.domain.post.Status;
 import eum.backed.server.commumityapi.domain.user.Users;
 import eum.backed.server.commumityapi.service.PostService;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/post")
@@ -46,6 +49,12 @@ public class PostController {
     public DataResponse updateState(@RequestParam Long postId,@RequestParam Status status, @AuthenticationPrincipal Users user){
         return postService.updateState(postId,status, user);
     }
+    @ApiOperation(value = "카테고리 별 게시글 조회", notes = "게시글 아이디받고 상태 수정")
+    @GetMapping("/findbycategory")
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByCategory(@RequestParam Long categoryId){
+        return postService.findByCategory(categoryId);
+    }
+
 
 
 }

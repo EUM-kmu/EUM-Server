@@ -1,8 +1,9 @@
 package eum.backed.server.commumityapi.service;
 
-import eum.backed.server.commumityapi.controller.dto.request.PostRequestDTO;
 import eum.backed.server.common.DataResponse;
 import eum.backed.server.common.Response;
+import eum.backed.server.commumityapi.controller.dto.request.PostRequestDTO;
+import eum.backed.server.commumityapi.controller.dto.response.PostResponseDTO;
 import eum.backed.server.commumityapi.domain.category.Category;
 import eum.backed.server.commumityapi.domain.category.CategoryRepository;
 import eum.backed.server.commumityapi.domain.post.Post;
@@ -11,12 +12,12 @@ import eum.backed.server.commumityapi.domain.post.Status;
 import eum.backed.server.commumityapi.domain.region.GU.Gu;
 import eum.backed.server.commumityapi.domain.region.GU.GuRepository;
 import eum.backed.server.commumityapi.domain.user.Users;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -72,5 +73,35 @@ public class PostService {
         getPost.updateStatus(status);
         postRepository.save(getPost);
         return new DataResponse<>(Response.class).success("게시글 상태 수정 성공");
+    }
+
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByCategory(Long categoryId) {
+        Category getCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
+        List<Post> posts = postRepository.findByCategoryOrderByCreateDateDesc(getCategory).orElseThrow(()->new IllegalArgumentException("아직 해당 카테고리에 데이터가 없습니다"));
+        List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(posts);
+        return new DataResponse<>(findByCategories).success(findByCategories,"데이터 조회 성공");
+    }
+    private List<PostResponseDTO.PostResponse> getAllPostResponse(List<Post> posts){
+        List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd a hh:mm", Locale.KOREAN);
+        for (Post post : posts) {
+            PostResponseDTO.PostResponse category = PostResponseDTO.PostResponse.builder()
+                    .postId(post.getPostId())
+                    .title(post.getTitle())
+                    .content(post.getContents())
+                    .startDate(simpleDateFormat.format(post.getStartDate()))
+                    .endDate(simpleDateFormat.format(post.getEndDate()))
+                    .pay(post.getPay())
+                    .location(post.getLocation())
+                    .volunteerTime(post.getVolunteerTime())
+                    .isHelper(post.getIsHelper())
+                    .maxNumOfPeople(post.getMaxNumOfPeople())
+                    .category(post.getCategory().getContents())
+                    .status(post.getStatus())
+                    .build();
+
+            postResponseArrayList.add(category);
+        }
+        return postResponseArrayList;
     }
 }

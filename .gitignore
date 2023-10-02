@@ -89,3 +89,4 @@ target/
 /bin
 
 *.yml
+*.sql

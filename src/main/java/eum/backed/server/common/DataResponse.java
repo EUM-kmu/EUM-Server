@@ -32,6 +32,9 @@ public class DataResponse<T> {
                 .build();
         return body;
     }
+    public DataResponse<T> success(T data, String msg) {
+        return success(data, msg, HttpStatus.OK);
+    }
     public DataResponse success(String msg){
         return success(Collections.emptyList(), msg, HttpStatus.OK);
     }
