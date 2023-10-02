@@ -26,6 +26,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final GuRepository guRepository;
+    private final PostResponseDTO postResponseDTO;
 
     public DataResponse<Response> create(PostRequestDTO.Create create, Users user) throws Exception {
         Gu getGu = guRepository.findById(create.getGuId()).orElseThrow(() -> new IllegalArgumentException("없는 구입니다"));
@@ -74,6 +75,12 @@ public class PostService {
         postRepository.save(getPost);
         return new DataResponse<>(Response.class).success("게시글 상태 수정 성공");
     }
+    public DataResponse<PostResponseDTO.PostResponse> findById(Long postId) {
+        Post getPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        PostResponseDTO.PostResponse singlePostResponse = postResponseDTO.newPostResponse(getPost);
+        return new DataResponse<>(singlePostResponse).success(singlePostResponse, "postId로 찾기");
+
+    }
 
     public DataResponse<List<PostResponseDTO.PostResponse>> findByCategory(Long categoryId) {
         Category getCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
@@ -90,25 +97,12 @@ public class PostService {
     }
     private List<PostResponseDTO.PostResponse> getAllPostResponse(List<Post> posts){
         List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd a hh:mm", Locale.KOREAN);
         for (Post post : posts) {
-            PostResponseDTO.PostResponse category = PostResponseDTO.PostResponse.builder()
-                    .postId(post.getPostId())
-                    .title(post.getTitle())
-                    .content(post.getContents())
-                    .startDate(simpleDateFormat.format(post.getStartDate()))
-                    .endDate(simpleDateFormat.format(post.getEndDate()))
-                    .pay(post.getPay())
-                    .location(post.getLocation())
-                    .volunteerTime(post.getVolunteerTime())
-                    .isHelper(post.getIsHelper())
-                    .maxNumOfPeople(post.getMaxNumOfPeople())
-                    .category(post.getCategory().getContents())
-                    .status(post.getStatus())
-                    .build();
-
-            postResponseArrayList.add(category);
+            PostResponseDTO.PostResponse singlePostResponse = postResponseDTO.newPostResponse(post);
+            postResponseArrayList.add(singlePostResponse);
         }
         return postResponseArrayList;
     }
+
+
 }

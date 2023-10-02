@@ -49,16 +49,22 @@ public class PostController {
     public DataResponse updateState(@RequestParam Long postId,@RequestParam Status status, @AuthenticationPrincipal Users user){
         return postService.updateState(postId,status, user);
     }
-    @ApiOperation(value = "카테고리 별 게시글 조회", notes = "게시글 아이디받고 상태 수정")
+    @ApiOperation(value = "단일 게시글 조회", notes = "게시글 아이디 받고 조회")
+    @GetMapping("/findById")
+    public DataResponse<PostResponseDTO.PostResponse> findById(@RequestParam Long postId, @AuthenticationPrincipal Users user){
+        return postService.findById(postId);
+    }
+    @ApiOperation(value = "카테고리 별 게시글 조회", notes = "카테고리별 게시글 최신정렬")
     @GetMapping("/findByCategory")
     public DataResponse<List<PostResponseDTO.PostResponse>> findByCategory(@RequestParam Long categoryId){
         return postService.findByCategory(categoryId);
     }
-    @ApiOperation(value = "카테고리 별 게시글 조회", notes = "게시글 아이디받고 상태 수정")
+    @ApiOperation(value = "상태 별 게시글 조회", notes = "상태별 게시글 최신 정렬")
     @GetMapping("/findByStatus")
     public DataResponse<List<PostResponseDTO.PostResponse>> findByStatus(@RequestParam Status status){
         return postService.findByStatus(status);
     }
+
 
 
 }
