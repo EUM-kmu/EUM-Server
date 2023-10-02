@@ -79,7 +79,14 @@ public class PostService {
         Category getCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
         List<Post> posts = postRepository.findByCategoryOrderByCreateDateDesc(getCategory).orElseThrow(()->new IllegalArgumentException("아직 해당 카테고리에 데이터가 없습니다"));
         List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(posts);
-        return new DataResponse<>(findByCategories).success(findByCategories,"데이터 조회 성공");
+        return new DataResponse<>(findByCategories).success(findByCategories,"카테고리 별 데이터 조회 성공");
+    }
+
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByStatus(Status status) {
+        List<Post> posts = postRepository.findByStatusOrderByCreateDateDesc(status).orElseThrow(()->new IllegalArgumentException("아직 해당 카테고리에 데이터가 없습니다"));
+        List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(posts);
+        return new DataResponse<>(findByCategories).success(findByCategories,"상태별 데이터 조회 성공");
+
     }
     private List<PostResponseDTO.PostResponse> getAllPostResponse(List<Post> posts){
         List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
