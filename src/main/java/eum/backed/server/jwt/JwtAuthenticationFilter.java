@@ -1,6 +1,7 @@
 package eum.backed.server.jwt;
 
 
+import eum.backed.server.exception.TokenExpiredException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -28,7 +30,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     private final RedisTemplate redisTemplate;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException, IOException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)  throws IOException, ServletException, IOException  {
 
         // 1. Request Header 에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
@@ -42,8 +44,11 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        }else {
+            throw new TokenExpiredException("Token is expired");
         }
         chain.doFilter(request, response);
+
     }
 
     // Request Header 에서 토큰 정보 추출

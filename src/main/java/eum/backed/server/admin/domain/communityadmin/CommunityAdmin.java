@@ -2,7 +2,7 @@ package eum.backed.server.admin.domain.communityadmin;
 
 import eum.backed.server.admin.domain.inquiryanswer.InquiryAnswer;
 import eum.backed.server.admin.domain.notification.Notification;
-import eum.backed.server.commumityapi.domain.BaseTimeEntity;
+import eum.backed.server.common.BaseTimeEntity;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

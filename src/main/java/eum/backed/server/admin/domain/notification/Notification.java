@@ -1,7 +1,7 @@
 package eum.backed.server.admin.domain.notification;
 
 import eum.backed.server.admin.domain.communityadmin.CommunityAdmin;
-import eum.backed.server.commumityapi.domain.BaseTimeEntity;
+import eum.backed.server.common.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;

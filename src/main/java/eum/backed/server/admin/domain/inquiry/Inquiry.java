@@ -1,7 +1,7 @@
 package eum.backed.server.admin.domain.inquiry;
 
 import eum.backed.server.admin.domain.inquirycategory.InquiryCategory;
-import eum.backed.server.commumityapi.domain.BaseTimeEntity;
+import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.commumityapi.domain.user.Users;
 import lombok.*;
 

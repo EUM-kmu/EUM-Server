@@ -27,7 +27,7 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .antMatchers("/user/signup", "user/sigin", "/user/authority", "/api/v1/users/reissue", "/api/v1/users/logout","/**").permitAll()
+                .antMatchers("/user/signup", "user/sigin", "/user/authority", "/api/v1/users/reissue", "/api/v1/users/logout").permitAll()
                 .antMatchers("/user/userTest").hasRole("USER")
                 .antMatchers("/user/adminTest").hasRole("ADMIN")
                 .and()

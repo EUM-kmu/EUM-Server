@@ -11,10 +11,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 @Component
-public class Response {
+public class Response<T> {
     @Getter
     @Builder
-    private static class Body{
+    public static class Body{
         private int state;
         private String result;
         private String massage;
@@ -33,11 +33,26 @@ public class Response {
                 .build();
         return ResponseEntity.ok(body);
     }
+    public Body su(Object data, String msg, HttpStatus status){
+        Body body = Body.builder()
+                .state(status.value())
+                .data(data)
+
+                .result("success")
+                .massage(msg)
+                .error(Collections.emptyList())
+                .build();
+        return body;
+    }
     public ResponseEntity<?> success(String msg){
         return success(Collections.emptyList(), msg, HttpStatus.OK);
     }
-    public ResponseEntity<?> success(Object data){
-        return success(data, null, HttpStatus.OK);
+    public Body succ(String msg){
+        return su(Collections.emptyList(), msg, HttpStatus.OK);
+    }
+
+    public Body success(Object data){
+        return su(data, null, HttpStatus.OK);
     }
     public ResponseEntity<?> fail(Object data, String msg, HttpStatus status) {
         Body body = Body.builder()

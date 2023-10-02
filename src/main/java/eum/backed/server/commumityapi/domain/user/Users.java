@@ -1,7 +1,7 @@
 package eum.backed.server.commumityapi.domain.user;
 
 import eum.backed.server.admin.domain.inquiry.Inquiry;
-import eum.backed.server.commumityapi.domain.BaseTimeEntity;
+import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.commumityapi.domain.apply.Apply;
 import eum.backed.server.commumityapi.domain.comment.Comment;
 import eum.backed.server.commumityapi.domain.scrap.Scrap;

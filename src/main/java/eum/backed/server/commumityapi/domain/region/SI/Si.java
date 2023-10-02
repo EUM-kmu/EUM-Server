@@ -1,6 +1,6 @@
 package eum.backed.server.commumityapi.domain.region.SI;
 
-import eum.backed.server.commumityapi.domain.BaseTimeEntity;
+import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.commumityapi.domain.region.GU.Gu;
 import lombok.*;
 
