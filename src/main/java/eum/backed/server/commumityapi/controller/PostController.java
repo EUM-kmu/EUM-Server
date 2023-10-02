@@ -27,7 +27,11 @@ public class PostController {
     public DataResponse create(@RequestBody PostRequestDTO.Create create, @AuthenticationPrincipal Users user ) throws Exception {
         return postService.create(create, user);
     }
-
+    @ApiOperation(value = "게시글 삭제", notes = "게시글 아이디로 삭제")
+    @DeleteMapping
+    public DataResponse delete(@RequestParam Long postId,@AuthenticationPrincipal Users user){
+        return postService.delete(postId);
+    }
 
 
 }

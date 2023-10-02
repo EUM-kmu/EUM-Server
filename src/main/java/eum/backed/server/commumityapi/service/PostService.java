@@ -48,5 +48,9 @@ public class PostService {
     }
 
 
-    
+    public DataResponse<Response> delete(Long postId) {
+        Post getPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        postRepository.delete(getPost);
+        return new DataResponse<>(Response.class).success("게시글 삭제 성공");
+    }
 }
