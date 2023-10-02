@@ -55,4 +55,8 @@ public class Post extends BaseTimeEntity {
     public void updateContents(String contents) {
         this.contents = contents;
     }
+
+    public void updateStatus(Status status) {
+        this.status = status;
+    }
 }

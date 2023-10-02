@@ -65,4 +65,12 @@ public class PostService {
         return new DataResponse<>(Response.class).success("게시글 수정 성공");
 
     }
+
+    public DataResponse updateState(Long postId,Status status, Users user) {
+        Post getPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        if(user.getUserId() != getPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+        getPost.updateStatus(status);
+        postRepository.save(getPost);
+        return new DataResponse<>(Response.class).success("게시글 상태 수정 성공");
+    }
 }

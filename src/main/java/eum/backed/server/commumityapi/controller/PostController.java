@@ -2,6 +2,7 @@ package eum.backed.server.commumityapi.controller;
 
 import eum.backed.server.common.DataResponse;
 import eum.backed.server.commumityapi.controller.dto.request.PostRequestDTO;
+import eum.backed.server.commumityapi.domain.post.Status;
 import eum.backed.server.commumityapi.domain.user.Users;
 import eum.backed.server.commumityapi.service.PostService;
 import io.swagger.annotations.ApiOperation;
@@ -9,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +40,11 @@ public class PostController {
     @PutMapping
     public DataResponse update(@RequestBody PostRequestDTO.Update update, @AuthenticationPrincipal Users user){
         return postService.update(update,user);
+    }
+    @ApiOperation(value = "게시글 상태 수정", notes = "게시글 아이디받고 상태 수정")
+    @PutMapping("/updateState")
+    public DataResponse updateState(@RequestParam Long postId,@RequestParam Status status, @AuthenticationPrincipal Users user){
+        return postService.updateState(postId,status, user);
     }
 
 
