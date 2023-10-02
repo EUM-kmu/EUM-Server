@@ -29,7 +29,7 @@ public class Post extends BaseTimeEntity {
     private int pay;
     private String location;
     private int volunteerTime;
-    private Boolean isHelper;
+    private Boolean needHelper;
     private int maxNumOfPeople;
 
     @Column

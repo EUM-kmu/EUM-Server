@@ -20,7 +20,7 @@ public class PostRequestDTO {
         private int pay;
         private String location;
         private int volunteerTime;
-        private boolean isHelper;
+        private boolean needHelper;
         private int maxNumOfPeople;
         @NotEmpty(message = "카테고리를 선택")
         private Long categoryId;

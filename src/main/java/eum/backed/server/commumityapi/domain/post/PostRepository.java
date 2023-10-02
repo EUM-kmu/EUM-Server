@@ -10,4 +10,6 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     Optional<List<Post>> findByCategoryOrderByCreateDateDesc(Category category);
 
     Optional<List<Post>> findByStatusOrderByCreateDateDesc(Status status);
+
+    Optional<List<Post>> findByNeedHelperOrderByCreateDateDesc(Boolean needHelper);
 }

@@ -1,6 +1,5 @@
 package eum.backed.server.commumityapi.controller.dto.response;
 
-import eum.backed.server.commumityapi.controller.dto.request.PostRequestDTO;
 import eum.backed.server.commumityapi.domain.post.Post;
 import eum.backed.server.commumityapi.domain.post.Status;
 import io.swagger.annotations.ApiModel;
@@ -27,7 +26,7 @@ public class PostResponseDTO {
         private int pay;
         private String location;
         private int volunteerTime;
-        private boolean isHelper;
+        private boolean needHelper;
         private int maxNumOfPeople;
         private String category;
         private Status status;
@@ -43,7 +42,7 @@ public class PostResponseDTO {
                 .pay(post.getPay())
                 .location(post.getLocation())
                 .volunteerTime(post.getVolunteerTime())
-                .isHelper(post.getIsHelper())
+                .needHelper(post.getNeedHelper())
                 .maxNumOfPeople(post.getMaxNumOfPeople())
                 .category(post.getCategory().getContents())
                 .status(post.getStatus())

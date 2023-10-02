@@ -40,7 +40,7 @@ public class PostService {
                 .pay(create.getPay())
                 .location(create.getLocation())
                 .volunteerTime(create.getVolunteerTime())
-                .isHelper(create.isHelper())
+                .needHelper(create.isNeedHelper())
                 .maxNumOfPeople(create.getMaxNumOfPeople())
                 .status(Status.RECRUITING)
                 .user(user)
@@ -90,9 +90,15 @@ public class PostService {
     }
 
     public DataResponse<List<PostResponseDTO.PostResponse>> findByStatus(Status status) {
-        List<Post> posts = postRepository.findByStatusOrderByCreateDateDesc(status).orElseThrow(()->new IllegalArgumentException("아직 해당 카테고리에 데이터가 없습니다"));
+        List<Post> posts = postRepository.findByStatusOrderByCreateDateDesc(status).orElseThrow(()->new IllegalArgumentException("아직 해당 상태의 데이터가 없습니다"));
         List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(posts);
         return new DataResponse<>(findByCategories).success(findByCategories,"상태별 데이터 조회 성공");
+
+    }
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByNeedHelper(Boolean needHelper) {
+        List<Post> posts = postRepository.findByNeedHelperOrderByCreateDateDesc(needHelper).orElseThrow(()->new IllegalArgumentException("아직 해당 상태의 데이터가 없습니다"));
+        List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(posts);
+        return new DataResponse<>(findByCategories).success(findByCategories,"도움주기, 받기 데이터 조회 성공");
 
     }
     private List<PostResponseDTO.PostResponse> getAllPostResponse(List<Post> posts){
@@ -103,6 +109,7 @@ public class PostService {
         }
         return postResponseArrayList;
     }
+
 
 
 }

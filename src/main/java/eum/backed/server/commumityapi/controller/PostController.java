@@ -27,6 +27,7 @@ public class PostController {
     @ApiOperation(value = "게시글 작성", notes = "도움요청, 받기 게시글 작성")
     @PostMapping("/create")
     public DataResponse create(@RequestBody PostRequestDTO.Create create, @AuthenticationPrincipal Users user ) throws Exception {
+        System.out.println(create.isNeedHelper());
         return postService.create(create, user);
     }
     @ApiOperation(value = "게시글 삭제", notes = "게시글 아이디로 삭제")
@@ -63,6 +64,11 @@ public class PostController {
     @GetMapping("/findByStatus")
     public DataResponse<List<PostResponseDTO.PostResponse>> findByStatus(@RequestParam Status status){
         return postService.findByStatus(status);
+    }
+    @ApiOperation(value = "도움 주기,받기 구분", notes = "도움 주기 , 받기에 따른 게시글 최신 정렬")
+    @GetMapping("/findByNeedHelper")
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByIsHelper(@RequestParam Boolean needHelper){
+        return postService.findByNeedHelper(needHelper);
     }
 
 
