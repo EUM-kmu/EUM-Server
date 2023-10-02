@@ -24,8 +24,8 @@ public class Post extends BaseTimeEntity {
     @Column
     private String title;
     private String contents;
-    private Date startTime;
-    private Date endTime;
+    private Date startDate;
+    private Date endDate;
     private int pay;
     private String location;
     private int volunteerTime;
@@ -48,4 +48,11 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name="gu_id")
     private Gu gu;
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContents(String contents) {
+        this.contents = contents;
+    }
 }

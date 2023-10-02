@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +29,12 @@ public class PostService {
     public DataResponse<Response> create(PostRequestDTO.Create create, Users user) throws Exception {
         Gu getGu = guRepository.findById(create.getGuId()).orElseThrow(() -> new IllegalArgumentException("없는 구입니다"));
         Category getCategory = categoryRepository.findById(create.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd a hh:mm", Locale.KOREAN);
         Post post = Post.builder()
                 .title(create.getTitle())
                 .contents(create.getContent())
-                .startTime(simpleDateFormat.parse(create.getStartTime()))
-                .endTime(simpleDateFormat.parse(create.getEndTime()))
+                .startDate(simpleDateFormat.parse(create.getStartTime()))
+                .endDate(simpleDateFormat.parse(create.getEndTime()))
                 .pay(create.getPay())
                 .location(create.getLocation())
                 .volunteerTime(create.getVolunteerTime())
@@ -48,9 +49,20 @@ public class PostService {
     }
 
 
-    public DataResponse<Response> delete(Long postId) {
+    public DataResponse<Response> delete(Long postId,Users user) {
         Post getPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        if(user.getUserId() != getPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         postRepository.delete(getPost);
         return new DataResponse<>(Response.class).success("게시글 삭제 성공");
+    }
+
+    public DataResponse update(PostRequestDTO.Update update,Users user) {
+        Post getPost = postRepository.findById(update.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        if(user.getUserId() != getPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+        getPost.updateTitle(update.getTitle());
+        getPost.updateContents(update.getContent());
+        postRepository.save(getPost);
+        return new DataResponse<>(Response.class).success("게시글 수정 성공");
+
     }
 }
