@@ -20,4 +20,8 @@ public class ScrapController {
     public DataResponse doScrap(@RequestParam Long postId, @AuthenticationPrincipal Users user) {
         return scrapService.doScrap(postId, user);
     }
+    @GetMapping("/undo")
+    public DataResponse undoScrap(@RequestParam Long postId,@AuthenticationPrincipal Users user) throws IllegalAccessException {
+        return scrapService.undoScrap(postId,user);
+    }
 }
