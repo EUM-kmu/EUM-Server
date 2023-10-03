@@ -1,4 +1,4 @@
-package eum.backed.server.common;
+package eum.backed.server.common.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

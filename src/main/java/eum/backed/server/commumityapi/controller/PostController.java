@@ -1,6 +1,6 @@
 package eum.backed.server.commumityapi.controller;
 
-import eum.backed.server.common.DataResponse;
+import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.commumityapi.controller.dto.request.PostRequestDTO;
 import eum.backed.server.commumityapi.controller.dto.response.PostResponseDTO;
 import eum.backed.server.commumityapi.domain.post.Status;

@@ -1,7 +1,7 @@
 package eum.backed.server.exception;
 
-import eum.backed.server.common.DataResponse;
-import eum.backed.server.common.Response;
+import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.Response;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

@@ -1,13 +1,16 @@
 package eum.backed.server.commumityapi.controller;
 
-import eum.backed.server.common.DataResponse;
+import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.commumityapi.controller.dto.request.CommentRequestDTO;
+import eum.backed.server.commumityapi.controller.dto.response.CommentResponseDTO;
 import eum.backed.server.commumityapi.domain.user.Users;
 import eum.backed.server.commumityapi.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/comment")
@@ -25,6 +28,11 @@ public class CommentController {
     @DeleteMapping
     DataResponse delete(@RequestParam Long commentId, @AuthenticationPrincipal Users user){
         return commentService.delete(commentId, user);
+    }
+
+    @GetMapping("/findByPostId")
+    DataResponse<List<CommentResponseDTO.CommentResponse>> findByPostId(@RequestParam Long postId){
+        return commentService.findByPostId(postId);
     }
 
 }

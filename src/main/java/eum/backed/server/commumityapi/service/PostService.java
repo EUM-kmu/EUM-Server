@@ -1,7 +1,7 @@
 package eum.backed.server.commumityapi.service;
 
-import eum.backed.server.common.DataResponse;
-import eum.backed.server.common.Response;
+import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.Response;
 import eum.backed.server.commumityapi.controller.dto.request.PostRequestDTO;
 import eum.backed.server.commumityapi.controller.dto.response.PostResponseDTO;
 import eum.backed.server.commumityapi.domain.category.Category;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -84,19 +85,19 @@ public class PostService {
 
     public DataResponse<List<PostResponseDTO.PostResponse>> findByCategory(Long categoryId) {
         Category getCategory = categoryRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
-        List<Post> posts = postRepository.findByCategoryOrderByCreateDateDesc(getCategory).orElseThrow(()->new IllegalArgumentException("아직 해당 카테고리에 데이터가 없습니다"));
+        List<Post> posts = postRepository.findByCategoryOrderByCreateDateDesc(getCategory).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(posts);
         return new DataResponse<>(findByCategories).success(findByCategories,"카테고리 별 데이터 조회 성공");
     }
 
     public DataResponse<List<PostResponseDTO.PostResponse>> findByStatus(Status status) {
-        List<Post> posts = postRepository.findByStatusOrderByCreateDateDesc(status).orElseThrow(()->new IllegalArgumentException("아직 해당 상태의 데이터가 없습니다"));
+        List<Post> posts = postRepository.findByStatusOrderByCreateDateDesc(status).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(posts);
         return new DataResponse<>(findByCategories).success(findByCategories,"상태별 데이터 조회 성공");
 
     }
     public DataResponse<List<PostResponseDTO.PostResponse>> findByNeedHelper(Boolean needHelper) {
-        List<Post> posts = postRepository.findByNeedHelperOrderByCreateDateDesc(needHelper).orElseThrow(()->new IllegalArgumentException("아직 해당 상태의 데이터가 없습니다"));
+        List<Post> posts = postRepository.findByNeedHelperOrderByCreateDateDesc(needHelper).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(posts);
         return new DataResponse<>(findByCategories).success(findByCategories,"도움주기, 받기 데이터 조회 성공");
 

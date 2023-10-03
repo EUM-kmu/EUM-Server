@@ -47,6 +47,9 @@ public class Users extends BaseTimeEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @ManyToOne
+    @JoinColumn(name="gu_id")
+    private Gu gu;
 
     @Column
     @ElementCollection(fetch = FetchType.EAGER)
@@ -71,9 +74,6 @@ public class Users extends BaseTimeEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Inquiry> inquiries = new ArrayList<>();
-    @ManyToOne
-    @JoinColumn(name="gu_id")
-    private Gu gu;
 
     @Override
     public String getUsername() {
