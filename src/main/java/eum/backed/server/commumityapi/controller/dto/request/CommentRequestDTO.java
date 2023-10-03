@@ -15,4 +15,12 @@ public class CommentRequestDTO {
         private String content;
     }
 
+    @Getter
+    @Setter
+    public static class Update{
+        private Long commentId;
+        private String content;
+
+    }
+
 }

@@ -7,10 +7,7 @@ import eum.backed.server.commumityapi.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/comment")
@@ -20,5 +17,9 @@ public class CommentController {
     @PostMapping
     DataResponse create(@RequestBody @Validated CommentRequestDTO.Create create, @AuthenticationPrincipal Users user){
         return commentService.create(create, user);
+    }
+    @PutMapping
+    DataResponse update(@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal Users user){
+        return commentService.update(update, user);
     }
 }

@@ -26,4 +26,13 @@ public class CommentService {
         commentRepository.save(comment);
         return new DataResponse<>(Response.class).success("댓글 작성 성공");
     }
+
+    public DataResponse update(CommentRequestDTO.Update update, Users user) {
+        Comment getComment = commentRepository.findById(update.getCommentId()).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
+        if(user.getUserId() != getComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+        getComment.updateContent(update.getContent());
+        commentRepository.save(getComment);
+        return new DataResponse<>(Response.class).success("댓글 수정 성공");
+    }
+
 }
