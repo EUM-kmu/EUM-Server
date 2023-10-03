@@ -22,4 +22,9 @@ public class CommentController {
     DataResponse update(@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal Users user){
         return commentService.update(update, user);
     }
+    @DeleteMapping
+    DataResponse delete(@RequestParam Long commentId, @AuthenticationPrincipal Users user){
+        return commentService.delete(commentId, user);
+    }
+
 }

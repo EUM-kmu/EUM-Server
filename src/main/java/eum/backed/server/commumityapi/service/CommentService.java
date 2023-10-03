@@ -35,4 +35,10 @@ public class CommentService {
         return new DataResponse<>(Response.class).success("댓글 수정 성공");
     }
 
+    public DataResponse delete(Long categoryId, Users user) {
+        Comment getComment = commentRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
+        if(user.getUserId() != getComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자)");
+        commentRepository.delete(getComment);
+        return new DataResponse<>(Response.class).success("댓글 삭제 성공");
+    }
 }
