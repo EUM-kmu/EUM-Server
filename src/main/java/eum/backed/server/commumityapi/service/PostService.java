@@ -11,6 +11,8 @@ import eum.backed.server.commumityapi.domain.post.PostRepository;
 import eum.backed.server.commumityapi.domain.post.Status;
 import eum.backed.server.commumityapi.domain.region.GU.Gu;
 import eum.backed.server.commumityapi.domain.region.GU.GuRepository;
+import eum.backed.server.commumityapi.domain.scrap.Scrap;
+import eum.backed.server.commumityapi.domain.scrap.ScrapRepository;
 import eum.backed.server.commumityapi.domain.user.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final GuRepository guRepository;
+    private final ScrapRepository scrapRepository;
     private final PostResponseDTO postResponseDTO;
 
     public DataResponse<Response> create(PostRequestDTO.Create create, Users user) throws Exception {
@@ -102,6 +105,17 @@ public class PostService {
         return new DataResponse<>(findByCategories).success(findByCategories,"도움주기, 받기 데이터 조회 성공");
 
     }
+
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByScrap(Users user) {
+        List<Scrap> scraps = scrapRepository.findByUserOrderByCreateDateDesc(user).orElse(Collections.emptyList());
+        List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
+        for (Scrap scrap : scraps) {
+            Post post = scrap.getPost();
+            PostResponseDTO.PostResponse singlePostResponse = postResponseDTO.newPostResponse(post);
+            postResponseArrayList.add(singlePostResponse);
+        }
+        return new DataResponse<>(postResponseArrayList).success(postResponseArrayList, "내가 스크랩한 게시글 조회)");
+    }
     private List<PostResponseDTO.PostResponse> getAllPostResponse(List<Post> posts){
         List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
         for (Post post : posts) {
@@ -110,7 +124,6 @@ public class PostService {
         }
         return postResponseArrayList;
     }
-
 
 
 }

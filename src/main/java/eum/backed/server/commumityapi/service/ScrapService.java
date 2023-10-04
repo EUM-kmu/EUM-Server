@@ -18,7 +18,7 @@ public class ScrapService {
 
     public DataResponse doScrap(Long postId, Users user) {
         Post getPost = postRepository.findById(postId).orElseThrow(()->new IllegalArgumentException("Invalid postId"));
-        if(scrapRepository.existsByUser(user)) throw new IllegalArgumentException("이미 스크랩 한 개시글 입니다");
+        if(scrapRepository.existsByPostAndUser(getPost,user)) throw new IllegalArgumentException("이미 스크랩 한 개시글 입니다");
         Scrap scrap = Scrap.builder().post(getPost).user(user).build();
         scrapRepository.save(scrap);
         return new DataResponse<>(Response.class).success("관심 게시글 등록 성공");

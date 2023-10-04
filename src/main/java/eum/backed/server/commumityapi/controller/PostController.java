@@ -70,6 +70,13 @@ public class PostController {
     public DataResponse<List<PostResponseDTO.PostResponse>> findByIsHelper(@RequestParam Boolean needHelper){
         return postService.findByNeedHelper(needHelper);
     }
+    @ApiOperation(value = "관심게시글 목록 조회", notes = "나의 관심 게시글 목록 최신 정렬")
+    @GetMapping("/findByScrap")
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByScrap(@AuthenticationPrincipal Users user){
+        return postService.findByScrap(user);
+    }
+
+
 
 
 

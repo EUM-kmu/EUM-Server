@@ -1,17 +1,23 @@
 package eum.backed.server.commumityapi.controller.dto.response;
 
+import eum.backed.server.common.DTO.Time;
 import eum.backed.server.commumityapi.domain.post.Post;
 import eum.backed.server.commumityapi.domain.post.Status;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Locale;
 @Component
+@RequiredArgsConstructor
 public class PostResponseDTO {
+    private final Time time;
 
     @Builder
     @Getter
@@ -30,8 +36,10 @@ public class PostResponseDTO {
         private int maxNumOfPeople;
         private String category;
         private Status status;
+        private String customCreatedTime;
     }
     public PostResponseDTO.PostResponse newPostResponse(Post post){
+        Date date = Date.from(post.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd a hh:mm", Locale.KOREAN);
         return PostResponseDTO.PostResponse.builder()
                 .postId(post.getPostId())
@@ -39,6 +47,7 @@ public class PostResponseDTO {
                 .content(post.getContents())
                 .startDate(simpleDateFormat.format(post.getStartDate()))
                 .endDate(simpleDateFormat.format(post.getEndDate()))
+                .customCreatedTime(time.calculateTime(date))
                 .pay(post.getPay())
                 .location(post.getLocation())
                 .volunteerTime(post.getVolunteerTime())
