@@ -1,18 +1,24 @@
 package eum.backed.server.commumityapi.controller;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import eum.backed.server.commumityapi.controller.dto.Response;
 import eum.backed.server.commumityapi.controller.dto.request.UsersRequestDTO;
 import eum.backed.server.commumityapi.controller.dto.response.UsersResponseDTO;
+import eum.backed.server.commumityapi.service.CustomUsersDetailsService;
 import eum.backed.server.commumityapi.service.UsersService;
 import eum.backed.server.lib.Helper;
+import eum.backed.server.util.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/user")
 @RestController
@@ -20,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 public class UsersController {
     private final UsersService usersService;
     private final Response response;
+    private final CustomUsersDetailsService customUsersDetailsService;
+    FirebaseAuth firebaseAuth;
 //    @ApiOperation(value = "signup", notes = "자체 회원가입")
 //    @ApiResponses(value={
 //            @ApiResponse(responseCode = "200", description = "가게 상세정보 조회 성공"),
@@ -32,6 +40,26 @@ public class UsersController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         return usersService.signUp(signUp);
+    }
+    @PostMapping("/auth")
+    public ResponseEntity<?> register(@RequestBody UsersRequestDTO.Test test) {
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(test.getIdtoken());
+            return usersService.register(test, decodedToken);
+        } catch ( FirebaseAuthException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
+    @PostMapping("/authsignin")
+    public ResponseEntity<?>authsignin(@RequestBody UsersRequestDTO.AuthSignin authSignin) {
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authSignin.getIdtoken());
+            return usersService.authsignin( decodedToken);
+        } catch ( FirebaseAuthException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
     @ApiResponse(code = 200,message = "ok",response = UsersResponseDTO.TokenInfo.class)
     @PostMapping("/signin")

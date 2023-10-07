@@ -47,6 +47,11 @@ public class UsersRequestDTO {
     }
     @Getter
     @Setter
+    public static class AuthSignin{
+        private String idtoken;
+    }
+    @Getter
+    @Setter
     public static class Reissue {
         @NotEmpty(message = "accessToken 을 입력해주세요.")
         private String accessToken;
@@ -65,6 +70,20 @@ public class UsersRequestDTO {
         private String refreshToken;
 
     }
+    @Getter
+    @Setter
+    public static class Test{
+        private String idtoken;
+        private String introduction;
+        private String name;
+        private String nickname;
+        private Date birth;
+        private String address;
+        private String phone;
+        private String sex;
+        private boolean isBanned = false;
+        private int totalVolunteerTime = 0;
 
 
+    }
 }

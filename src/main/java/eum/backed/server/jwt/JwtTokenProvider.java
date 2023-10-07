@@ -64,14 +64,37 @@ public class JwtTokenProvider {
                 .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
                 .build();
     }
+    public UsersResponseDTO.TokenInfo generateToken(String email) {
+            // 권한 가져오기
+
+            long now = (new Date()).getTime();
+            // Access Token 생성
+            Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+            String accessToken = Jwts.builder()
+                    .setSubject(email)
+                    .claim(AUTHORITIES_KEY, "authorities")
+                    .setExpiration(accessTokenExpiresIn)
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+
+            // Refresh Token 생성
+            String refreshToken = Jwts.builder()
+                    .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+
+            return UsersResponseDTO.TokenInfo.builder()
+                    .grantType(BEARER_TYPE)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
+                    .build();
+        }
 
     // JWT 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
     public Authentication getAuthentication(String accessToken) {
         // 토큰 복호화
         Claims claims = parseClaims(accessToken);
-        log.info(">>"+accessToken);
-        log.info(claims.getSubject());
-
 //        if (claims.get(AUTHORITIES_KEY) == null) {
 //            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
 //        }
@@ -86,7 +109,7 @@ public class JwtTokenProvider {
 //        UserDetails principal = new User(claims.getSubject(), "", authorities);
         UserDetails userDetails = customUsersDetailsService.loadUserByUsername(claims.getSubject());
 //        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
-        return new UsernamePasswordAuthenticationToken(userDetails, accessToken, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), accessToken, userDetails.getAuthorities());
     }
 
 
@@ -122,6 +145,7 @@ public class JwtTokenProvider {
         Long now = new Date().getTime();
         return (expiration.getTime() - now);
     }
+
 }
 
 

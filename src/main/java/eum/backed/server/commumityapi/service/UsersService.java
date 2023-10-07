@@ -1,5 +1,6 @@
 package eum.backed.server.commumityapi.service;
 
+import com.google.firebase.auth.FirebaseToken;
 import eum.backed.server.commumityapi.controller.dto.request.UsersRequestDTO;
 import eum.backed.server.commumityapi.controller.dto.Response;
 import eum.backed.server.commumityapi.controller.dto.response.UsersResponseDTO;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -118,5 +120,45 @@ public class UsersService {
                 .set(logout.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
 
         return response.success("로그아웃 되었습니다.");
+    }
+
+    public ResponseEntity<?> register(UsersRequestDTO.Test test, FirebaseToken decodedToken) {
+        if(usersRepository.existsByEmail(decodedToken.getEmail())) {
+            UsersResponseDTO.TokenInfo tokenInfo = jwtTokenProvider.generateToken(decodedToken.getEmail());
+            // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
+            redisTemplate.opsForValue()
+                    .set("RT:" +decodedToken.getEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+            return response.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
+        }
+            Users users = Users.builder()
+                    .email(decodedToken.getEmail())
+                    .introduction(test.getIntroduction())
+                    .name(test.getName())
+                    .sex(test.getSex())
+                    .birth(test.getBirth())
+                    .nickname(test.getNickname())
+                    .address(test.getAddress())
+                    .phone(test.getPhone())
+                    .isBanned(false)
+                    .authorities(Collections.singletonList(Authority.ROLE_USER.name()))
+                    .totalVolunteerTime(0).build();
+            usersRepository.save(users);
+            return response.success("회원가입");
+
+    }
+    public ResponseEntity<?> authsignin(FirebaseToken decodedToken) {
+        if(usersRepository.existsByEmail(decodedToken.getEmail())) {
+            UsersResponseDTO.TokenInfo tokenInfo = jwtTokenProvider.generateToken(decodedToken.getEmail());
+            // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
+            redisTemplate.opsForValue()
+                    .set("RT:" +decodedToken.getEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+
+            return response.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
+        }
+        return response.success("회원정보가 없습니다. 회원 요청으로 넘어가주세요");
+    }
+    public UsernamePasswordAuthenticationToken toAuthentication(String email){
+        return new UsernamePasswordAuthenticationToken(email, "");
     }
 }

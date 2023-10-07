@@ -14,6 +14,7 @@ import eum.backed.server.commumityapi.domain.region.GU.GuRepository;
 import eum.backed.server.commumityapi.domain.scrap.Scrap;
 import eum.backed.server.commumityapi.domain.scrap.ScrapRepository;
 import eum.backed.server.commumityapi.domain.user.Users;
+import eum.backed.server.commumityapi.domain.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +32,10 @@ public class PostService {
     private final GuRepository guRepository;
     private final ScrapRepository scrapRepository;
     private final PostResponseDTO postResponseDTO;
+    private final UsersRepository usersRepository;
 
-    public DataResponse<Response> create(PostRequestDTO.Create create, Users user) throws Exception {
+    public DataResponse<Response> create(PostRequestDTO.Create create,String email) throws Exception {
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         Gu getGu = guRepository.findById(create.getGuId()).orElseThrow(() -> new IllegalArgumentException("없는 구입니다"));
         Category getCategory = categoryRepository.findById(create.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd a hh:mm", Locale.KOREAN);
@@ -55,14 +58,16 @@ public class PostService {
     }
 
 
-    public DataResponse<Response> delete(Long postId,Users user) {
+    public DataResponse<Response> delete(Long postId,String email) {
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         Post getPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         postRepository.delete(getPost);
         return new DataResponse<>(Response.class).success("게시글 삭제 성공");
     }
 
-    public DataResponse update(PostRequestDTO.Update update,Users user) {
+    public DataResponse update(PostRequestDTO.Update update,String email) {
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         Post getPost = postRepository.findById(update.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         getPost.updateTitle(update.getTitle());
@@ -72,7 +77,8 @@ public class PostService {
 
     }
 
-    public DataResponse updateState(Long postId,Status status, Users user) {
+    public DataResponse updateState(Long postId,Status status, String email) {
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         Post getPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         getPost.updateStatus(status);
@@ -106,7 +112,8 @@ public class PostService {
 
     }
 
-    public DataResponse<List<PostResponseDTO.PostResponse>> findByScrap(Users user) {
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByScrap(String email) {
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         List<Scrap> scraps = scrapRepository.findByUserOrderByCreateDateDesc(user).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
         for (Scrap scrap : scraps) {

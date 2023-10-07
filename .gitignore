@@ -77,7 +77,7 @@ local.properties
 ### IntelliJ ###
 *.iml
 *.ipr
-*.iws
+*.iwsfirebase.json
 .idea/
 
 ### SVN ###
@@ -90,3 +90,6 @@ target/
 
 *.yml
 *.sql
+*.json
+
+*.html
