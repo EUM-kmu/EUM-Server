@@ -36,13 +36,11 @@ Icon
 *.class
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
 ### Gradle ###
 # Exclude Folder List #
-.gradle/
 build/
 
 
