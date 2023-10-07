@@ -89,5 +89,3 @@ target/
 *.yml
 *.sql
 *.json
-
-*.html

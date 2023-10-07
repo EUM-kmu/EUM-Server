@@ -1,4 +1,4 @@
-package eum.backed.server.security;
+package eum.backed.server.admin.domain.security;
 
 
 import eum.backed.server.jwt.JwtAuthenticationFilter;

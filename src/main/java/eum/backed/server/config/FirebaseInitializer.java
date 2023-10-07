@@ -17,8 +17,15 @@ public class FirebaseInitializer {
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
         log.info("Initializing Firebase.");
-        FileInputStream serviceAccount =
-                new FileInputStream("src/main/resources/firebase.json");
+
+        // 현재 작업 디렉토리를 얻어옵니다.
+        String currentDirectory = System.getProperty("user.dir");
+
+        // 상대 경로로 `firebase.json` 파일을 찾을 수 있는 경로를 설정합니다.
+        String relativePath = "src/main/resources/firebase.json"; // 상대 경로
+        String fullPath = currentDirectory + "/" + relativePath;
+
+        FileInputStream serviceAccount = new FileInputStream(fullPath);
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -26,9 +33,10 @@ public class FirebaseInitializer {
                 .build();
 
         FirebaseApp app = FirebaseApp.initializeApp(options);
-        log.info("FirebaseApp initialized" + app.getName());
+        log.info("FirebaseApp initialized: " + app.getName());
         return app;
     }
+
 
 
     @Bean
