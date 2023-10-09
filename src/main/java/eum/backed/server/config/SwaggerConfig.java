@@ -1,7 +1,5 @@
 package eum.backed.server.config;
 
-import com.fasterxml.classmate.TypeResolver;
-import eum.backed.server.commumityapi.controller.dto.Response;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
