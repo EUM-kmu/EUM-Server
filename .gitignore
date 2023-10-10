@@ -86,7 +86,6 @@ target/
 
 /bin
 
-*.yml
 *.sql
 *.json
 *.html
