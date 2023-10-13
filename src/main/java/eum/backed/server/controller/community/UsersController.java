@@ -1,19 +1,20 @@
 package eum.backed.server.controller.community;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
+import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.controller.community.dto.Response;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
-import eum.backed.server.service.community.CustomUsersDetailsService;
-import eum.backed.server.service.community.UsersService;
 import eum.backed.server.lib.Helper;
+import eum.backed.server.service.community.UsersService;
 import io.swagger.annotations.Api;
+
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,60 +24,31 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Api(tags = "user")
 public class UsersController {
-    private final UsersService usersService;
+    @Autowired
+    private UsersService usersService;
     private final Response response;
-    private final CustomUsersDetailsService customUsersDetailsService;
-    FirebaseAuth firebaseAuth;
-//    @ApiOperation(value = "signup", notes = "자체 회원가입")
-//    @ApiResponses(value={
-//            @ApiResponse(responseCode = "200", description = "가게 상세정보 조회 성공"),
-//
-//    })
-//    @ApiOperation(summary = "자체 회원 가입", description = "회원가입")
-    @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody @Validated UsersRequestDTO.SignUp signUp, Errors errors) {
-        if(errors.hasErrors()){
-            return response.invalidFields(Helper.refineErrors(errors));
-        }
+    @ApiOperation(value = "자체 회원가입", notes = "자체 회원가입")
+    @PostMapping("/auth/signup")
+    public DataResponse signup(@RequestBody @Validated UsersRequestDTO.SignUp signUp) {
         return usersService.signUp(signUp);
     }
-    @PostMapping("/auth")
-    public ResponseEntity<?> register(@RequestBody UsersRequestDTO.Test test) {
-        try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(test.getIdtoken());
-            return usersService.register(test, decodedToken);
-        } catch ( FirebaseAuthException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @ApiOperation(value = "프로필 생성", notes = "프로필 만드는 단계")
+    @PostMapping("/makeprofile" )
+    public DataResponse createProfile(@AuthenticationPrincipal String email,@RequestBody UsersRequestDTO.AuthSignup authSignup) {
+        return usersService.register(authSignup, email);
 
     }
-    @PostMapping("/authsignin")
-    public ResponseEntity<?>authsignin(@RequestBody UsersRequestDTO.AuthSignin authSignin) {
-        try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authSignin.getIdtoken());
-            return usersService.authsignin( decodedToken);
-        } catch ( FirebaseAuthException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
-    }
-    @ApiResponse(code = 200,message = "ok",response = UsersResponseDTO.TokenInfo.class)
-    @PostMapping("/signin")
-    public ResponseEntity<?> signIn(@RequestBody @Validated UsersRequestDTO.SignIn signIn, Errors errors){
-        if(errors.hasErrors()){
-            return response.invalidFields(Helper.refineErrors(errors));
-        }
+    @ApiOperation(value = "자체로그인", notes = "자체 앱 로그인")
+    @PostMapping("/auth/signin")
+    public DataResponse<UsersResponseDTO.TokenInfo> signIn(@RequestBody @Validated UsersRequestDTO.SignIn signIn){
         return usersService.signIn(signIn);
     }
-    @ApiResponse(code = 200,message = "ok",  response = UsersResponseDTO.TokenInfo.class)
+    @ApiOperation(value = "토근 갱신", notes = "토큰 갱신")
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@RequestBody @Validated UsersRequestDTO.Reissue reissue, Errors errors){
-        if(errors.hasErrors()){
-            return response.invalidFields(Helper.refineErrors(errors));
-        }
+    public DataResponse<UsersResponseDTO.TokenInfo> reissue(@RequestBody @Validated UsersRequestDTO.Reissue reissue){
         return usersService.reissue(reissue);
     }
-
+    @ApiOperation(value = "로그아웃", notes = "엑세스 토큰 삭제")
     @GetMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody @Validated UsersRequestDTO.Logout logout, Errors errors){
         if (errors.hasErrors()) {

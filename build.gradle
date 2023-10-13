@@ -44,6 +44,9 @@ dependencies {
 	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '8.0.1'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+	implementation'com.google.code.gson:gson:2.8.7'
+	implementation group: 'org.json', name: 'json', version: '20160810'
+
 }
 
 tasks.named('test') {

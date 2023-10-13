@@ -1,19 +1,20 @@
 package eum.backed.server.service.community;
 
-import com.google.firebase.auth.FirebaseToken;
-import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
+import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.config.jwt.JwtTokenProvider;
 import eum.backed.server.controller.community.dto.Response;
+import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
+import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.enums.Authority;
-import eum.backed.server.config.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,50 +30,45 @@ import java.util.concurrent.TimeUnit;
 public class UsersService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisTemplate redisTemplate;
     private final Response response;
+    private final DataResponse dataResponse;
 
-    public ResponseEntity<?> signUp(UsersRequestDTO.SignUp signUp){
+
+    public DataResponse signUp(UsersRequestDTO.SignUp signUp){
         if(usersRepository.existsByEmail(signUp.getEmail())){
-            return response.fail("이미 있는 이메일입니다", HttpStatus.BAD_REQUEST);
+            return dataResponse.fail("이미 있는 이메일입니다", HttpStatus.BAD_REQUEST);
         }
         Users users = Users.builder()
                 .email(signUp.getEmail())
                 .password(passwordEncoder.encode(signUp.getPassword()))
-                .introduction(signUp.getIntroduction())
-                .name(signUp.getName())
-                .sex(signUp.getSex())
-                .birth(signUp.getBirth())
-                .nickname(signUp.getNickname())
-                .address(signUp.getAddress())
-                .phone(signUp.getPhone())
-                .isBanned(false)
-                .authorities(Collections.singletonList(Authority.ROLE_USER.name()))
-                .totalVolunteerTime(0).build();
+                .banned(false)
+                .role(Role.ROLE_TEMPORARY_USER)
+                .authorities(Collections.singletonList(Authority.ROLE_TEMPORARY_USER.name())).build();
         usersRepository.save(users);
-        return response.success("회원가입에 성공");
+        return dataResponse.success("자체 회원가입에 성공");
     }
 
-    public ResponseEntity<?> signIn(UsersRequestDTO.SignIn signIn) {
-        UsernamePasswordAuthenticationToken authenticationToken = signIn.toAuthentication();
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+    public DataResponse<UsersResponseDTO.TokenInfo> signIn(UsersRequestDTO.SignIn signIn) {
+        Users getUser = usersRepository.findByEmail(signIn.getEmail()).orElseThrow(() -> new IllegalArgumentException("잘못된 이메일 정보"));
+        if(!passwordEncoder.matches(signIn.getPassword(),getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
+        UsersResponseDTO.TokenInfo  tokenInfo = jwtTokenProvider.generateToken(getUser.getEmail(),getUser.getRole());
 
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        UsersResponseDTO.TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
 
         // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
         redisTemplate.opsForValue()
-                .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+                .set("RT:" + getUser.getEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        return response.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
+        return dataResponse.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
     }
 
-    public ResponseEntity<?> reissue(UsersRequestDTO.Reissue reissue) {
+    public DataResponse<UsersResponseDTO.TokenInfo> reissue(UsersRequestDTO.Reissue reissue) {
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(reissue.getRefreshToken())) {
-            return response.fail("Refresh Token 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+            return dataResponse.fail("Refresh Token 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
 
         // 2. Access Token 에서 User email 을 가져옵니다.
@@ -82,10 +78,10 @@ public class UsersService {
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
         // (추가) 로그아웃되어 Redis 에 RefreshToken 이 존재하지 않는 경우 처리
         if(ObjectUtils.isEmpty(refreshToken)) {
-            return response.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+            return dataResponse.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
         }
         if(!refreshToken.equals(reissue.getRefreshToken())) {
-            return response.fail("Refresh Token 정보가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+            return dataResponse.fail("Refresh Token 정보가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
 
         // 4. 새로운 토큰 생성
@@ -95,7 +91,7 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        return response.success(tokenInfo, "Token 정보가 갱신되었습니다.", HttpStatus.OK);
+        return dataResponse.success(tokenInfo, "Token 정보가 갱신되었습니다.", HttpStatus.OK);
     }
 
     public ResponseEntity<?> logout(UsersRequestDTO.Logout logout) {
@@ -120,44 +116,41 @@ public class UsersService {
 
         return response.success("로그아웃 되었습니다.");
     }
-
-    public ResponseEntity<?> register(UsersRequestDTO.Test test, FirebaseToken decodedToken) {
-        if(usersRepository.existsByEmail(decodedToken.getEmail())) {
-            UsersResponseDTO.TokenInfo tokenInfo = jwtTokenProvider.generateToken(decodedToken.getEmail());
-            // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
-            redisTemplate.opsForValue()
-                    .set("RT:" +decodedToken.getEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-
-            return response.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
-        }
-            Users users = Users.builder()
-                    .email(decodedToken.getEmail())
-                    .introduction(test.getIntroduction())
-                    .name(test.getName())
-                    .sex(test.getSex())
-                    .birth(test.getBirth())
-                    .nickname(test.getNickname())
-                    .address(test.getAddress())
-                    .phone(test.getPhone())
-                    .isBanned(false)
-                    .authorities(Collections.singletonList(Authority.ROLE_USER.name()))
-                    .totalVolunteerTime(0).build();
-            usersRepository.save(users);
-            return response.success("회원가입");
+    //엑세스 토큰으로 프로필 만들기
+    public DataResponse register(UsersRequestDTO.AuthSignup authSignup, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("로그인되지 않은 유저"));
+        getUser.setIntroduction(authSignup.getIntroduction());
+        getUser.setName(authSignup.getName());
+        getUser.setNickname(authSignup.getNickname());
+        getUser.setAddress(authSignup.getAddress());
+        getUser.setBanned(false);
+        getUser.setTotalVolunteerTime(0);
+        getUser.setRole(Role.ROLE_USER);
+        usersRepository.save(getUser);
+        return dataResponse.success("회원가입");
 
     }
-    public ResponseEntity<?> authsignin(FirebaseToken decodedToken) {
-        if(usersRepository.existsByEmail(decodedToken.getEmail())) {
-            UsersResponseDTO.TokenInfo tokenInfo = jwtTokenProvider.generateToken(decodedToken.getEmail());
-            // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
-            redisTemplate.opsForValue()
-                    .set("RT:" +decodedToken.getEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-
-            return response.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
+    public DataResponse<UsersResponseDTO.TokenInfo> getToken(String email){
+        UsersResponseDTO.TokenInfo tokenInfo = null;
+        if(email.isBlank()) throw new IllegalArgumentException("email is empty");
+        Role role = null;
+        if(usersRepository.existsByEmail(email)){
+            if(usersRepository.existsByEmailAndRole(email,Role.ROLE_USER)){
+                role = Role.ROLE_USER;
+                tokenInfo = jwtTokenProvider.generateToken(email,role);
+//                return new DataResponse<>(tokenInfo).success(tokenInfo, "로그인 성공");
+            } else if (usersRepository.existsByEmailAndRole(email,Role.ROLE_TEMPORARY_USER)) {
+                role = Role.ROLE_TEMPORARY_USER;
+                tokenInfo = jwtTokenProvider.generateToken(email,role);
+            }
+        }else{
+            role = Role.ROLE_TEMPORARY_USER;
+            Users temporaryUser = Users.builder().email(email).role(role).build();
+            usersRepository.save(temporaryUser);
+            tokenInfo = jwtTokenProvider.generateToken(email,role);
         }
-        return response.success("회원정보가 없습니다. 회원 요청으로 넘어가주세요");
-    }
-    public UsernamePasswordAuthenticationToken toAuthentication(String email){
-        return new UsernamePasswordAuthenticationToken(email, "");
+        redisTemplate.opsForValue()
+                .set("RT:" +email, tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+        return dataResponse.success(tokenInfo, role.toString());
     }
 }

@@ -10,27 +10,20 @@ import javax.validation.constraints.Pattern;
 import java.sql.Date;
 
 public class UsersRequestDTO {
+    //자체회원가입 폼
     @Getter
     @Setter
     public static class SignUp{
         @NotEmpty(message = "이메일을 입력하세요")
         @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식에 맞지 않습니다.")
         private String email;
-        private String introduction;
-        private String name;
-        private String nickname;
-        private Date birth;
-        private String address;
-        private String phone;
-        private String sex;
-        private boolean isBanned = false;
-        private int totalVolunteerTime = 0;
-
         @NotEmpty(message = "비밀번호는 필수 입력값입니다.")
 //        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,16}$", message = "비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.")
         private String password;
 
+
     }
+    //자체 로그인 폼
     @Getter
     @Setter
     public static class SignIn{
@@ -72,7 +65,7 @@ public class UsersRequestDTO {
     }
     @Getter
     @Setter
-    public static class Test{
+    public static class AuthSignup {
         private String idtoken;
         private String introduction;
         private String name;

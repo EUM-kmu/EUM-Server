@@ -22,7 +22,7 @@ public class FirebaseInitializer {
         String currentDirectory = System.getProperty("user.dir");
 
         // 상대 경로로 `firebase.json` 파일을 찾을 수 있는 경로를 설정합니다.
-        String relativePath = "src/main/resources/firebase.json"; // 상대 경로
+        String relativePath = "src/main/resources/firebasekey.json"; // 상대 경로
         String fullPath = currentDirectory + "/" + relativePath;
 
         FileInputStream serviceAccount = new FileInputStream(fullPath);

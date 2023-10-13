@@ -9,6 +9,7 @@ import eum.backed.server.domain.community.sleeperuser.SleeperUser;
 import eum.backed.server.domain.community.post.Post;
 import eum.backed.server.domain.community.region.GU.Gu;
 import lombok.*;
+import org.hibernate.type.CharacterType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,11 +42,17 @@ public class Users extends BaseTimeEntity implements UserDetails {
     private String nickname;
     private String address;
     private String phone;
-    private boolean isBanned;
+    private boolean banned;
     private int totalVolunteerTime;
     @Column
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private TypeOfCharacter typeOfCharacter;
+
+
 
     @ManyToOne
     @JoinColumn(name="gu_id")

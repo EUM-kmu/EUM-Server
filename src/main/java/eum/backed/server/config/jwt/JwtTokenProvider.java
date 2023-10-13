@@ -1,6 +1,8 @@
 package eum.backed.server.config.jwt;
 
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
+import eum.backed.server.domain.community.user.Role;
+import eum.backed.server.enums.Authority;
 import eum.backed.server.service.community.CustomUsersDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -8,6 +10,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,6 +32,8 @@ public class JwtTokenProvider {
     @Autowired
     private CustomUsersDetailsService customUsersDetailsService;
     private final Key key;
+    @Value("${jwt.secret}")
+    private String jwtKey;
 
     public JwtTokenProvider(){
         byte[] keyBytes = Decoders.BASE64.decode("VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHN");
@@ -64,9 +69,8 @@ public class JwtTokenProvider {
                 .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
                 .build();
     }
-    public UsersResponseDTO.TokenInfo generateToken(String email) {
+    public UsersResponseDTO.TokenInfo generateToken(String email, Role role) {
             // 권한 가져오기
-
             long now = (new Date()).getTime();
             // Access Token 생성
             Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
@@ -88,6 +92,7 @@ public class JwtTokenProvider {
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
+                    .role(role)
                     .build();
         }
 

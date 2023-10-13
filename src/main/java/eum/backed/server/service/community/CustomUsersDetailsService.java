@@ -33,22 +33,22 @@ public class CustomUsersDetailsService implements UserDetailsService {
     private UserDetails createUserDetails(Users users) {
         return new User(users.getEmail(), "", users.getAuthorities());
     }
-    @Transactional
-    public Users create(UsersRequestDTO.SignUp signUp, FirebaseToken decode) {
-        Users users = Users.builder()
-                .email(decode.getEmail())
-                .introduction(signUp.getIntroduction())
-                .name(signUp.getName())
-                .sex(signUp.getSex())
-                .birth(signUp.getBirth())
-                .nickname(signUp.getNickname())
-                .address(signUp.getAddress())
-                .phone(signUp.getPhone())
-                .isBanned(false)
-                .authorities(Collections.singletonList(Authority.ROLE_USER.name()))
-                .totalVolunteerTime(0).build();
-        usersRepository.save(users);
-        return users;
-    }
+//    @Transactional
+//    public Users create(UsersRequestDTO.SignUp signUp, FirebaseToken decode) {
+//        Users users = Users.builder()
+//                .email(decode.getEmail())
+//                .introduction(signUp.getIntroduction())
+//                .name(signUp.getName())
+//                .sex(signUp.getSex())
+//                .birth(signUp.getBirth())
+//                .nickname(signUp.getNickname())
+//                .address(signUp.getAddress())
+//                .phone(signUp.getPhone())
+//                .banned(false)
+//                .authorities(Collections.singletonList(Authority.ROLE_USER.name()))
+//                .totalVolunteerTime(0).build();
+//        usersRepository.save(users);
+//        return users;
+//    }
 
 }

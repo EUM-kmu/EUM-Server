@@ -1,17 +1,21 @@
 package eum.backed.server.common.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import eum.backed.server.controller.community.dto.Response;
+import lombok.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @Setter
+@RequiredArgsConstructor
+@Component
 public class DataResponse<T> {
     private int state;
     private String result;
@@ -53,6 +57,15 @@ public class DataResponse<T> {
     }
     public DataResponse fail(String msg, HttpStatus status){
         return fail(Collections.emptyList(), msg, status);
+    }
+    public DataResponse invalidFields(LinkedList<LinkedHashMap<String,String>> errors){
+        return DataResponse.builder()
+                .state(HttpStatus.BAD_REQUEST.value())
+                .data(Collections.emptyList())
+                .result("fail")
+                .massage("")
+                .error(errors)
+                .build();
     }
 
 }

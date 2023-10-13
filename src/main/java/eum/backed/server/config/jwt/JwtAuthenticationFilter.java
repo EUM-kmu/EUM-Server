@@ -2,8 +2,10 @@ package eum.backed.server.config.jwt;
 
 
 import eum.backed.server.exception.TokenExpiredException;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,12 +21,14 @@ import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_TYPE = "Bearer";
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
 
     @Override
