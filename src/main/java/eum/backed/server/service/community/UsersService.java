@@ -46,8 +46,8 @@ public class UsersService {
                 .email(signUp.getEmail())
                 .password(passwordEncoder.encode(signUp.getPassword()))
                 .banned(false)
-                .role(Role.ROLE_TEMPORARY_USER)
-                .authorities(Collections.singletonList(Authority.ROLE_TEMPORARY_USER.name())).build();
+                .role(Role.ROLE_USER)
+                .authorities(Collections.singletonList(Authority.ROLE_USER.name())).build();
         usersRepository.save(users);
         return dataResponse.success("자체 회원가입에 성공");
     }
@@ -116,20 +116,7 @@ public class UsersService {
 
         return response.success("로그아웃 되었습니다.");
     }
-    //엑세스 토큰으로 프로필 만들기
-    public DataResponse register(UsersRequestDTO.AuthSignup authSignup, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("로그인되지 않은 유저"));
-        getUser.setIntroduction(authSignup.getIntroduction());
-        getUser.setName(authSignup.getName());
-        getUser.setNickname(authSignup.getNickname());
-        getUser.setAddress(authSignup.getAddress());
-        getUser.setBanned(false);
-        getUser.setTotalVolunteerTime(0);
-        getUser.setRole(Role.ROLE_USER);
-        usersRepository.save(getUser);
-        return dataResponse.success("회원가입");
 
-    }
     public DataResponse<UsersResponseDTO.TokenInfo> getToken(String email){
         UsersResponseDTO.TokenInfo tokenInfo = null;
         if(email.isBlank()) throw new IllegalArgumentException("email is empty");

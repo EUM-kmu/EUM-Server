@@ -1,8 +1,8 @@
 package eum.backed.server.controller.community.dto.response;
 
 import eum.backed.server.common.DTO.Time;
-import eum.backed.server.domain.community.post.Post;
-import eum.backed.server.domain.community.post.Status;
+import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.transactionpost.Status;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,23 +38,22 @@ public class PostResponseDTO {
         private Status status;
         private String customCreatedTime;
     }
-    public PostResponseDTO.PostResponse newPostResponse(Post post){
-        Date date = Date.from(post.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
+    public PostResponseDTO.PostResponse newPostResponse(TransactionPost transactionPost){
+        Date date = Date.from(transactionPost.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd a hh:mm", Locale.KOREAN);
         return PostResponseDTO.PostResponse.builder()
-                .postId(post.getPostId())
-                .title(post.getTitle())
-                .content(post.getContents())
-                .startDate(simpleDateFormat.format(post.getStartDate()))
-                .endDate(simpleDateFormat.format(post.getEndDate()))
+                .postId(transactionPost.getTransactionPostId())
+                .title(transactionPost.getTitle())
+                .content(transactionPost.getContents())
+                .startDate(simpleDateFormat.format(transactionPost.getStartDate()))
                 .customCreatedTime(time.calculateTime(date))
-                .pay(post.getPay())
-                .location(post.getLocation())
-                .volunteerTime(post.getVolunteerTime())
-                .needHelper(post.getNeedHelper())
-                .maxNumOfPeople(post.getMaxNumOfPeople())
-                .category(post.getCategory().getContents())
-                .status(post.getStatus())
+                .pay(transactionPost.getPay())
+                .location(transactionPost.getLocation())
+                .volunteerTime(transactionPost.getVolunteerTime())
+                .needHelper(transactionPost.getNeedHelper())
+                .maxNumOfPeople(transactionPost.getMaxNumOfPeople())
+                .category(transactionPost.getTransactionCategory().getContents())
+                .status(transactionPost.getStatus())
                 .build();
     }
 }

@@ -1,21 +1,26 @@
 package eum.backed.server.domain.community.user;
 
+import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.admin.inquiry.Inquiry;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.apply.Apply;
-import eum.backed.server.domain.community.comment.Comment;
+import eum.backed.server.domain.community.comment.OpinionComment;
+import eum.backed.server.domain.community.comment.TransactionComment;
+import eum.backed.server.domain.community.comment.VoteComment;
+import eum.backed.server.domain.community.opinionpost.OpinionPost;
+import eum.backed.server.domain.community.profile.Profile;
+import eum.backed.server.domain.community.promotionpost.PromotionPost;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.sleeperuser.SleeperUser;
-import eum.backed.server.domain.community.post.Post;
-import eum.backed.server.domain.community.region.GU.Gu;
+import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.votepost.VotePost;
+import eum.backed.server.domain.community.voteresult.VoteResult;
 import lombok.*;
-import org.hibernate.type.CharacterType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,40 +40,38 @@ public class Users extends BaseTimeEntity implements UserDetails {
     @Column
     private String email;
     private String password;
-    private String introduction;
-    private String name;
-    private String sex;
-    private Date birth;
-    private String nickname;
-    private String address;
     private String phone;
     private boolean banned;
-    private int totalVolunteerTime;
+
     @Column
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column
     @Enumerated(EnumType.STRING)
-    private TypeOfCharacter typeOfCharacter;
+    private Avatar avatar;
 
-
-
-    @ManyToOne
-    @JoinColumn(name="gu_id")
-    private Gu gu;
 
     @Column
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> authorities = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user")
+    private Profile profile;
+
+    @OneToOne(mappedBy = "user")
+    private UserBankAccount userBankAccount;
+
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
+    private List<TransactionPost> transactionPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
+    private List<OpinionPost> opinionPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<TransactionComment> transactionComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Scrap> scraps = new ArrayList<>();
@@ -81,6 +84,22 @@ public class Users extends BaseTimeEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Inquiry> inquiries = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<VotePost> votePosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<VoteComment> voteComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<VoteResult> voteResults = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<OpinionComment> opinionComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<PromotionPost> promotionPosts = new ArrayList<>();
+
 
     @Override
     public String getUsername() {

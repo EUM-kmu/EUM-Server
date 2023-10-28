@@ -1,7 +1,7 @@
 package eum.backed.server.controller.community.dto.response;
 
 import eum.backed.server.common.DTO.Time;
-import eum.backed.server.domain.community.comment.Comment;
+import eum.backed.server.domain.community.comment.TransactionComment;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,15 +29,15 @@ public class CommentResponseDTO {
         private boolean writer;
     }
 
-    public CommentResponse newCommentResponse(Comment comment, boolean writer){
-        Date date = Date.from(comment.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
+    public CommentResponse newCommentResponse(TransactionComment transactionComment, boolean writer){
+        Date date = Date.from(transactionComment.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
         return CommentResponse.builder()
-                .postId(comment.getPost().getPostId())
-                .commentId(comment.getCommentId())
-                .nickname(comment.getUser().getNickname())
-                .userAddress(comment.getUser().getAddress())
+                .postId(transactionComment.getTransactionPost().getTransactionPostId())
+                .commentId(transactionComment.getTransactionCommentId())
+                .nickname(transactionComment.getUser().getProfile().getNickname())
+                .userAddress(transactionComment.getUser().getProfile().getDong().getDong())
                 .customCreatedTime(time.calculateTime(date))
-                .content(comment.getContent())
+                .content(transactionComment.getContent())
                 .writer(writer).build();
     }
 }

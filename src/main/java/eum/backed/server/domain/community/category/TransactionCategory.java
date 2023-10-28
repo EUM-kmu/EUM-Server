@@ -1,7 +1,7 @@
 package eum.backed.server.domain.community.category;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.community.post.Post;
+import eum.backed.server.domain.community.transactionpost.TransactionPost;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Category extends BaseTimeEntity {
+public class TransactionCategory extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
@@ -22,6 +22,6 @@ public class Category extends BaseTimeEntity {
     @Column
     private String contents;
 
-    @OneToMany(mappedBy = "category", orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
+    @OneToMany(mappedBy = "transactionCategory", orphanRemoval = true)
+    private List<TransactionPost> transactionPosts = new ArrayList<>();
 }

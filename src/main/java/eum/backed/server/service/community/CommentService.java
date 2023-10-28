@@ -4,10 +4,10 @@ import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.controller.community.dto.Response;
 import eum.backed.server.controller.community.dto.request.CommentRequestDTO;
 import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
-import eum.backed.server.domain.community.comment.Comment;
-import eum.backed.server.domain.community.comment.CommentRepository;
-import eum.backed.server.domain.community.post.Post;
-import eum.backed.server.domain.community.post.PostRepository;
+import eum.backed.server.domain.community.comment.TransactionComment;
+import eum.backed.server.domain.community.comment.TransactionCommentRepository;
+import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.transactionpost.TransactionPostRepository;
 import eum.backed.server.domain.community.user.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,46 +19,46 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
-    private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
+    private final TransactionCommentRepository transactionCommentRepository;
+    private final TransactionPostRepository transactionPostRepository;
     private final CommentResponseDTO commentResponseDTO;
 
     public DataResponse create(CommentRequestDTO.Create create, Users user) {
-        Post getPost = postRepository.findById(create.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
-        Comment comment = Comment.builder()
+        TransactionPost getTransactionPost = transactionPostRepository.findById(create.getTransactionPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
+        TransactionComment transactionComment = TransactionComment.builder()
                 .content(create.getContent())
-                .post(getPost)
+                .transactionPost(getTransactionPost)
                 .user(user).build();
-        commentRepository.save(comment);
+        transactionCommentRepository.save(transactionComment);
         return new DataResponse<>(Response.class).success("댓글 작성 성공");
     }
 
     public DataResponse update(CommentRequestDTO.Update update, Users user) {
-        Comment getComment = commentRepository.findById(update.getCommentId()).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
-        if(user.getUserId() != getComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-        getComment.updateContent(update.getContent());
-        commentRepository.save(getComment);
+        TransactionComment getTransactionComment = transactionCommentRepository.findById(update.getCommentId()).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
+        if(user.getUserId() != getTransactionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+        getTransactionComment.updateContent(update.getContent());
+        transactionCommentRepository.save(getTransactionComment);
         return new DataResponse<>(Response.class).success("댓글 수정 성공");
     }
 
     public DataResponse delete(Long categoryId, Users user) {
-        Comment getComment = commentRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
-        if(user.getUserId() != getComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자)");
-        commentRepository.delete(getComment);
+        TransactionComment getTransactionComment = transactionCommentRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
+        if(user.getUserId() != getTransactionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자)");
+        transactionCommentRepository.delete(getTransactionComment);
         return new DataResponse<>(Response.class).success("댓글 삭제 성공");
     }
 
     public DataResponse<List<CommentResponseDTO.CommentResponse>> findByPostId(Long postId) {
-        Post getPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
-        List<Comment> comments = commentRepository.findByPostOrderByCreateDateDesc(getPost).orElse(Collections.emptyList());
-        List<CommentResponseDTO.CommentResponse> findByPost = getAllComment(comments, getPost);
+        TransactionPost getTransactionPost = transactionPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        List<TransactionComment> transactionComments = transactionCommentRepository.findByTransactionPostOrderByCreateDateDesc(getTransactionPost).orElse(Collections.emptyList());
+        List<CommentResponseDTO.CommentResponse> findByPost = getAllComment(transactionComments, getTransactionPost);
         return new DataResponse<>(findByPost).success(findByPost, "게시글 별 댓글 조회성공");
     }
-    private List<CommentResponseDTO.CommentResponse> getAllComment(List<Comment> comments, Post post){
+    private List<CommentResponseDTO.CommentResponse> getAllComment(List<TransactionComment> transactionComments, TransactionPost transactionPost){
         List<CommentResponseDTO.CommentResponse> commentResponseArrayList = new ArrayList<>();
-        for(Comment comment:comments){
-            boolean writer = (post.getUser().getUserId() == comment.getUser().getUserId()) ? true : false;
-            CommentResponseDTO.CommentResponse singleCommentResponse = commentResponseDTO.newCommentResponse(comment, writer);
+        for(TransactionComment transactionComment : transactionComments){
+            boolean writer = (transactionPost.getUser().getUserId() == transactionComment.getUser().getUserId()) ? true : false;
+            CommentResponseDTO.CommentResponse singleCommentResponse = commentResponseDTO.newCommentResponse(transactionComment, writer);
             commentResponseArrayList.add(singleCommentResponse);
         }
         return commentResponseArrayList;

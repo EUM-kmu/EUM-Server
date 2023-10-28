@@ -1,6 +1,6 @@
 package eum.backed.server.domain.admin.inquiryanswer;
 
-import eum.backed.server.domain.admin.communityadmin.CommunityAdmin;
+import eum.backed.server.domain.admin.admin.Admin;
 import eum.backed.server.domain.admin.inquiry.Inquiry;
 import eum.backed.server.common.BaseTimeEntity;
 import lombok.*;
@@ -27,5 +27,5 @@ public class InquiryAnswer extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "community_admin_id")
-    private CommunityAdmin communityAdmin;
+    private Admin admin;
 }

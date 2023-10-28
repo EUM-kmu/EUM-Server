@@ -1,13 +1,16 @@
-package eum.backed.server.domain.community.post;
+package eum.backed.server.domain.community.transactionpost;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.community.category.Category;
-import eum.backed.server.domain.community.region.GU.Gu;
+import eum.backed.server.domain.community.category.TransactionCategory;
+import eum.backed.server.domain.community.comment.TransactionComment;
+import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,26 +18,30 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Post extends BaseTimeEntity {
+public class TransactionPost extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    private Long transactionPostId;
 
     @Column
     private String title;
     private String contents;
-    private Date startDate;
-    private Date endDate;
     private int pay;
     private String location;
     private int volunteerTime;
     private Boolean needHelper;
     private int maxNumOfPeople;
+    private int currentAcceptedPeople;
+    private Date startDate;
 
     @Column
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Slot slot;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -42,11 +49,14 @@ public class Post extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name="category_id")
-    private Category category;
+    private TransactionCategory transactionCategory;
 
     @ManyToOne
-    @JoinColumn(name="gu_id")
-    private Gu gu;
+    @JoinColumn(name = "dong_id")
+    private Dong dong;
+
+    @OneToMany(mappedBy = "transactionPost")
+    private List<TransactionComment> transactionComments = new ArrayList<>();
 
     public void updateTitle(String title) {
         this.title = title;

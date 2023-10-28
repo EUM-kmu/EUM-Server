@@ -27,9 +27,9 @@ public class GoogleController {
     @ApiResponse(code = 200,message = "ok",response = UsersResponseDTO.TokenInfo.class)
     @ApiOperation(value = "구글 로그인", notes = "구글 로그인")
     @PostMapping("/auth/google")
-    public DataResponse<UsersResponseDTO.TokenInfo> signIn(@RequestBody UsersRequestDTO.AuthSignup authSignup) throws FirebaseAuthException {
+    public DataResponse<UsersResponseDTO.TokenInfo> signIn(@RequestBody UsersRequestDTO.AuthSignin authSignin) throws FirebaseAuthException {
         try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authSignup.getIdtoken());
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authSignin.getIdtoken());
             return usersService.getToken( decodedToken.getEmail());
         } catch (FirebaseAuthException e) {
             throw new RuntimeException(e);

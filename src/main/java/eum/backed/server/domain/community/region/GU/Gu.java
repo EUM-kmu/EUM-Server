@@ -1,8 +1,7 @@
 package eum.backed.server.domain.community.region.GU;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.post.Post;
+import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.region.SI.Si;
 import lombok.*;
 
@@ -29,9 +28,8 @@ public class Gu extends BaseTimeEntity {
     private Si si;
 
     @OneToMany(mappedBy = "gu", orphanRemoval = true)
-    private List<Post>posts = new ArrayList<>();
+    private List<Dong> dongList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "gu", orphanRemoval = true)
-    private List<Users> usersList = new ArrayList<>();
+
 
 }

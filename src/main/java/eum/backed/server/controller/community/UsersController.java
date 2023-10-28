@@ -32,12 +32,6 @@ public class UsersController {
     public DataResponse signup(@RequestBody @Validated UsersRequestDTO.SignUp signUp) {
         return usersService.signUp(signUp);
     }
-    @ApiOperation(value = "프로필 생성", notes = "프로필 만드는 단계")
-    @PostMapping("/makeprofile" )
-    public DataResponse createProfile(@AuthenticationPrincipal String email,@RequestBody UsersRequestDTO.AuthSignup authSignup) {
-        return usersService.register(authSignup, email);
-
-    }
     @ApiOperation(value = "자체로그인", notes = "자체 앱 로그인")
     @PostMapping("/auth/signin")
     public DataResponse<UsersResponseDTO.TokenInfo> signIn(@RequestBody @Validated UsersRequestDTO.SignIn signIn){

@@ -1,8 +1,9 @@
-package eum.backed.server.domain.admin.communityadmin;
+package eum.backed.server.domain.admin.admin;
 
 import eum.backed.server.domain.admin.inquiryanswer.InquiryAnswer;
 import eum.backed.server.domain.admin.notification.Notification;
 import eum.backed.server.common.BaseTimeEntity;
+import eum.backed.server.domain.bank.branchbankaccountlog.BranchBankAccountLog;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,10 +21,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class CommunityAdmin extends BaseTimeEntity implements UserDetails {
+public class Admin extends BaseTimeEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long communityAminId;
+    private Long adminId;
 
     @Column
     private String name;
@@ -36,10 +37,13 @@ public class CommunityAdmin extends BaseTimeEntity implements UserDetails {
     @Builder.Default
     private List<String> authorities = new ArrayList<>();
 
-    @OneToMany(mappedBy = "communityAdmin", orphanRemoval = true)
+    @OneToMany(mappedBy = "admin", orphanRemoval = true)
+    private List<BranchBankAccountLog> branchBankAccountLogs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "admin", orphanRemoval = true)
     private List<InquiryAnswer> inquiryAnswers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "communityAdmin", orphanRemoval = true)
+    @OneToMany(mappedBy = "admin", orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
     @Override

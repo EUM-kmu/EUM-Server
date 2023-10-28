@@ -1,4 +1,4 @@
-package eum.backed.server.domain.community.scrap;
+package eum.backed.server.domain.community.comment;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
@@ -13,10 +13,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Scrap extends BaseTimeEntity {
+public class TransactionComment extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long scrapId;
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    private Long transactionCommentId;
+
+    @Column
+    private String content;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -25,4 +28,8 @@ public class Scrap extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name="transaction_post_id")
     private TransactionPost transactionPost;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
