@@ -63,20 +63,4 @@ public class UsersRequestDTO {
         private String refreshToken;
 
     }
-    @Getter
-    @Setter
-    public static class AuthSignup {
-        private String idtoken;
-        private String introduction;
-        private String name;
-        private String nickname;
-        private Date birth;
-        private String address;
-        private String phone;
-        private String sex;
-        private boolean isBanned = false;
-        private int totalVolunteerTime = 0;
-
-
-    }
 }

@@ -21,7 +21,7 @@ public class MyLevel extends BaseTimeEntity {
 
     @Column
     private int standard;
-    private int level;
+    private String level;
 
     @OneToMany(mappedBy = "myLevel", orphanRemoval = true)
     private List<Profile> profiles  = new ArrayList<>();

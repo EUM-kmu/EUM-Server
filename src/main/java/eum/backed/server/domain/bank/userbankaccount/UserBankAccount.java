@@ -32,5 +32,18 @@ public class UserBankAccount extends BaseTimeEntity {
     @JoinColumn(name="user_id")
     private Users user;
 
+    public void updateBalance(int balance) {
+        this.balance = balance;
+    }
+
+    public static UserBankAccount toEntity(String nickname, String password, Users user){
+        return UserBankAccount.builder()
+                .accountName(nickname)
+                .password(password)
+                .owner(Owner.USER)
+                .balance(0)
+                .user(user)
+                .build();
+    }
 
 }

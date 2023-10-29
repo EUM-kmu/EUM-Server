@@ -47,9 +47,6 @@ public class Users extends BaseTimeEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private Avatar avatar;
 
 
     @Column

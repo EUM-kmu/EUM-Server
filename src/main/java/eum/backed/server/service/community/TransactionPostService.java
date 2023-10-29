@@ -49,7 +49,7 @@ public class TransactionPostService {
                 .transactionCategory(getTransactionCategory)
                 .build();
         transactionPostRepository.save(transactionPost);
-        return new DataResponse<>(Response.class).success("게시글 작성 성공");
+        return new DataResponse<>().success("게시글 작성 성공");
     }
 
 

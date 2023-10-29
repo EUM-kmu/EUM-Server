@@ -1,6 +1,7 @@
 package eum.backed.server.domain.community.profile;
 
 import eum.backed.server.common.BaseTimeEntity;
+import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.domain.community.mylevel.MyLevel;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.user.Users;
@@ -28,7 +29,7 @@ public class Profile extends BaseTimeEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private TypeOfCharacter typeOfCharacter;
+    private Avatar avatar;
 
     @ManyToOne
     @JoinColumn(name = "dong_id")
@@ -41,5 +42,16 @@ public class Profile extends BaseTimeEntity {
     @OneToOne
     @JoinColumn(name="ueer_id")
     private Users user;
+
+    public static Profile toEntiry(ProfileRequestDTO.CreateProfile createProfile,Dong dong ,MyLevel myLevel,Users user){
+        return Profile.builder()
+                .nickname(createProfile.getNickname())
+                .introduction(createProfile.getIntroduction())
+                .totalSunrisePay(0)
+                .myLevel(myLevel)
+                .user(user)
+                .avatar(createProfile.getAvatar())
+                .build();
+    }
 
 }

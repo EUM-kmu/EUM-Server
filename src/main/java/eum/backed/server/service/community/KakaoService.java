@@ -87,7 +87,6 @@ public class KakaoService {
             }
             br.close();
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
