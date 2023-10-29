@@ -46,6 +46,7 @@ public class Profile extends BaseTimeEntity {
     public static Profile toEntiry(ProfileRequestDTO.CreateProfile createProfile,Dong dong ,MyLevel myLevel,Users user){
         return Profile.builder()
                 .nickname(createProfile.getNickname())
+                .dong(dong)
                 .introduction(createProfile.getIntroduction())
                 .totalSunrisePay(0)
                 .myLevel(myLevel)

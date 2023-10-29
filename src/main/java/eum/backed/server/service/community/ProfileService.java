@@ -8,11 +8,11 @@ import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.region.DONG.DongRepository;
+import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.service.bank.BankAccountService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,8 +28,12 @@ public class ProfileService {
         Dong getDong = dongRepository.findByDong(createProfile.getDong()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
         MyLevel getMyLevel = myLevelRepository.findById(1L).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());
+
         Profile profile = Profile.toEntiry(createProfile,getDong,getMyLevel,getUser);
         profileRepository.save(profile);
+
+        getUser.updateRole(Role.ROLE_USER);
+        userRepository.save(getUser);
         bankAccountService.createUserBankAccount(createProfile.getNickname(), createProfile.getAccountPassword(),getUser);
         return new DataResponse<>().success("데이터 저장 성공");
 
@@ -37,4 +41,5 @@ public class ProfileService {
     private void validateNickname(String nickname){
         if(profileRepository.existsByNickname(nickname)) throw new IllegalArgumentException("이미 있는 닉네임");
     }
+
 }

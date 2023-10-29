@@ -129,4 +129,8 @@ public class Users extends BaseTimeEntity implements UserDetails {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
+
+    public void updateRole(Role role) {
+        this.role = role;
+    }
 }

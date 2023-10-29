@@ -23,7 +23,6 @@ public class UserBankAccount extends BaseTimeEntity {
     private String accountName;
     private String password;
     private int balance;
-
     @Column
     @Enumerated(EnumType.STRING)
     private Owner owner;
@@ -32,10 +31,12 @@ public class UserBankAccount extends BaseTimeEntity {
     @JoinColumn(name="user_id")
     private Users user;
 
-    public void updateBalance(int balance) {
-        this.balance = balance;
+    public void withDraw(int balance) {
+        this.balance -= balance;
     }
-
+    public void deposit(int balance){
+        this.balance += balance;
+    }
     public static UserBankAccount toEntity(String nickname, String password, Users user){
         return UserBankAccount.builder()
                 .accountName(nickname)

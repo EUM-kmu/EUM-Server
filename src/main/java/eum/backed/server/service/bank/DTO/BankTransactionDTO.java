@@ -12,16 +12,17 @@ public class BankTransactionDTO {
     @Getter
     @Setter
     @Builder
-    public static class TransactionWithBranchBank {
+    public static class Transaction {
         private Code code;
         private Status status;
         private int amount;
         private UserBankAccount receiverBankAccount;
+        private UserBankAccount senderBankAccount;
         private BranchBankAccount branchBankAccount;
     }
 
-    public static TransactionWithBranchBank toDTO(Code code, Status status,int amount, UserBankAccount userBankAccount, BranchBankAccount branchBankAccount){
-        return TransactionWithBranchBank.builder()
+    public static Transaction toInitialDTO(Code code, Status status, int amount, UserBankAccount userBankAccount, BranchBankAccount branchBankAccount){
+        return Transaction.builder()
                 .status(status)
                 .code(code)
                 .amount(amount)
@@ -30,4 +31,13 @@ public class BankTransactionDTO {
                 .build();
     }
 
+    public static Transaction toUserTransactionDTO (Code code, Status status, int amount, UserBankAccount senderBankAccount, UserBankAccount receiverBankAccount){
+        return Transaction.builder()
+                .status(status)
+                .code(code)
+                .amount(amount)
+                .receiverBankAccount(receiverBankAccount)
+                .senderBankAccount(senderBankAccount)
+                .build();
+    }
 }
