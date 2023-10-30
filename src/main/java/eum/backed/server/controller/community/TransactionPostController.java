@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,6 @@ public class TransactionPostController {
     @ApiOperation(value = "게시글 작성", notes = "도움요청, 받기 게시글 작성")
     @PostMapping("/create")
     public DataResponse create(@RequestBody PostRequestDTO.Create create, @AuthenticationPrincipal String email ) throws Exception {
-        System.out.println(create.isNeedHelper());
         return transactionPostService.create(create, email);
     }
     @ApiOperation(value = "게시글 삭제", notes = "게시글 아이디로 삭제")
@@ -41,7 +41,7 @@ public class TransactionPostController {
 
     @ApiOperation(value = "게시글 수정", notes = "게시글 아이디 받고 수정")
     @PutMapping
-    public DataResponse update(@RequestBody PostRequestDTO.Update update, @AuthenticationPrincipal String email){
+    public DataResponse update(@RequestBody PostRequestDTO.Update update, @AuthenticationPrincipal String email) throws ParseException {
         return transactionPostService.update(update,email);
     }
     @ApiOperation(value = "게시글 상태 수정", notes = "게시글 아이디받고 상태 수정")

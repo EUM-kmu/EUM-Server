@@ -69,4 +69,8 @@ public class TransactionPost extends BaseTimeEntity {
     public void updateStatus(Status status) {
         this.status = status;
     }
+    public void updateStartDate(Date startDate) {this.startDate = startDate;}
+    public void updateSlot(Slot slot) {this.slot = slot;}
+    public  void updateLocation(String location) {this.location = location;}
+    public  void updateDong(Dong dong){this.dong = dong;}
 }

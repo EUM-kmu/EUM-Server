@@ -6,6 +6,8 @@ import eum.backed.server.controller.community.dto.request.PostRequestDTO;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
 import eum.backed.server.domain.community.category.TransactionCategory;
 import eum.backed.server.domain.community.category.TransactionCategoryRepository;
+import eum.backed.server.domain.community.region.DONG.Dong;
+import eum.backed.server.domain.community.region.DONG.DongRepository;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
 import eum.backed.server.domain.community.transactionpost.TransactionPostRepository;
 import eum.backed.server.domain.community.transactionpost.Status;
@@ -16,6 +18,7 @@ import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,16 +33,20 @@ public class TransactionPostService {
     private final ScrapRepository scrapRepository;
     private final PostResponseDTO postResponseDTO;
     private final UsersRepository usersRepository;
+    private final DongRepository dongRepository;
 
     public DataResponse<Response> create(PostRequestDTO.Create create,String email) throws Exception {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        Dong dong = dongRepository.findByDong(create.getDong()).orElseThrow(() -> new NullPointerException("Invalid address"));
         TransactionCategory getTransactionCategory = transactionCategoryRepository.findById(create.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd a hh:mm", Locale.KOREAN);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
         TransactionPost transactionPost = TransactionPost.builder()
                 .title(create.getTitle())
                 .contents(create.getContent())
                 .startDate(simpleDateFormat.parse(create.getStartTime()))
+                .slot(create.getSlot())
                 .pay(create.getPay())
+                .dong(dong)
                 .location(create.getLocation())
                 .volunteerTime(create.getVolunteerTime())
                 .needHelper(create.isNeedHelper())
@@ -61,12 +68,18 @@ public class TransactionPostService {
         return new DataResponse<>(Response.class).success("게시글 삭제 성공");
     }
 
-    public DataResponse update(PostRequestDTO.Update update,String email) {
+    public DataResponse update(PostRequestDTO.Update update,String email) throws ParseException {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        Dong dong = dongRepository.findByDong(update.getDong()).orElseThrow(() -> new NullPointerException("Invalid address"));
         TransactionPost getTransactionPost = transactionPostRepository.findById(update.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getTransactionPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
         getTransactionPost.updateTitle(update.getTitle());
         getTransactionPost.updateContents(update.getContent());
+        getTransactionPost.updateSlot(update.getSlot());
+        getTransactionPost.updateStartDate(simpleDateFormat.parse(update.getStartDate()));
+        getTransactionPost.updateLocation(update.getLocation());
+        getTransactionPost.updateDong(dong);
         transactionPostRepository.save(getTransactionPost);
         return new DataResponse<>(Response.class).success("게시글 수정 성공");
 
