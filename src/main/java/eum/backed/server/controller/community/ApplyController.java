@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,8 +25,8 @@ public class ApplyController {
         return applyService.getApplyList(email);
     }
     @GetMapping("/accept")
-    public DataResponse accept(@RequestParam Long applyId){
-        return applyService.accept(applyId);
+    public DataResponse accept(@RequestParam Long applyId,@AuthenticationPrincipal String email){
+        return applyService.accept(applyId,email);
     }
 
 }

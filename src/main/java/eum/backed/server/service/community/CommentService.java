@@ -9,6 +9,7 @@ import eum.backed.server.domain.community.comment.TransactionCommentRepository;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
 import eum.backed.server.domain.community.transactionpost.TransactionPostRepository;
 import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,28 +23,32 @@ public class CommentService {
     private final TransactionCommentRepository transactionCommentRepository;
     private final TransactionPostRepository transactionPostRepository;
     private final CommentResponseDTO commentResponseDTO;
+    private final UsersRepository userRepository;
 
-    public DataResponse create(CommentRequestDTO.Create create, Users user) {
+    public DataResponse create(CommentRequestDTO.Create create, String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         TransactionPost getTransactionPost = transactionPostRepository.findById(create.getTransactionPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
         TransactionComment transactionComment = TransactionComment.builder()
                 .content(create.getContent())
                 .transactionPost(getTransactionPost)
-                .user(user).build();
+                .user(getUser).build();
         transactionCommentRepository.save(transactionComment);
         return new DataResponse<>(Response.class).success("댓글 작성 성공");
     }
 
-    public DataResponse update(CommentRequestDTO.Update update, Users user) {
+    public DataResponse update(CommentRequestDTO.Update update, String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         TransactionComment getTransactionComment = transactionCommentRepository.findById(update.getCommentId()).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
-        if(user.getUserId() != getTransactionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+        if(getUser.getUserId() != getTransactionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         getTransactionComment.updateContent(update.getContent());
         transactionCommentRepository.save(getTransactionComment);
         return new DataResponse<>(Response.class).success("댓글 수정 성공");
     }
 
-    public DataResponse delete(Long categoryId, Users user) {
+    public DataResponse delete(Long categoryId, String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         TransactionComment getTransactionComment = transactionCommentRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
-        if(user.getUserId() != getTransactionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자)");
+        if(getUser.getUserId() != getTransactionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자)");
         transactionCommentRepository.delete(getTransactionComment);
         return new DataResponse<>(Response.class).success("댓글 삭제 성공");
     }

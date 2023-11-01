@@ -18,16 +18,16 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
     @PostMapping
-    DataResponse create(@RequestBody @Validated CommentRequestDTO.Create create, @AuthenticationPrincipal Users user){
-        return commentService.create(create, user);
+    DataResponse create(@RequestBody @Validated CommentRequestDTO.Create create, @AuthenticationPrincipal String email){
+        return commentService.create(create, email);
     }
     @PutMapping
-    DataResponse update(@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal Users user){
-        return commentService.update(update, user);
+    DataResponse update(@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal String email){
+        return commentService.update(update, email);
     }
     @DeleteMapping
-    DataResponse delete(@RequestParam Long commentId, @AuthenticationPrincipal Users user){
-        return commentService.delete(commentId, user);
+    DataResponse delete(@RequestParam Long commentId, @AuthenticationPrincipal String email){
+        return commentService.delete(commentId, email);
     }
 
     @GetMapping("/findByPostId")

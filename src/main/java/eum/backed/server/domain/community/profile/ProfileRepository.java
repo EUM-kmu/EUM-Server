@@ -13,4 +13,6 @@ public interface ProfileRepository extends JpaRepository<Profile,Long> {
 
     Optional<Profile> findByUser(Users users);
 
+    Boolean existsByUser(Users user);
+
 }

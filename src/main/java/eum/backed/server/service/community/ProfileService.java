@@ -1,5 +1,6 @@
 package eum.backed.server.service.community;
 
+import com.google.api.gax.rpc.InvalidArgumentException;
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.domain.community.mylevel.MyLevel;
@@ -25,6 +26,7 @@ public class ProfileService {
     private final BankAccountService bankAccountService;
     public DataResponse create(ProfileRequestDTO.CreateProfile createProfile, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
         Dong getDong = dongRepository.findByDong(createProfile.getDong()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
         MyLevel getMyLevel = myLevelRepository.findById(1L).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());

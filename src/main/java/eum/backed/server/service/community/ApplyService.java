@@ -31,6 +31,7 @@ public class ApplyService {
     public DataResponse doApply(ApplyRequestDTO.Apply applyRequest, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
         TransactionPost getTransactionPost = transactionPostRepository.findById(applyRequest.getPostId()).orElseThrow(() -> new NullPointerException("Invalid postId"));
+        if (applyRepository.existsByUserAndTransactionPost(getUser,getTransactionPost)) throw new IllegalArgumentException("이미 신청했음");
         Apply apply = Apply.toEntity(applyRequest.getIntroduction(), getUser, getTransactionPost);
         applyRepository.save(apply);
         return new DataResponse<>().success("지원 신청 완료");
@@ -59,8 +60,10 @@ public class ApplyService {
         return applyListResponses;
     }
 
-    public DataResponse accept(Long applyId) {
+    public DataResponse accept(Long applyId,String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
         Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid id"));
+        if (getApply.getTransactionPost().getUser() != getUser) throw new IllegalArgumentException("해당 게시글에 대한 권한이 없다");
         getApply.updateAccepted(true);
         applyRepository.save(getApply);
         return new DataResponse<>().success("선정성공");
