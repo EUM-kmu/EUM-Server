@@ -1,6 +1,5 @@
 package eum.backed.server.domain.community.profile;
 
-import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.user.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 

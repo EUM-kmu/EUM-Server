@@ -29,7 +29,6 @@ public class CommentController {
     DataResponse delete(@RequestParam Long commentId, @AuthenticationPrincipal String email){
         return commentService.delete(commentId, email);
     }
-
     @GetMapping("/findByPostId")
     DataResponse<List<CommentResponseDTO.CommentResponse>> findByPostId(@RequestParam Long postId){
         return commentService.findByPostId(postId);

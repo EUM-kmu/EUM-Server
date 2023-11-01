@@ -1,6 +1,7 @@
 package eum.backed.server.domain.community.region.DONG;
 
 import eum.backed.server.common.BaseTimeEntity;
+import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.region.GU.Gu;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
 import lombok.*;
@@ -30,5 +31,8 @@ public class Dong extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "dong")
     private List<TransactionPost> transactionPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dong")
+    private List<OpinionPost> opinionPosts = new ArrayList<>();
 
 }
