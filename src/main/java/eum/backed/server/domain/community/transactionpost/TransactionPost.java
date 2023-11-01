@@ -1,6 +1,7 @@
 package eum.backed.server.domain.community.transactionpost;
 
 import eum.backed.server.common.BaseTimeEntity;
+import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.category.TransactionCategory;
 import eum.backed.server.domain.community.comment.TransactionComment;
 import eum.backed.server.domain.community.region.DONG.Dong;
@@ -50,6 +51,9 @@ public class TransactionPost extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name="category_id")
     private TransactionCategory transactionCategory;
+
+    @OneToMany(mappedBy = "transactionPost", orphanRemoval = true)
+    private List<Apply> applies = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "dong_id")

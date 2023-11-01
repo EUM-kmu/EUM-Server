@@ -1,7 +1,10 @@
 package eum.backed.server.domain.community.transactionpost;
 
 import eum.backed.server.domain.community.category.TransactionCategory;
+import eum.backed.server.domain.community.user.Users;
+import org.aspectj.apache.bcel.classfile.Module;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.core.userdetails.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,4 +15,6 @@ public interface TransactionPostRepository extends JpaRepository<TransactionPost
     Optional<List<TransactionPost>> findByStatusOrderByCreateDateDesc(Status status);
 
     Optional<List<TransactionPost>> findByNeedHelperOrderByCreateDateDesc(Boolean needHelper);
+
+    Optional<List<TransactionPost>> findByUserOrderByCreateDateDesc(Users user);
 }
