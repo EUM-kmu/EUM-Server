@@ -4,6 +4,7 @@ import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.region.GU.Gu;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.votepost.VotePost;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,5 +35,8 @@ public class Dong extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "dong")
     private List<OpinionPost> opinionPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dong")
+    private List<VotePost> votePosts = new ArrayList<>();
 
 }
