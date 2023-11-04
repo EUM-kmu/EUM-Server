@@ -27,7 +27,7 @@ public class CommentService {
 
     public DataResponse create(CommentRequestDTO.Create create, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-        TransactionPost getTransactionPost = transactionPostRepository.findById(create.getTransactionPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
+        TransactionPost getTransactionPost = transactionPostRepository.findById(create.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
         TransactionComment transactionComment = TransactionComment.builder()
                 .content(create.getContent())
                 .transactionPost(getTransactionPost)

@@ -9,7 +9,7 @@ public class CommentRequestDTO {
     @Setter
     @Getter
     public static class Create{
-        private Long transactionPostId;
+        private Long postId;
         @NotEmpty
         private String content;
     }

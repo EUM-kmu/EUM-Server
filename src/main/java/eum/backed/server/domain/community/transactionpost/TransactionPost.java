@@ -69,6 +69,9 @@ public class TransactionPost extends BaseTimeEntity {
     public void updateContents(String contents) {
         this.contents = contents;
     }
+    public void addCurrentAcceptedPeople(){
+        this.currentAcceptedPeople += 1;
+    }
 
     public void updateStatus(Status status) {
         this.status = status;

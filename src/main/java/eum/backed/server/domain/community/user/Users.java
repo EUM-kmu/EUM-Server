@@ -7,6 +7,8 @@ import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.comment.OpinionComment;
 import eum.backed.server.domain.community.comment.TransactionComment;
 import eum.backed.server.domain.community.comment.VoteComment;
+import eum.backed.server.domain.community.likeVotePost.LikeVotePost;
+import eum.backed.server.domain.community.likeopinionpost.LikeOpinionPost;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.promotionpost.PromotionPost;
@@ -96,6 +98,13 @@ public class Users extends BaseTimeEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<PromotionPost> promotionPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<LikeOpinionPost> likeOpinionPosts  = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<LikeVotePost> likeVotePosts = new ArrayList<>();
+
 
 
     @Override

@@ -3,6 +3,7 @@ package eum.backed.server.domain.community.opinionpost;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.comment.OpinionComment;
+import eum.backed.server.domain.community.likeopinionpost.LikeOpinionPost;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
@@ -25,6 +26,7 @@ public class OpinionPost extends BaseTimeEntity {
     @Column
     private String title;
     private String content;
+    private int likeCount;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -36,6 +38,9 @@ public class OpinionPost extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "opinionPost", orphanRemoval = true)
     private List<OpinionComment> opinionComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "opinionPost", orphanRemoval = true)
+    private List<LikeOpinionPost> likeOpinionPosts = new ArrayList<>();
 
     public void updateTitle(String title) {
         this.title = title;

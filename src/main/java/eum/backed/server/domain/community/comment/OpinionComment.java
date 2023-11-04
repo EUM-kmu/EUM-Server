@@ -28,4 +28,11 @@ public class OpinionComment extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name="opinion_post_id")
     private OpinionPost opinionPost;
+
+    public static OpinionComment toEntity(String comment, Users user, OpinionPost opinionPost){
+        return OpinionComment.builder()
+                .comment(comment)
+                .user(user)
+                .opinionPost(opinionPost).build();
+    }
 }

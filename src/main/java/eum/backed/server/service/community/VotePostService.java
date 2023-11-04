@@ -22,10 +22,30 @@ public class VotePostService {
 
     public DataResponse create(VotePostRequestDTO.Create create, String email) throws ParseException {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        if(getUser.getRole() != Role.ROLE_AUTH_USER) throw new IllegalArgumentException("인증 받지 않은 유저");
+        if(getUser.getRole() != Role.ROLE_USER) throw new IllegalArgumentException("프로필이 없는 유저");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
         VotePost votePost = VotePost.toEntity(create.getTitle(), create.getContent(), simpleDateFormat.parse(create.getEndDate()), getUser);
         votePostRespository.save(votePost);
         return new DataResponse().success("게시글 작성 성공");
+    }
+
+    public DataResponse update(VotePostRequestDTO.Update update,String email) throws ParseException {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        VotePost getVotePost = votePostRespository.findById(update.getVotePostId()).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+        if(getVotePost.getUser() != getUser) throw new IllegalArgumentException("수정권한이 없는 유저");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
+        getVotePost.updateContent(update.getContent());
+        getVotePost.updateTitle(update.getTitle());
+        getVotePost.updateEndTime(simpleDateFormat.parse(update.getEndDate()));
+        votePostRespository.save(getVotePost);
+        return new DataResponse().success("게시글 수정 성공");
+    }
+
+    public DataResponse delete(Long votePostId, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        VotePost getVotePost = votePostRespository.findById(votePostId).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+        if(getVotePost.getUser() != getUser) throw new IllegalArgumentException("삭제권한이 없는 유저");
+        votePostRespository.delete(getVotePost);
+        return new DataResponse().success("게시글 삭제 성공");
     }
 }

@@ -50,19 +50,21 @@ public class OpinionPostService {
         return new DataResponse().success("삭제 성공");
     }
 
-    public DataResponse<List<OpinionResponseDTO.OpinionPostsResponse>> getAllOpinionPosts(String email) {
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getAllOpinionPosts(String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         List<OpinionPost> opinionPosts = opinionPostRepository.findByDongOrderByCreateDateDesc(getUser.getProfile().getDong()).orElse(Collections.emptyList());
-        List<OpinionResponseDTO.OpinionPostsResponse> opinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
-        return new DataResponse<>(opinionPostsResponses).success(opinionPostsResponses, "마을 별 게시글 조회");
+        List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsRespons = getAllOpinionResponseDTO(opinionPosts);
+        return new DataResponse<>(allOpinionPostsRespons).success(allOpinionPostsRespons, "마을 별 게시글 조회");
 
     }
-    private List<OpinionResponseDTO.OpinionPostsResponse> getAllOpinionResponseDTO(List<OpinionPost> opinionPosts) {
-        List<OpinionResponseDTO.OpinionPostsResponse> opinionPostsResponses = new ArrayList<>();
+    private List<OpinionResponseDTO.AllOpinionPostsResponses> getAllOpinionResponseDTO(List<OpinionPost> opinionPosts) {
+        List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = new ArrayList<>();
         for (OpinionPost opinionPost : opinionPosts) {
-            OpinionResponseDTO.OpinionPostsResponse singleOpinionPostResponse = opinionResponseDTO.newOpinionPostsResponse(opinionPost);
-            opinionPostsResponses.add(singleOpinionPostResponse);
+            OpinionResponseDTO.AllOpinionPostsResponses singleOpinionPostResponse = opinionResponseDTO.newOpinionPostsResponse(opinionPost);
+            allOpinionPostsResponses.add(singleOpinionPostResponse);
         }
-        return opinionPostsResponses;
+        return allOpinionPostsResponses;
     }
+
+
 }

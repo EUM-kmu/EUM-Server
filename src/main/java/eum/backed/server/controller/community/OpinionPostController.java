@@ -3,6 +3,7 @@ package eum.backed.server.controller.community;
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.controller.community.dto.request.OpinionPostRequestDTO;
 import eum.backed.server.controller.community.dto.response.OpinionResponseDTO;
+import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.service.community.OpinionPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,7 +30,7 @@ public class OpinionPostController {
         return opinionPostService.delete(opinionPostId, email);
     }
     @GetMapping
-    public DataResponse<List<OpinionResponseDTO.OpinionPostsResponse>> getAllOpinionPosts(@AuthenticationPrincipal String email){
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getAllOpinionPosts(@AuthenticationPrincipal String email){
         return opinionPostService.getAllOpinionPosts(email);
     }
 

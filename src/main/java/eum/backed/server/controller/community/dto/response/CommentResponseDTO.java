@@ -22,10 +22,10 @@ public class CommentResponseDTO {
     public static class CommentResponse {
         private Long postId;
         private Long commentId;
-        private String nickname;
-        private String userAddress;
-        private String customCreatedTime;
-        private String content;
+        private String commentNickName;
+        private String commentUserAddress;
+        private String commentCustomCreatedTime;
+        private String commentContent;
         private boolean writer;
     }
 
@@ -34,10 +34,10 @@ public class CommentResponseDTO {
         return CommentResponse.builder()
                 .postId(transactionComment.getTransactionPost().getTransactionPostId())
                 .commentId(transactionComment.getTransactionCommentId())
-                .nickname(transactionComment.getUser().getProfile().getNickname())
-                .userAddress(transactionComment.getUser().getProfile().getDong().getDong())
-                .customCreatedTime(time.calculateTime(date))
-                .content(transactionComment.getContent())
+                .commentNickName(transactionComment.getUser().getProfile().getNickname())
+                .commentUserAddress(transactionComment.getUser().getProfile().getDong().getDong())
+                .commentCustomCreatedTime(time.calculateTime(date))
+                .commentContent(transactionComment.getContent())
                 .writer(writer).build();
     }
 }

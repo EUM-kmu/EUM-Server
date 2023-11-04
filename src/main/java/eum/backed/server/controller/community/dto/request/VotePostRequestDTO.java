@@ -13,4 +13,12 @@ public class VotePostRequestDTO {
         private String content;
         private String endDate;
     }
+    @Getter
+    @Setter
+    public static class Update {
+        private Long votePostId;
+        private String title;
+        private String content;
+        private String endDate;
+    }
 }

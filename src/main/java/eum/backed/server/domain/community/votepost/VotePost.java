@@ -2,6 +2,7 @@ package eum.backed.server.domain.community.votepost;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.comment.VoteComment;
+import eum.backed.server.domain.community.likeVotePost.LikeVotePost;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.voteresult.VoteResult;
@@ -29,6 +30,7 @@ public class VotePost extends BaseTimeEntity {
     private int agreeCount;
     private int disagreeCount;
     private int total;
+    private int likeCount;
     private Date endTime;
 
     @ManyToOne
@@ -44,6 +46,21 @@ public class VotePost extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "votePost", orphanRemoval = true)
     private List<VoteComment> voteComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "votePost", orphanRemoval = true)
+    private List<LikeVotePost> likeVotePosts = new ArrayList<>();
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
 
     public static VotePost toEntity(String title, String content, Date endTime, Users user){
         return VotePost.builder()

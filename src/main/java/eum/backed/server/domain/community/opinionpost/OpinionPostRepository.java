@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface OpinionPostRepository extends JpaRepository<OpinionPost,Long> {
     Optional<List<OpinionPost>> findByDongOrderByCreateDateDesc(Dong dong);
+    Optional <List<OpinionPost>> findByLikeCountGreaterThanOrderByLikeCountDesc(int likeCount);
 }
