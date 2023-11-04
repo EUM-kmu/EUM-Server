@@ -6,6 +6,7 @@ import eum.backed.server.domain.community.category.TransactionCategory;
 import eum.backed.server.domain.community.comment.TransactionComment;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.user.Users;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -38,10 +39,12 @@ public class TransactionPost extends BaseTimeEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(value = "Status", allowableValues = "RECRUITING, TRADING, COMPLETED")
     private Status status;
 
     @Column
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(value = "Slot", allowableValues = "AM, PM, ALL")
     private Slot slot;
 
     @ManyToOne

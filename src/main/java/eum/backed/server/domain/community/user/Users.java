@@ -17,6 +17,7 @@ import eum.backed.server.domain.community.sleeperuser.SleeperUser;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
 import eum.backed.server.domain.community.votepost.VotePost;
 import eum.backed.server.domain.community.voteresult.VoteResult;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -47,6 +48,7 @@ public class Users extends BaseTimeEntity implements UserDetails {
 
     @Column
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(value = "role", allowableValues = "ROLE_USER, ROLE_TEMPORARY_USER, ROLE_AUTH_USER, ROLE_ORGANIZATION")
     private Role role;
 
 

@@ -29,6 +29,10 @@ public class OpinionComment extends BaseTimeEntity {
     @JoinColumn(name="opinion_post_id")
     private OpinionPost opinionPost;
 
+    public void updateComment(String comment) {
+        this.comment = comment;
+    }
+
     public static OpinionComment toEntity(String comment, Users user, OpinionPost opinionPost){
         return OpinionComment.builder()
                 .comment(comment)

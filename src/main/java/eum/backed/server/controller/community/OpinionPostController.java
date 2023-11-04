@@ -3,7 +3,6 @@ package eum.backed.server.controller.community;
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.controller.community.dto.request.OpinionPostRequestDTO;
 import eum.backed.server.controller.community.dto.response.OpinionResponseDTO;
-import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.service.community.OpinionPostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

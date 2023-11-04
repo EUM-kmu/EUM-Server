@@ -1,6 +1,7 @@
 package eum.backed.server.controller.community.dto.response;
 
 import eum.backed.server.common.DTO.Time;
+import eum.backed.server.domain.community.transactionpost.Slot;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
 import eum.backed.server.domain.community.transactionpost.Status;
 import io.swagger.annotations.ApiModel;
@@ -22,7 +23,7 @@ public class PostResponseDTO {
     @Builder
     @Getter
     @AllArgsConstructor
-    @ApiModel(value = "전체 데이터 정렬")
+    @ApiModel(value = "거래 게시글 데이터 ")
     public static class PostResponse {
         private Long postId;
         private String title;
@@ -36,12 +37,13 @@ public class PostResponseDTO {
         private int maxNumOfPeople;
         private String category;
         private Status status;
+        private Slot slot;
         private String customCreatedTime;
     }
     public PostResponseDTO.PostResponse newPostResponse(TransactionPost transactionPost){
         Date date = Date.from(transactionPost.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd a hh:mm", Locale.KOREAN);
-        return PostResponseDTO.PostResponse.builder()
+        return PostResponse.builder()
                 .postId(transactionPost.getTransactionPostId())
                 .title(transactionPost.getTitle())
                 .content(transactionPost.getContents())
@@ -54,6 +56,7 @@ public class PostResponseDTO {
                 .maxNumOfPeople(transactionPost.getMaxNumOfPeople())
                 .category(transactionPost.getTransactionCategory().getContents())
                 .status(transactionPost.getStatus())
+                .slot(transactionPost.getSlot())
                 .build();
     }
 }

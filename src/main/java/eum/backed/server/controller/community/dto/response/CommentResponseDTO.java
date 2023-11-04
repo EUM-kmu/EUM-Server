@@ -26,7 +26,8 @@ public class CommentResponseDTO {
         private String commentUserAddress;
         private String commentCustomCreatedTime;
         private String commentContent;
-        private boolean writer;
+        private Boolean isPostWriter;
+        private Boolean isCommentWriter;
     }
 
     public CommentResponse newCommentResponse(TransactionComment transactionComment, boolean writer){
@@ -38,6 +39,6 @@ public class CommentResponseDTO {
                 .commentUserAddress(transactionComment.getUser().getProfile().getDong().getDong())
                 .commentCustomCreatedTime(time.calculateTime(date))
                 .commentContent(transactionComment.getContent())
-                .writer(writer).build();
+                .isPostWriter(writer).build();
     }
 }

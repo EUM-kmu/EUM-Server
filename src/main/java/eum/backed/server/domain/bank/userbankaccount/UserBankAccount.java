@@ -3,6 +3,7 @@ package eum.backed.server.domain.bank.userbankaccount;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.enums.Owner;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,6 +26,7 @@ public class UserBankAccount extends BaseTimeEntity {
     private int balance;
     @Column
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(value = "MyEnum 값", allowableValues = "USER, ADMIN, MASTER")
     private Owner owner;
 
     @OneToOne
