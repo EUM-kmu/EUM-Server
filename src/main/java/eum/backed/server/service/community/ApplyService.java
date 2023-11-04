@@ -38,8 +38,8 @@ public class ApplyService {
         return new DataResponse<>().success("지원 신청 완료");
     }
 
-    public DataResponse<List<ApplyResponseDTO.ApplyListResponse>> getApplyList(Long postId, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
+    public DataResponse<List<ApplyResponseDTO.ApplyListResponse>> getApplyList(Long postId) {
+//        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
         TransactionPost getTransactionPost = transactionPostRepository.findById(postId).orElseThrow(() -> new NullPointerException("Invalid id"));
 //        List<TransactionPost> transactionPosts = transactionPostRepository.findByUserOrderByCreateDateDesc(getUser).orElse(Collections.emptyList()); //로그인 유저가 작성한 게시글 목록 조회
         List<ApplyResponseDTO.ApplyListResponse> getAllApplicants = findByTransactionPosts(getTransactionPost);

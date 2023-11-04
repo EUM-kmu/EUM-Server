@@ -5,6 +5,7 @@ import eum.backed.server.controller.community.dto.request.PostRequestDTO;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
 import eum.backed.server.domain.community.transactionpost.Status;
 import eum.backed.server.service.community.TransactionPostService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/post")
 @RequiredArgsConstructor
 @Slf4j
+@Api(tags = "거래 게시글")
 public class TransactionPostController {
     private final TransactionPostService transactionPostService;
 
