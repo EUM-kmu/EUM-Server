@@ -5,8 +5,6 @@ import eum.backed.server.domain.community.profile.Profile;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Data
@@ -14,16 +12,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class MyLevel extends BaseTimeEntity {
+public class AvatarLevel extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long myLevelId;
+    private Long avatarLevelId;
 
     @Column
     private int standard;
-    private String level;
+    private String levelName;
+    private String avatarLevelPhotoUrl;
 
-    @OneToMany(mappedBy = "myLevel", orphanRemoval = true)
-    private List<Profile> profiles  = new ArrayList<>();
+//    @Column
+//    @Enumerated(EnumType.STRING)
+//    private AvatarName avatarName;
+
+    @OneToOne(mappedBy = "avatarLevel")
+    private Profile profile;
 
 }

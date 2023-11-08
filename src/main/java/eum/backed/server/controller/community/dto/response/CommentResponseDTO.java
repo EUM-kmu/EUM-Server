@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.asm.Advice;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 @Component
@@ -28,6 +30,7 @@ public class CommentResponseDTO {
         private String commentContent;
         private Boolean isPostWriter;
         private Boolean isCommentWriter;
+        private LocalDateTime createdTime;
     }
 
     public CommentResponse newCommentResponse(TransactionComment transactionComment, boolean writer){
@@ -39,6 +42,7 @@ public class CommentResponseDTO {
                 .commentUserAddress(transactionComment.getUser().getProfile().getDong().getDong())
                 .commentCustomCreatedTime(time.calculateTime(date))
                 .commentContent(transactionComment.getContent())
+                .createdTime(transactionComment.getCreateDate())
                 .isPostWriter(writer).build();
     }
 }

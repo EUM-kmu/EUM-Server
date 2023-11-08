@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
@@ -38,6 +39,7 @@ public class PostResponseDTO {
         private String category;
         private Status status;
         private Slot slot;
+        private LocalDateTime createdDate;
         private String customCreatedTime;
     }
     public PostResponseDTO.PostResponse newPostResponse(TransactionPost transactionPost){
@@ -48,6 +50,7 @@ public class PostResponseDTO {
                 .title(transactionPost.getTitle())
                 .content(transactionPost.getContents())
                 .startDate(simpleDateFormat.format(transactionPost.getStartDate()))
+                .createdDate(transactionPost.getCreateDate())
                 .customCreatedTime(time.calculateTime(date))
                 .pay(transactionPost.getPay())
                 .location(transactionPost.getLocation())

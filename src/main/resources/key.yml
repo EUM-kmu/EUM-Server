@@ -1,4 +1,0 @@
-jwt.header : "Authorization"
-jwt.secret: "VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHN"
-kakao.clientid: "de004a895d20b65f0210c2435ed8d7d1"
-kakao.redirect: "http://localhost:8080/user/auth/kakao"

@@ -21,4 +21,11 @@ public class VotePostRequestDTO {
         private String content;
         private String endDate;
     }
+
+    @Getter
+    @Setter
+    public static class Voting {
+        private Long postId;
+        private Boolean agree;
+    }
 }

@@ -2,7 +2,7 @@ package eum.backed.server.domain.community.profile;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
-import eum.backed.server.domain.community.mylevel.MyLevel;
+import eum.backed.server.domain.community.mylevel.AvatarLevel;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
@@ -27,31 +27,27 @@ public class Profile extends BaseTimeEntity {
     private String address;
     private int totalSunrisePay;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private Avatar avatar;
 
     @ManyToOne
     @JoinColumn(name = "dong_id")
     private Dong dong;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="my_leve_id")
-    private MyLevel myLevel;
+    private AvatarLevel avatarLevel;
 
     @OneToOne
     @JoinColumn(name="ueer_id")
     private Users user;
 
-    public static Profile toEntiry(ProfileRequestDTO.CreateProfile createProfile,Dong dong ,MyLevel myLevel,Users user){
+    public static Profile t0Entity(ProfileRequestDTO.CreateProfile createProfile, Dong dong , AvatarLevel avatarLevel, Users user){
         return Profile.builder()
                 .nickname(createProfile.getNickname())
                 .dong(dong)
                 .introduction(createProfile.getIntroduction())
                 .totalSunrisePay(0)
-                .myLevel(myLevel)
+                .avatarLevel(avatarLevel)
                 .user(user)
-                .avatar(createProfile.getAvatar())
                 .build();
     }
 

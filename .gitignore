@@ -88,3 +88,5 @@ target/
 
 *.json
 *.html
+
+src/main/resources/key.yml
