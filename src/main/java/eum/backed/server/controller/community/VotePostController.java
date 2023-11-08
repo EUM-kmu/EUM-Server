@@ -32,11 +32,11 @@ public class VotePostController {
     public DataResponse delete(@RequestParam Long votePostId, @AuthenticationPrincipal String email){
         return votePostService.delete(votePostId, email);
     }
-    @PostMapping("/voting")
-    @ApiOperation(value = "투표하기")
-    public DataResponse voting(@RequestParam VotePostRequestDTO.Voting voting,@AuthenticationPrincipal String email){
-
-    }
+//    @PostMapping("/voting")
+//    @ApiOperation(value = "투표하기")
+//    public DataResponse voting(@RequestParam VotePostRequestDTO.Voting voting,@AuthenticationPrincipal String email){
+//
+//    }
 
 
 }

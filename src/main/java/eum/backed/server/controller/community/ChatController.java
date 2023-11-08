@@ -29,6 +29,6 @@ public class ChatController {
     }
     @GetMapping("/getChatListInOtherPost")
     public DataResponse<List<ChatRoomResponseDTO>> getCheckListInOtherPost(@AuthenticationPrincipal String email){
-        return chatService.getChatListInMyPost(email);
+        return chatService.getChatListInOtherPost(email);
     }
 }

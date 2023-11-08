@@ -1,4 +1,4 @@
-package eum.backed.server.domain.community.mylevel;
+package eum.backed.server.domain.community.avatar;
 
 public enum AvatarName {
     CLOUD_YOUNG,BABYSUN_YOUNG,SUN_YOUNG

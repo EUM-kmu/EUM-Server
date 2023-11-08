@@ -1,4 +1,4 @@
-package eum.backed.server.domain.community.mylevel;
+package eum.backed.server.domain.community.avatar;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.profile.Profile;
@@ -12,21 +12,23 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class AvatarLevel extends BaseTimeEntity {
+public class Avatar extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long avatarLevelId;
+    private Long avatarId;
 
     @Column
-    private int standard;
-    private String levelName;
-    private String avatarLevelPhotoUrl;
-
+    private String name;
+    private String avatarPhotoUrl;
 //    @Column
 //    @Enumerated(EnumType.STRING)
 //    private AvatarName avatarName;
 
-    @OneToOne(mappedBy = "avatarLevel")
+    @OneToOne(mappedBy = "avatar")
     private Profile profile;
+
+    @OneToOne
+    @JoinColumn(name = "standard_id")
+    private Standard standard;
 
 }
