@@ -1,6 +1,7 @@
 package eum.backed.server.service.community;
 
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.controller.community.dto.response.ChatRoomResponseDTO;
 import eum.backed.server.domain.community.apply.Apply;
@@ -36,17 +37,18 @@ public class ChatService {
     public DataResponse createChatRoom(Long applyId){
         Apply apply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid Id"));
         if(apply.getIsAccepted() == false) throw new IllegalArgumentException("선정되지 않은 유저와는 채팅을 만들 수 없습니다");
-        DatabaseReference newChatRoomRef =  databaseReference.push();
-        String chatRoomKey = newChatRoomRef.getKey();
         String transactionPostUserNickName  = apply.getTransactionPost().getUser().getProfile().getNickname();
+//        DatabaseReference newChatRoomRef =  databaseReference.push();
+//        String chatRoomKey = newChatRoomRef.getKey();
+//        newChatRoomRef.push().setValueAsync(chat);
 
         LocalDateTime currentTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String timestamp = currentTime.format(formatter);
-        Message message = Message.toEntity(transactionPostUserNickName, "채팅방이 개설되었어요", timestamp, "");
 
-        Chat chat = Chat.toEntity(transactionPostUserNickName, apply.getUser().getProfile().getNickname(), apply.getTransactionPost().getTransactionPostId(), apply.getApplyId(),message);
-        newChatRoomRef.push().setValueAsync(chat);
+        Chat chat = Chat.toEntity(transactionPostUserNickName, apply.getUser().getProfile().getNickname(), apply.getTransactionPost().getTransactionPostId(), apply.getApplyId());
+        Message message = Message.toEntity(transactionPostUserNickName, "채팅방이 개설되었어요", timestamp, "");
+        String chatRoomKey = chat.saveToFirebase(chat,message);
 
         ChatRoom chatRoom = ChatRoom.toEntity(chatRoomKey, apply.getTransactionPost(), apply);
         chatRoomRepository.save(chatRoom);

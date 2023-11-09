@@ -1,5 +1,7 @@
 package eum.backed.server.domain.community.chat;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import lombok.Builder;
 import lombok.Data;
 
