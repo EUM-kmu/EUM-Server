@@ -14,7 +14,7 @@ public interface TransactionPostRepository extends JpaRepository<TransactionPost
 
     Optional<List<TransactionPost>> findByStatusOrderByCreateDateDesc(Status status);
 
-    Optional<List<TransactionPost>> findByNeedHelperOrderByCreateDateDesc(Boolean needHelper);
+    Optional<List<TransactionPost>> findByProvidingHelpOrderByCreateDateDesc(Boolean needHelper);
 
     Optional<List<TransactionPost>> findByUserOrderByCreateDateDesc(Users user);
 }

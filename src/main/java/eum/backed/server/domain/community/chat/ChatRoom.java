@@ -21,6 +21,7 @@ public class ChatRoom extends BaseTimeEntity {
 
     @Column
     private String chatRoomKeyFB;
+    private Boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "transaciton_post_id")
@@ -45,6 +46,7 @@ public class ChatRoom extends BaseTimeEntity {
                 .chatRoomKeyFB(chatRoomKeyFB)
                 .transactionPost(transactionPost)
                 .apply(apply)
+                .isDeleted(false)
                 .postWriter(transactionPost.getUser())
                 .applicant(apply.getUser())
                 .build();

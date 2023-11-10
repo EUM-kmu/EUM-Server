@@ -3,9 +3,12 @@ package eum.backed.server.service.community;
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.common.DTO.Response;
 import eum.backed.server.controller.community.dto.request.PostRequestDTO;
+import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
 import eum.backed.server.domain.community.category.TransactionCategory;
 import eum.backed.server.domain.community.category.TransactionCategoryRepository;
+import eum.backed.server.domain.community.comment.TransactionComment;
+import eum.backed.server.domain.community.comment.TransactionCommentRepository;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.region.DONG.DongRepository;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
@@ -24,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class TransactionPostService {
     private final PostResponseDTO postResponseDTO;
     private final UsersRepository usersRepository;
     private final DongRepository dongRepository;
+    private final TransactionCommentRepository transactionCommentRepository;
 
     public DataResponse<Response> create(PostRequestDTO.Create create,String email) throws Exception {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
@@ -49,7 +54,7 @@ public class TransactionPostService {
                 .dong(dong)
                 .location(create.getLocation())
                 .volunteerTime(create.getVolunteerTime())
-                .needHelper(create.isNeedHelper())
+                .providingHelp(create.isProvidingHelp())
                 .maxNumOfPeople(create.getMaxNumOfPeople())
                 .status(Status.RECRUITING)
                 .user(user)
@@ -93,10 +98,22 @@ public class TransactionPostService {
         transactionPostRepository.save(getTransactionPost);
         return new DataResponse<>(Response.class).success("게시글 상태 수정 성공");
     }
-    public DataResponse<PostResponseDTO.PostResponse> findById(Long postId) {
+    public DataResponse<PostResponseDTO.TransactionPostWithComment> getTransactionPostWithComment(Long postId) {
         TransactionPost getTransactionPost = transactionPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
-        PostResponseDTO.PostResponse singlePostResponse = postResponseDTO.newPostResponse(getTransactionPost);
-        return new DataResponse<>(singlePostResponse).success(singlePostResponse, "postId로 찾기");
+        List<TransactionComment> transactionComments = transactionCommentRepository.findByTransactionPostOrderByCreateDateDesc(getTransactionPost).orElse(Collections.emptyList());
+        List<CommentResponseDTO.CommentResponse> commentResponses = transactionComments.stream().map(transactionComment -> {
+            CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
+                    .postId(postId)
+                    .commentId(transactionComment.getTransactionCommentId())
+                    .commentNickName(transactionComment.getUser().getProfile().getNickname())
+                    .commentUserAddress(transactionComment.getUser().getProfile().getDong().getDong())
+                    .isPostWriter(getTransactionPost.getUser() == transactionComment.getUser())
+                    .createdTime(transactionComment.getCreateDate())
+                    .commentContent(transactionComment.getContent()).build();
+            return commentResponse;
+        }).collect(Collectors.toList());
+        PostResponseDTO.TransactionPostWithComment singlePostResponse = postResponseDTO.newTransactionPostWithComment(getTransactionPost,commentResponses);
+        return new DataResponse<>(singlePostResponse).success(singlePostResponse, "id에 따른 게시글 정보조회 + 댓글");
 
     }
 
@@ -114,7 +131,7 @@ public class TransactionPostService {
 
     }
     public DataResponse<List<PostResponseDTO.PostResponse>> findByNeedHelper(Boolean needHelper) {
-        List<TransactionPost> transactionPosts = transactionPostRepository.findByNeedHelperOrderByCreateDateDesc(needHelper).orElse(Collections.emptyList());
+        List<TransactionPost> transactionPosts = transactionPostRepository.findByProvidingHelpOrderByCreateDateDesc(needHelper).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> findByCategories = getAllPostResponse(transactionPosts);
         return new DataResponse<>(findByCategories).success(findByCategories,"도움주기, 받기 데이터 조회 성공");
 

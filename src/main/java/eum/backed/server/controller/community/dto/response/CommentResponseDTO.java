@@ -1,6 +1,7 @@
 package eum.backed.server.controller.community.dto.response;
 
 import eum.backed.server.common.DTO.Time;
+import eum.backed.server.domain.community.comment.OpinionComment;
 import eum.backed.server.domain.community.comment.TransactionComment;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.Date;
 @Component
 @RequiredArgsConstructor
 public class CommentResponseDTO {
-    private final Time time;
+
     @Builder
     @Getter
     @AllArgsConstructor
@@ -26,23 +27,20 @@ public class CommentResponseDTO {
         private Long commentId;
         private String commentNickName;
         private String commentUserAddress;
-        private String commentCustomCreatedTime;
         private String commentContent;
         private Boolean isPostWriter;
-        private Boolean isCommentWriter;
         private LocalDateTime createdTime;
     }
 
-    public CommentResponse newCommentResponse(TransactionComment transactionComment, boolean writer){
-        Date date = Date.from(transactionComment.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
+    public CommentResponse newCommentResponse(Long postId, Long commentId,String commentWriter,String commentWriterAddress,String content,LocalDateTime createdTime, boolean writer){
         return CommentResponse.builder()
-                .postId(transactionComment.getTransactionPost().getTransactionPostId())
-                .commentId(transactionComment.getTransactionCommentId())
-                .commentNickName(transactionComment.getUser().getProfile().getNickname())
-                .commentUserAddress(transactionComment.getUser().getProfile().getDong().getDong())
-                .commentCustomCreatedTime(time.calculateTime(date))
-                .commentContent(transactionComment.getContent())
-                .createdTime(transactionComment.getCreateDate())
+                .postId(postId)
+                .commentId(commentId)
+                .commentNickName(commentWriter)
+                .commentUserAddress(commentWriterAddress)
+                .commentContent(content)
+                .createdTime(createdTime)
                 .isPostWriter(writer).build();
     }
+
 }

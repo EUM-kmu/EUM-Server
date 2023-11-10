@@ -27,14 +27,18 @@ public class ApplyService {
     private final TransactionPostRepository transactionPostRepository;
     private final ProfileRepository profileRepository;
     private final ApplyResponseDTO applyResponseDTO;
+    private final ChatService chatService;
 
 
     public DataResponse  doApply(ApplyRequestDTO.Apply applyRequest, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
         TransactionPost getTransactionPost = transactionPostRepository.findById(applyRequest.getPostId()).orElseThrow(() -> new NullPointerException("Invalid postId"));
+        if(getTransactionPost.getCurrentAcceptedPeople() >= getTransactionPost.getMaxNumOfPeople()) throw new RuntimeException("최대 신청자 수를 넘었습니다");
         if (applyRepository.existsByUserAndTransactionPost(getUser,getTransactionPost)) throw new IllegalArgumentException("이미 신청했음");
         Apply apply = Apply.toEntity(applyRequest.getIntroduction(), getUser, getTransactionPost);
+        getTransactionPost.addCurrentAcceptedPeople();
         applyRepository.save(apply);
+        transactionPostRepository.save(getTransactionPost);
         return new DataResponse<>().success("지원 신청 완료");
     }
 
@@ -78,6 +82,7 @@ public class ApplyService {
         if (getApply.getTransactionPost().getUser() != getUser) throw new IllegalArgumentException("해당 게시글에 대한 권한이 없다");
         getApply.updateAccepted(true);
         applyRepository.save(getApply);
+        chatService.createChatRoom(applyId);
         return new DataResponse<>().success("선정성공");
     }
 }

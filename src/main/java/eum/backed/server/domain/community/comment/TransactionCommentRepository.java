@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TransactionCommentRepository extends JpaRepository<TransactionComment, Long> {
-    Optional<List<TransactionComment>> findByTransactionPostOrderByCreateDateDesc(TransactionPost transarctionPost);
+    Optional<List<TransactionComment>> findByTransactionPostOrderByCreateDateDesc(TransactionPost transactionPost);
     boolean existsByUser(Users users);
 }

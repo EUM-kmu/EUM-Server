@@ -35,10 +35,10 @@ public class CommentController {
     DataResponse delete(@RequestParam Long commentId, @AuthenticationPrincipal String email){
         return commentService.delete(commentId, email);
     }
-    @ApiOperation(value = "거래 게시글에 따른 댓글 조회", notes = "게시글 조회시 게시글 내용 + 댓글들 데이터로 수정 예정, 댓글 response 폼은 그대로")
-    @GetMapping("/findByPostId")
-    DataResponse<List<CommentResponseDTO.CommentResponse>> findByPostId(@RequestParam Long postId){
-        return commentService.findByPostId(postId);
-    }
+//    @ApiOperation(value = "거래 게시글에 따른 댓글 조회", notes = "게시글 조회시 게시글 내용 + 댓글들 데이터로 수정 예정, 댓글 response 폼은 그대로")
+//    @GetMapping("/findByPostId")
+//    DataResponse<List<CommentResponseDTO.CommentResponse>> findByPostId(@RequestParam Long postId){
+//        return commentService.findByPostId(postId);
+//    }
 
 }

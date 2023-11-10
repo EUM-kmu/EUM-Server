@@ -34,7 +34,7 @@ public class ChatService {
     private final TransactionPostRepository transactionPostRepository;
     private final UsersRepository usersRepository;
 
-    public DataResponse createChatRoom(Long applyId){
+    public void createChatRoom(Long applyId){
         Apply apply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid Id"));
         if(apply.getIsAccepted() == false) throw new IllegalArgumentException("선정되지 않은 유저와는 채팅을 만들 수 없습니다");
         String transactionPostUserNickName  = apply.getTransactionPost().getUser().getProfile().getNickname();
@@ -52,7 +52,7 @@ public class ChatService {
 
         ChatRoom chatRoom = ChatRoom.toEntity(chatRoomKey, apply.getTransactionPost(), apply);
         chatRoomRepository.save(chatRoom);
-        return new DataResponse().success("채팅 방 개설 완료");
+//        return new DataResponse().success("채팅 방 개설 완료");
     }
 
     public DataResponse<List<ChatRoomResponseDTO>> getChatListInMyPost(String email) {

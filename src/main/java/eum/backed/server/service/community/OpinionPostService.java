@@ -2,7 +2,10 @@ package eum.backed.server.service.community;
 
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.controller.community.dto.request.OpinionPostRequestDTO;
+import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.OpinionResponseDTO;
+import eum.backed.server.domain.community.comment.OpinionComment;
+import eum.backed.server.domain.community.comment.OpinionCommentRepository;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.opinionpost.OpinionPostRepository;
 import eum.backed.server.domain.community.region.DONG.Dong;
@@ -15,11 +18,13 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class OpinionPostService {
     private final OpinionPostRepository opinionPostRepository;
+    private final OpinionCommentRepository opinionCommentRepository;
     private final UsersRepository userRepository;
     private final OpinionResponseDTO opinionResponseDTO;
 
@@ -56,6 +61,23 @@ public class OpinionPostService {
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsRespons = getAllOpinionResponseDTO(opinionPosts);
         return new DataResponse<>(allOpinionPostsRespons).success(allOpinionPostsRespons, "마을 별 게시글 조회");
 
+    }
+    public DataResponse<OpinionResponseDTO.OpinionPostWithComment> getOpininonPostWithComment(Long opinionPostId) {
+        OpinionPost getOpinionPost = opinionPostRepository.findById(opinionPostId).orElseThrow(() -> new NullPointerException("invalid id"));
+        List<OpinionComment> opinionComments = opinionCommentRepository.findByOpinionPostOrderByCreateDateDesc(getOpinionPost).orElse(Collections.emptyList());
+        List<CommentResponseDTO.CommentResponse> commentResponseDTOS = opinionComments.stream().map(opinionComment -> {
+            CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
+                    .postId(opinionPostId)
+                    .commentId(opinionComment.getOpinionCommentId())
+                    .commentNickName(opinionComment.getUser().getProfile().getNickname())
+                    .commentUserAddress(opinionComment.getUser().getProfile().getDong().getDong())
+                    .isPostWriter(getOpinionPost.getUser() == opinionComment.getUser())
+                    .createdTime(opinionComment.getCreateDate())
+                    .commentContent(opinionComment.getComment()).build();
+            return commentResponse;
+        }).collect(Collectors.toList());
+        OpinionResponseDTO.OpinionPostWithComment opinionPostWithComment = opinionResponseDTO.newOpinionPostWithComment(getOpinionPost,commentResponseDTOS);
+        return new DataResponse<>(opinionPostWithComment).success(opinionPostWithComment, "의견 게시글 + 댓글 조회");
     }
     private List<OpinionResponseDTO.AllOpinionPostsResponses> getAllOpinionResponseDTO(List<OpinionPost> opinionPosts) {
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = new ArrayList<>();

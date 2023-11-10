@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.Date;
 
 public class PostRequestDTO {
 
@@ -24,7 +23,7 @@ public class PostRequestDTO {
         private int pay;
         private String location;
         private int volunteerTime;
-        private boolean needHelper;
+        private boolean providingHelp;
         private int maxNumOfPeople;
         @NotEmpty(message = "카테고리를 선택")
         private Long categoryId;
@@ -46,7 +45,7 @@ public class PostRequestDTO {
         private String startDate;
         private int pay; //undefineE도 있음,,
         private String location;
-        private int volunteerTime;
+        private int providingHelp;
         private int maxNumOfPeople;
         private String dong;
         private Status status;

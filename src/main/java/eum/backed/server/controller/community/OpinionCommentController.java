@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping
+@RequestMapping("opinionComment/")
 @RestController
 @RequiredArgsConstructor
 @Api(tags = "의견 댓글")

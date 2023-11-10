@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +29,7 @@ public class OpinionResponseDTO {
         private String userAddress;
         private int likeCount;
         private int commentCount;
+        private LocalDateTime createdTime;
     }
     @Getter
     @Setter
@@ -36,25 +39,32 @@ public class OpinionResponseDTO {
         private String writerNickName;
         private String title;
         private String postContent;
-        private String postCustomCreatedTime;
         private String userAddress;
         private int likeCount;
         private int commentCount;
+        private LocalDateTime createdTime;
         private List<CommentResponseDTO.CommentResponse> commentResponses;
     }
     public AllOpinionPostsResponses newOpinionPostsResponse(OpinionPost opinionPost){
-        Date date = Date.from(opinionPost.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
         return AllOpinionPostsResponses.builder()
                 .userId(opinionPost.getUser().getUserId())
                 .nickName(opinionPost.getUser().getProfile().getNickname())
                 .userAddress(opinionPost.getUser().getProfile().getDong().getDong())
                 .title(opinionPost.getTitle())
                 .content(opinionPost.getContent())
-                .customCreatedTime(time.calculateTime(date))
+                .createdTime(opinionPost.getCreateDate())
                 .build();
     }
-//    public AllOpinionPostsResponses newOpinionPostWithComment(OpinionPost opinionPost, List<CommentResponseDTO.CommentResponse> commentResponseDTO){
-//        Date date = Date.from(opinionPost.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
-//
-//    }
+    public OpinionPostWithComment newOpinionPostWithComment(OpinionPost opinionPost, List<CommentResponseDTO.CommentResponse> commentResponseDTO){
+        return OpinionPostWithComment.builder()
+                .userId(opinionPost.getUser().getUserId())
+                .writerNickName(opinionPost.getUser().getProfile().getNickname())
+                .userAddress(opinionPost.getUser().getProfile().getDong().getDong())
+                .title(opinionPost.getTitle())
+                .postContent(opinionPost.getContent())
+                .createdTime(opinionPost.getCreateDate())
+                .likeCount(0)
+                .commentCount(commentResponseDTO.size())
+                .commentResponses(commentResponseDTO).build();
+    }
 }

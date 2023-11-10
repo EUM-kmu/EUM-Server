@@ -63,8 +63,8 @@ public class CommentService {
         List<CommentResponseDTO.CommentResponse> commentResponseArrayList = new ArrayList<>();
         for(TransactionComment transactionComment : transactionComments){
             boolean writer = (transactionPost.getUser().getUserId() == transactionComment.getUser().getUserId()) ? true : false;
-            CommentResponseDTO.CommentResponse singleCommentResponse = commentResponseDTO.newCommentResponse(transactionComment, writer);
-            commentResponseArrayList.add(singleCommentResponse);
+//            CommentResponseDTO.CommentResponse singleCommentResponse = commentResponseDTO.newCommentResponse(transactionComment, writer);
+//            commentResponseArrayList.add(singleCommentResponse);
         }
         return commentResponseArrayList;
     }

@@ -32,7 +32,7 @@ public class TransactionPost extends BaseTimeEntity {
     private int pay;
     private String location;
     private int volunteerTime;
-    private Boolean needHelper;
+    private Boolean providingHelp;
     private int maxNumOfPeople;
     private int currentAcceptedPeople;
     private Date startDate;

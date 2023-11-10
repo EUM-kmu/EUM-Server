@@ -6,6 +6,7 @@ import eum.backed.server.domain.community.avatar.Avatar;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
+import org.hibernate.mapping.ToOne;
 
 import javax.persistence.*;
 
@@ -32,7 +33,7 @@ public class Profile extends BaseTimeEntity {
     @JoinColumn(name = "dong_id")
     private Dong dong;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="my_leve_id")
     private Avatar avatar;
 

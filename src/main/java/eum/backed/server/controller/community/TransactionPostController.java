@@ -53,8 +53,8 @@ public class TransactionPostController {
     }
     @ApiOperation(value = "단일 게시글 조회", notes = "게시글 아이디 받고 조회")
     @GetMapping("/findById")
-    public DataResponse<PostResponseDTO.PostResponse> findById(@RequestParam Long postId){
-        return transactionPostService.findById(postId);
+    public DataResponse<PostResponseDTO.TransactionPostWithComment> findById(@RequestParam Long postId){
+        return transactionPostService.getTransactionPostWithComment(postId);
     }
     @ApiOperation(value = "카테고리 별 게시글 조회", notes = "카테고리별 게시글 최신정렬")
     @GetMapping("/findByCategory")
@@ -67,19 +67,10 @@ public class TransactionPostController {
     public DataResponse<List<PostResponseDTO.PostResponse>> findByStatus(@RequestParam Status status){
         return transactionPostService.findByStatus(status);
     }
-//    @ApiOperation(value = "상태 별 게시글 조회", notes = "상태별 게시글 최신 정렬")
-//    @GetMapping("/findByStatus")
-//    public DataResponse findByStatus(@RequestParam Status status){
-//        try{
-//            return postService.findByStatus(status);
-//        }catch (Exception e){
-//            return new DataResponse<>(Object.class).fail(e.getMessage(), HttpStatus.BAD_REQUEST);
-//        }
-//    }
     @ApiOperation(value = "도움 주기,받기 구분", notes = "도움 주기 , 받기에 따른 게시글 최신 정렬")
-    @GetMapping("/findByNeedHelper")
-    public DataResponse<List<PostResponseDTO.PostResponse>> findByIsHelper(@RequestParam Boolean needHelper){
-        return transactionPostService.findByNeedHelper(needHelper);
+    @GetMapping("/findByProvidingHelp")
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByIsHelper(@RequestParam Boolean providingHelp){
+        return transactionPostService.findByNeedHelper(providingHelp);
     }
 
     @ApiOperation(value = "관심게시글 목록 조회", notes = "나의 관심 게시글 목록 최신 정렬")

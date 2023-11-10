@@ -1,6 +1,5 @@
 package eum.backed.server.domain.community.opinionpost;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.comment.OpinionComment;
 import eum.backed.server.domain.community.likeopinionpost.LikeOpinionPost;

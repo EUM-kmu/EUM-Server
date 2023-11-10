@@ -5,6 +5,8 @@ import eum.backed.server.domain.community.profile.Profile;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -24,8 +26,8 @@ public class Avatar extends BaseTimeEntity {
 //    @Enumerated(EnumType.STRING)
 //    private AvatarName avatarName;
 
-    @OneToOne(mappedBy = "avatar")
-    private Profile profile;
+    @OneToMany(mappedBy = "avatar")
+    private List<Profile> profiles = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "standard_id")

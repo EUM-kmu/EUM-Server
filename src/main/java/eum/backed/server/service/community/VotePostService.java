@@ -7,11 +7,14 @@ import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.domain.community.votepost.VotePost;
 import eum.backed.server.domain.community.votepost.VotePostRepository;
+import eum.backed.server.domain.community.voteresult.VoteResult;
+import eum.backed.server.domain.community.voteresult.VoteResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 @Service
@@ -19,6 +22,9 @@ import java.util.Locale;
 public class VotePostService {
     private final VotePostRepository votePostRespository;
     private final UsersRepository usersRepository;
+    private final VoteResultRepository voteResultRepository;
+    SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
+
 
     public DataResponse create(VotePostRequestDTO.Create create, String email) throws ParseException {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
@@ -47,5 +53,27 @@ public class VotePostService {
         if(getVotePost.getUser() != getUser) throw new IllegalArgumentException("삭제권한이 없는 유저");
         votePostRespository.delete(getVotePost);
         return new DataResponse().success("게시글 삭제 성공");
+    }
+
+    public DataResponse voting(VotePostRequestDTO.Voting voting, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        VotePost getVotePost = votePostRespository.findById(voting.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+        if (voteResultRepository.existsByUserAndVotePost(getUser,getVotePost)) throw new IllegalArgumentException("이미 투표한 사람");
+        Date currentDate = new Date();
+        if(currentDate.after(getVotePost.getEndTime())) throw new RuntimeException("시간이 지나서 투표를 할 수 없습니다");
+
+        VoteResult voteResult = VoteResult.toEntity(voting.getAgree(), getUser, getVotePost);
+        voteResultRepository.save(voteResult);
+        reflectResult(getVotePost,voting.getAgree());
+        votePostRespository.save(getVotePost);
+        return new DataResponse().success("투표 성공");
+    }
+    private void reflectResult(VotePost votePost, Boolean IsAgree){
+        if (IsAgree) {
+            votePost.addAgreeCount();
+        }else{
+            votePost.addDisagreeCount();
+        }
+        votePost.addTotal();
     }
 }

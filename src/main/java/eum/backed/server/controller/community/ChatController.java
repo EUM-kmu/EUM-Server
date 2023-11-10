@@ -17,11 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatController {
     private final ChatService chatService;
-
-    @GetMapping
-    public DataResponse createChat(@RequestParam Long applyId){
-        return chatService.createChatRoom(applyId);
-    }
+//
+//    @GetMapping
+//    public DataResponse createChat(@RequestParam Long applyId){
+//        return chatService.createChatRoom(applyId);
+//    }
 
     @GetMapping("/getChatListInMypost")
     public DataResponse<List<ChatRoomResponseDTO>> getChatListInMyPost(@AuthenticationPrincipal String email){

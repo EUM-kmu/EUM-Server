@@ -62,6 +62,12 @@ public class VotePost extends BaseTimeEntity {
         this.endTime = endTime;
     }
 
+    public void addAgreeCount() {this.agreeCount += 1;}
+
+    public void addDisagreeCount() {this.disagreeCount +=1 ;}
+
+    public void addTotal() {this.total += 1;}
+
     public static VotePost toEntity(String title, String content, Date endTime, Users user){
         return VotePost.builder()
                 .title(title)

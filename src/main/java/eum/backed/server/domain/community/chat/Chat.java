@@ -11,11 +11,7 @@ public class Chat {
     private String applicantNickName;
     private Long postId;
     private Long applyId;
-//    private Message message;
-//    private String senderNickName;
-//    private String message;
-//    private String timestamp;
-//    private String photoUrl;
+
     public String saveToFirebase(Chat chat, Message message) {
         DatabaseReference chatsRef = FirebaseDatabase.getInstance().getReference("chatRooms");
         DatabaseReference chatRoomRef = chatsRef.push(); // 채팅방에 대한 고유한 키 생성

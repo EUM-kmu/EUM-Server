@@ -28,4 +28,11 @@ public class VoteResult extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name="vote_post_id")
     private VotePost votePost;
+
+    public static VoteResult toEntity(Boolean agree, Users user, VotePost votePost){
+        return VoteResult.builder()
+                .agree(agree)
+                .user(user)
+                .votePost(votePost).build();
+    }
 }

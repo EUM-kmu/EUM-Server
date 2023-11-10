@@ -39,5 +39,11 @@ public class OpinionPostController {
         return opinionPostService.getAllOpinionPosts(email);
     }
 
+    @GetMapping("/findById")
+    @ApiOperation(value = "단일 의견 게시글 조회",notes = "입력받은 게시글의 정보 + 댓글")
+    public DataResponse<OpinionResponseDTO.OpinionPostWithComment> getOpinionPostWithComment(@RequestParam Long opinionPostId){
+        return opinionPostService.getOpininonPostWithComment(opinionPostId);
+    }
+
 
 }
