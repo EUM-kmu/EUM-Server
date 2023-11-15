@@ -50,4 +50,18 @@ public class ProfileService {
     private void validateNickname(String nickname){
         if(profileRepository.existsByNickname(nickname)) throw new IllegalArgumentException("이미 있는 닉네임");
     }
+
+    public DataResponse updateMyProfile(ProfileRequestDTO.UpdateProfile updateProfile,String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
+        Dong getDong = dongRepository.findByDong(updateProfile.getDong()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
+        Avatar getAvatar = avatarRepository.findByName(updateProfile.getAvatar()).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
+        validateNickname(updateProfile.getNickname());
+        getProfile.updateNickName(updateProfile.getNickname());
+        getProfile.updateDong(getDong);
+        getProfile.upDateAvatar(getAvatar);
+        getProfile.updateInstroduction(updateProfile.getIntroduction());
+        profileRepository.save(getProfile);
+        return new DataResponse().success("프로필 수정 성공");
+    }
 }

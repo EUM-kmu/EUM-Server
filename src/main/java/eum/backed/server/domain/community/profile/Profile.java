@@ -41,6 +41,26 @@ public class Profile extends BaseTimeEntity {
     @JoinColumn(name="ueer_id")
     private Users user;
 
+    public void updateInstroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public void updateNickName(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateAddress(String address) {
+        this.address = address;
+    }
+
+    public void updateDong(Dong dong) {
+        this.dong = dong;
+    }
+
+    public void upDateAvatar(Avatar avatar) {
+        this.avatar = avatar;
+    }
+
     public static Profile t0Entity(ProfileRequestDTO.CreateProfile createProfile, Dong dong , Avatar avatar, Users user){
         return Profile.builder()
                 .nickname(createProfile.getNickname())

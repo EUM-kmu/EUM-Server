@@ -60,7 +60,6 @@ public class OpinionPostService {
         List<OpinionPost> opinionPosts = opinionPostRepository.findByDongOrderByCreateDateDesc(getUser.getProfile().getDong()).orElse(Collections.emptyList());
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsRespons = getAllOpinionResponseDTO(opinionPosts);
         return new DataResponse<>(allOpinionPostsRespons).success(allOpinionPostsRespons, "마을 별 게시글 조회");
-
     }
     public DataResponse<OpinionResponseDTO.OpinionPostWithComment> getOpininonPostWithComment(Long opinionPostId) {
         OpinionPost getOpinionPost = opinionPostRepository.findById(opinionPostId).orElseThrow(() -> new NullPointerException("invalid id"));
@@ -89,4 +88,12 @@ public class OpinionPostService {
     }
 
 
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        Dong getDong = getUser.getProfile().getDong();
+        int majorityCounts = getDong.getProfiles().size()/2;
+        List<OpinionPost> opinionPosts = opinionPostRepository.findByLikeCountGreaterThanOrderByLikeCountDesc(majorityCounts).orElse(Collections.emptyList());
+        List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsRespons = getAllOpinionResponseDTO(opinionPosts);
+        return new DataResponse<>(allOpinionPostsRespons).success(allOpinionPostsRespons, "마을 별 게시글 조회");
+    }
 }

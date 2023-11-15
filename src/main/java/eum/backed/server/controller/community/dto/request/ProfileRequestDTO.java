@@ -17,6 +17,16 @@ public class ProfileRequestDTO {
         private String accountPassword;
         private String avatar;
 
+    }
+    @Getter
+    @Setter
+    public static class UpdateProfile{
+        @NotEmpty
+        private String nickname;
+        private String introduction;
+        private String dong;
+        private String accountPassword;
+        private String avatar;
 
     }
 

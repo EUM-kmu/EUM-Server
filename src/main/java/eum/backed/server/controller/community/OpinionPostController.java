@@ -44,6 +44,12 @@ public class OpinionPostController {
     public DataResponse<OpinionResponseDTO.OpinionPostWithComment> getOpinionPostWithComment(@RequestParam Long opinionPostId){
         return opinionPostService.getOpininonPostWithComment(opinionPostId);
     }
+    @GetMapping("/hottest")
+    @ApiOperation(value = "상위 좋아요 개수",notes = "주민의 과반수 이상")
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(@AuthenticationPrincipal String email){
+        return opinionPostService.getHottestPosts(email);
+    }
+
 
 
 }

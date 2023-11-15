@@ -28,9 +28,15 @@ public class ProfileController {
         log.info(email);
         return profileService.create(createProfile, email);
     }
-    @GetMapping()
+    @GetMapping
     @ApiOperation(value = "내 프로필 조회")
     public DataResponse<ProfileResponseDTO> getMyProfile(@AuthenticationPrincipal String email){
         return profileService.getMyProfile(email);
     }
+    @PutMapping
+    @ApiOperation(value = "프로필 수정")
+    public DataResponse updateMyProfile(@RequestBody ProfileRequestDTO.UpdateProfile updateProfile, @AuthenticationPrincipal String email){
+        return profileService.updateMyProfile(updateProfile,email);
+    }
+
 }

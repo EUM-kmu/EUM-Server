@@ -25,4 +25,10 @@ public class LikeOpinionPost {
     @ManyToOne
     @JoinColumn(name="opinion_post_id")
     private OpinionPost opinionPost;
+
+    public static LikeOpinionPost toEntity(Users user, OpinionPost opinionPost){
+        return LikeOpinionPost.builder()
+                .user(user)
+                .opinionPost(opinionPost).build();
+    }
 }

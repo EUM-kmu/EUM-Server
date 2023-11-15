@@ -49,6 +49,10 @@ public class OpinionPost extends BaseTimeEntity {
         this.content = content;
     }
 
+    public void updateLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
     public static OpinionPost toEntity(String title, String content, Users user, Dong dong){
         return OpinionPost.builder()
                 .dong(dong)

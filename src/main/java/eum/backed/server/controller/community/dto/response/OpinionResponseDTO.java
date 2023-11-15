@@ -51,6 +51,7 @@ public class OpinionResponseDTO {
                 .nickName(opinionPost.getUser().getProfile().getNickname())
                 .userAddress(opinionPost.getUser().getProfile().getDong().getDong())
                 .title(opinionPost.getTitle())
+                .likeCount(opinionPost.getLikeOpinionPosts().size())
                 .content(opinionPost.getContent())
                 .createdTime(opinionPost.getCreateDate())
                 .build();
@@ -63,7 +64,7 @@ public class OpinionResponseDTO {
                 .title(opinionPost.getTitle())
                 .postContent(opinionPost.getContent())
                 .createdTime(opinionPost.getCreateDate())
-                .likeCount(0)
+                .likeCount(opinionPost.getLikeOpinionPosts().size())
                 .commentCount(commentResponseDTO.size())
                 .commentResponses(commentResponseDTO).build();
     }

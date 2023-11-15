@@ -2,8 +2,7 @@ package eum.backed.server.controller.community;
 
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.service.community.ScrapService;
-import io.swagger.annotations.Api;
+import eum.backed.server.service.community.LikeOpinionPostService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,18 +12,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor@RequestMapping("/scrap")
-@Api(tags = "관심 기능")
-public class ScrapController {
-    private final ScrapService scrapService;
-    @GetMapping("/do")
+@RequestMapping("/likeOpinion")
+@RequiredArgsConstructor
+public class LikeOpinionPostController {
+    private final LikeOpinionPostService likeOpinionPostService;
+    @GetMapping("/like")
     @ApiOperation(value = "관심 설정", notes = "관심 설정")
     public DataResponse doScrap(@RequestParam Long postId, @AuthenticationPrincipal String email) {
-        return scrapService.doScrap(postId, email);
+        return likeOpinionPostService.like(postId, email);
     }
-    @GetMapping("/undo")
+    @GetMapping("/unlike")
     @ApiOperation(value = "관심 해제", notes = "관심 해제")
     public DataResponse undoScrap(@RequestParam Long postId,@AuthenticationPrincipal String email) throws IllegalAccessException {
-        return scrapService.undoScrap(postId,email);
+        return likeOpinionPostService.unLike(postId,email);
     }
 }

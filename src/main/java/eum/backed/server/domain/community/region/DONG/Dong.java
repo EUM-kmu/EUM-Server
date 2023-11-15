@@ -2,6 +2,7 @@ package eum.backed.server.domain.community.region.DONG;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
+import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.region.GU.Gu;
 import eum.backed.server.domain.community.transactionpost.TransactionPost;
 import eum.backed.server.domain.community.votepost.VotePost;
@@ -29,6 +30,8 @@ public class Dong extends BaseTimeEntity {
     @JoinColumn(name="gu_id")
     private Gu gu;
 
+    @OneToMany(mappedBy = "dong")
+    private List<Profile> profiles = new ArrayList<>();
 
     @OneToMany(mappedBy = "dong")
     private List<TransactionPost> transactionPosts = new ArrayList<>();
