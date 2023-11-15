@@ -105,10 +105,7 @@ public class VotePostService {
                     .commentContent(voteComment.getContent()).build();
             return commentResponse;
         }).collect(Collectors.toList());
-        LocalDateTime now = LocalDateTime.now();
-        Date currentDate = Date.from(Instant.from(now));
-        Boolean isVoting = currentDate.before(getVotePost.getEndTime());
-        VotePostResponseDTO.VotePostWithComment votePostWithComment = votePostResponseDTO.newVotePostWithComment(getVotePost,commentResponses,isVoting,amIVote);
+        VotePostResponseDTO.VotePostWithComment votePostWithComment = votePostResponseDTO.newVotePostWithComment(getVotePost,commentResponses,amIVote);
         return new DataResponse<>(votePostWithComment).success("게시글 조회 + 댓글 목록");
     }
     private void reflectResult(VotePost votePost, Boolean IsAgree){
@@ -121,5 +118,10 @@ public class VotePostService {
     }
 
 
-
+    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> getMyPosts(String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        List<VotePost> votePosts = votePostRepository.findByUserOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
+        List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
+        return new DataResponse<>(votePostResponses).success(votePostResponses,"전체 투표 게시글 조회");
+    }
 }

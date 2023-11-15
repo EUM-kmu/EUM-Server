@@ -5,6 +5,7 @@ import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 @Getter
@@ -34,5 +35,10 @@ public class BankAccountResponseDTO {
                 .myCurrentBalance(bankAccountTransaction.getMyCurrentBalance())
                 .transactionAmount(bankAccountTransaction.getAmount()).build();
 
+    }
+    @Getter
+    @Setter
+    public static class UpdatePassword {
+        private String password;
     }
 }

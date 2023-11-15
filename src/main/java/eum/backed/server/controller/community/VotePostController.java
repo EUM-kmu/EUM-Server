@@ -51,6 +51,12 @@ public class VotePostController {
         return votePostService.voting(voting, email);
     }
 
+    @GetMapping("/mypost")
+    @ApiOperation(value = "내가 작성한 투표 게시글")
+    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> getMyPosts(@AuthenticationPrincipal String email){
+        return votePostService.getMyPosts(email);
+    }
+
 
 
 }

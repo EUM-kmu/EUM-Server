@@ -93,7 +93,14 @@ public class OpinionPostService {
         Dong getDong = getUser.getProfile().getDong();
         int majorityCounts = getDong.getProfiles().size()/2;
         List<OpinionPost> opinionPosts = opinionPostRepository.findByLikeCountGreaterThanOrderByLikeCountDesc(majorityCounts).orElse(Collections.emptyList());
-        List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsRespons = getAllOpinionResponseDTO(opinionPosts);
-        return new DataResponse<>(allOpinionPostsRespons).success(allOpinionPostsRespons, "마을 별 게시글 조회");
+        List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
+        return new DataResponse<>(allOpinionPostsResponses).success(allOpinionPostsResponses, "좋아요 과반주 정렬 + 좋아요 순");
+    }
+
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getMyOpinionPosts(String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        List<OpinionPost> opinionPosts = opinionPostRepository.findByUserOrderByCreateDate(getUser).orElse(Collections.emptyList());
+        List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
+        return new DataResponse<>(allOpinionPostsResponses).success(allOpinionPostsResponses, "내가 작성한 의견 게시글");
     }
 }

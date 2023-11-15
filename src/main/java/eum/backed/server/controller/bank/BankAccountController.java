@@ -23,10 +23,15 @@ import java.util.List;
 public class BankAccountController {
     private final BankAccountService bankAccountService;
     private final BankTransactionService bankTransactionService;
+
+    @PostMapping("/updatePassword")
+    @ApiOperation(value = "카드 비밀 번호 바꾸기")
+    public DataResponse updatePassword(@RequestBody BankAccountResponseDTO.UpdatePassword updatePassword,@AuthenticationPrincipal String email){
+        return bankAccountService.updatePassword(updatePassword.getPassword(),email);
+    }
     @PostMapping("/remittance")
     @ApiOperation(value = "거래(송금하기)")
     public DataResponse remittance(@RequestBody BankAccountRequestDTO.Remittance remittance, @AuthenticationPrincipal String email){
-        log.info(email);
         return bankAccountService.remittance(remittance, email);
     }
     @GetMapping("/getAllHistory")
@@ -40,7 +45,7 @@ public class BankAccountController {
         return bankTransactionService.getAllHistory(email, TrasnactionType.DEPOSIT);
     }
     @GetMapping("/getWithDrawHistory")
-    @ApiOperation(value = "거래 내역 조회")
+    @ApiOperation(value = "출금 내역 조회")
     public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getWithDrawHistory(@AuthenticationPrincipal String email){
         return bankTransactionService.getAllHistory(email,TrasnactionType.WITHDRAW);
     }

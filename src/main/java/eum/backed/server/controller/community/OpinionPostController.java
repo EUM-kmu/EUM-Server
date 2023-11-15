@@ -49,6 +49,11 @@ public class OpinionPostController {
     public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(@AuthenticationPrincipal String email){
         return opinionPostService.getHottestPosts(email);
     }
+    @GetMapping("/mypost")
+    @ApiOperation(value = "내가 작성한 의견 게시물")
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getMyOpinionPosts(@AuthenticationPrincipal String email){
+        return opinionPostService.getMyOpinionPosts(email);
+    }
 
 
 

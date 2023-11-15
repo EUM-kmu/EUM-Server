@@ -46,11 +46,13 @@ public class VotePostResponseDTO {
         private Boolean isVoting;
         private Boolean amIVote;
         private int commentCount;
-        private List<CommentResponseDTO> commentResponseDTOS;
+        private List<CommentResponseDTO.CommentResponse> commentResponses;
         private LocalDateTime createdTime;
     }
 
-    public static VotePostWithComment newVotePostWithComment(VotePost votePost, List<CommentResponseDTO.CommentResponse> commentResponses,Boolean isVoting,Boolean amIVote){
+    public static VotePostWithComment newVotePostWithComment(VotePost votePost, List<CommentResponseDTO.CommentResponse> commentResponses,Boolean amIVote){
+        LocalDateTime now = LocalDateTime.now();
+        Date currentDate = Date.from(Instant.from(now));
         return VotePostWithComment.builder()
                 .writerId(votePost.getUser().getUserId())
                 .writerNickName(votePost.getUser().getProfile().getNickname())
@@ -60,10 +62,10 @@ public class VotePostResponseDTO {
                 .postTitle(votePost.getTitle())
                 .postContent(votePost.getContent())
                 .voteEndDate(votePost.getEndTime())
-                .isVoting(isVoting)
+                .isVoting(currentDate.before(votePost.getEndTime()))
                 .amIVote(amIVote)
-                .commentResponseDTOS(commentResponseDTOS)
-                .commentCount(commentResponseDTOS.size())
+                .commentResponses(commentResponses)
+                .commentCount(commentResponses.size())
                 .createdTime(votePost.getCreateDate()).build();
     }
 }

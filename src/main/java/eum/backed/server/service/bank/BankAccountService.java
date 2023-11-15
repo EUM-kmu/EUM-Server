@@ -43,15 +43,22 @@ public class BankAccountService {
         BankTransactionDTO.Transaction transaction = BankTransactionDTO.toInitialDTO(Code.SUCCESS, Status.INITIAL, 300L, savedUserBankAccount, initialBankAccount);
         bankTransactionService.createTransactionWithBranchBank(transaction);
     }
+    public DataResponse updatePassword(String password, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        UserBankAccount myBankAccount = getUser.getUserBankAccount();
+        myBankAccount.updatePassword(passwordEncoder.encode(password));
+        userBankAccountRepository.save(myBankAccount);
+        return new DataResponse().success("비밀번호 변경완료");
+    }
 
 
     public DataResponse remittance(BankAccountRequestDTO.Remittance remittance, String email) {
-        Users sender = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
 
         Profile getProfile = profileRepository.findByNickname(remittance.getReceiverNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
         Users receiver = getProfile.getUser();
 
-        UserBankAccount myBankAccount = sender.getUserBankAccount();
+        UserBankAccount myBankAccount = getUser.getUserBankAccount();
         UserBankAccount receiverBankAccount = userBankAccountRepository.findByUser(receiver).orElseThrow(() -> new NullPointerException("InValid receiver"));
         //각 계좌에 송금 결과 반영
         remittance(myBankAccount, receiverBankAccount, remittance.getAmount());

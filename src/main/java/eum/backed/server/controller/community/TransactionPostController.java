@@ -79,6 +79,12 @@ public class TransactionPostController {
         return transactionPostService.findByScrap(email);
     }
 
+    @GetMapping("/myposts")
+    @ApiOperation(value = "내가 작성한 거래 게시글")
+    public DataResponse<List<PostResponseDTO.PostResponse>> getMyPosts(String email){
+        return transactionPostService.getMyPosts(email);
+    }
+
 
 
 

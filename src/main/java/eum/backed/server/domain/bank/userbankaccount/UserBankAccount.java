@@ -45,6 +45,11 @@ public class UserBankAccount extends BaseTimeEntity {
     public void deposit(Long balance){
         this.balance += balance;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
     public static UserBankAccount toEntity(String nickname, String password, Users user){
         return UserBankAccount.builder()
                 .accountName(nickname)
