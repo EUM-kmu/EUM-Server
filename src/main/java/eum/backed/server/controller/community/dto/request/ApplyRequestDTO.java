@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 public class ApplyRequestDTO {
     @Getter
@@ -12,6 +13,12 @@ public class ApplyRequestDTO {
         @NotEmpty
         private Long postId;
         private String introduction;
+    }
+
+    @Getter
+    @Setter
+    public static class AcceptList{
+        private List<Long> applyIds;
     }
 
 

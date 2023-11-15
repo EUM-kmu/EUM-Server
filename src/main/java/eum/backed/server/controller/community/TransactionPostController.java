@@ -46,12 +46,12 @@ public class TransactionPostController {
     public DataResponse update(@RequestBody PostRequestDTO.Update update, @AuthenticationPrincipal String email) throws ParseException {
         return transactionPostService.update(update,email);
     }
-    @ApiOperation(value = "게시글 상태 수정", notes = "게시글 아이디받고 상태 수정")
+    @ApiOperation(value = "게시글 상태 수정", notes = "게시글 아이디받고 거래 상태 상태 수정")
     @PutMapping("/updateStatus")
     public DataResponse updateState(@RequestParam Long postId,@RequestParam Status status, @AuthenticationPrincipal String email){
         return transactionPostService.updateState(postId,status, email);
     }
-    @ApiOperation(value = "단일 게시글 조회", notes = "게시글 아이디 받고 조회")
+    @ApiOperation(value = "단일 게시글 조회", notes = "게시글 정보 + 댓글  조회")
     @GetMapping("/findById")
     public DataResponse<PostResponseDTO.TransactionPostWithComment> findById(@RequestParam Long postId){
         return transactionPostService.getTransactionPostWithComment(postId);

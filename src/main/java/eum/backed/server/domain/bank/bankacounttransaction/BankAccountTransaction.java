@@ -22,7 +22,12 @@ public class BankAccountTransaction extends BaseTimeEntity {
     private Long bankAccountTransactionId;
 
     @Column
-    private int amount;
+    private Long amount;
+    private Long myCurrentBalance;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private TrasnactionType trasnactionType;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -33,6 +38,10 @@ public class BankAccountTransaction extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(value = "Status", allowableValues = "INITIAL, TRADING, REFUND")
     private Status status;
+
+    @ManyToOne
+    @JoinColumn(name = "my_bank_account")
+    private UserBankAccount myBankAccount;
 
     @ManyToOne
     @JoinColumn(name = "receiver_bank_account_id")
@@ -46,11 +55,14 @@ public class BankAccountTransaction extends BaseTimeEntity {
     @JoinColumn(name = "branch_bank_account_id")
     private BranchBankAccount branchBankAccount;
 
-    public static BankAccountTransaction toEntity(int amount, Code code, Status status, UserBankAccount receiverBankAccount, UserBankAccount senderBankAccount, BranchBankAccount branchBankAccount){
+    public static BankAccountTransaction toEntity(Long amount, Code code, Status status,TrasnactionType trasnactionType,UserBankAccount myBankAccount, UserBankAccount receiverBankAccount, UserBankAccount senderBankAccount, BranchBankAccount branchBankAccount){
         return BankAccountTransaction.builder()
                 .amount(amount)
                 .code(code)
                 .status(status)
+                .trasnactionType(trasnactionType)
+                .myBankAccount(myBankAccount)
+                .myCurrentBalance(myBankAccount.getBalance())
                 .receiverBankAccount(receiverBankAccount)
                 .senderBankAccount(senderBankAccount)
                 .branchBankAccount(branchBankAccount).build();

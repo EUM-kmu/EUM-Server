@@ -1,13 +1,16 @@
 package eum.backed.server.domain.bank.userbankaccount;
 
 import eum.backed.server.common.BaseTimeEntity;
+import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransaction;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.enums.Owner;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -23,7 +26,8 @@ public class UserBankAccount extends BaseTimeEntity {
     @Column
     private String accountName;
     private String password;
-    private int balance;
+    private Long balance;
+
     @Column
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(value = "MyEnum 값", allowableValues = "USER, ADMIN, MASTER")
@@ -33,10 +37,12 @@ public class UserBankAccount extends BaseTimeEntity {
     @JoinColumn(name="user_id")
     private Users user;
 
-    public void withDraw(int balance) {
+    @OneToMany(mappedBy = "myBankAccount")
+    private List<BankAccountTransaction> bankAccountTransactions = new ArrayList<>();
+    public void withDraw(Long balance) {
         this.balance -= balance;
     }
-    public void deposit(int balance){
+    public void deposit(Long balance){
         this.balance += balance;
     }
     public static UserBankAccount toEntity(String nickname, String password, Users user){
@@ -44,7 +50,7 @@ public class UserBankAccount extends BaseTimeEntity {
                 .accountName(nickname)
                 .password(password)
                 .owner(Owner.USER)
-                .balance(0)
+                .balance(0L)
                 .user(user)
                 .build();
     }

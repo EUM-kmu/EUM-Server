@@ -29,9 +29,9 @@ public class ApplyController {
         return applyService.getApplyList(postId);
     }
     @ApiOperation(value = "선정하기", notes = "해당 신청자 선정")
-    @GetMapping("/accept")
-    public DataResponse accept(@RequestParam Long applyId,@AuthenticationPrincipal String email){
-        return applyService.accept(applyId,email);
+    @PostMapping("/accept")
+    public DataResponse accept(@RequestBody ApplyRequestDTO.AcceptList acceptList,@AuthenticationPrincipal String email){
+        return applyService.accept(acceptList,email);
     }
 
 }

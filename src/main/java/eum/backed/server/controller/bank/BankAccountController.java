@@ -1,17 +1,19 @@
 package eum.backed.server.controller.bank;
 
 import eum.backed.server.common.DTO.DataResponse;
-import eum.backed.server.controller.bank.dto.TransactionRequestDTO;
+import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
+import eum.backed.server.controller.bank.dto.response.BankAccountResponseDTO;
+import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
 import eum.backed.server.service.bank.BankAccountService;
+import eum.backed.server.service.bank.BankTransactionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/bankAccount")
@@ -20,10 +22,26 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class BankAccountController {
     private final BankAccountService bankAccountService;
+    private final BankTransactionService bankTransactionService;
     @PostMapping("/remittance")
     @ApiOperation(value = "거래(송금하기)")
-    public DataResponse remittance(@RequestBody TransactionRequestDTO.Remittance remittance, @AuthenticationPrincipal String email){
+    public DataResponse remittance(@RequestBody BankAccountRequestDTO.Remittance remittance, @AuthenticationPrincipal String email){
         log.info(email);
         return bankAccountService.remittance(remittance, email);
+    }
+    @GetMapping("/getAllHistory")
+    @ApiOperation(value = "거래 내역 조회")
+    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getAllHistory(@AuthenticationPrincipal String email){
+        return bankTransactionService.getAllHistory(email,null);
+    }
+    @GetMapping("/getDePositHistory")
+    @ApiOperation(value = "입금 내역 조회")
+    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getDePositHistory(@AuthenticationPrincipal String email){
+        return bankTransactionService.getAllHistory(email, TrasnactionType.DEPOSIT);
+    }
+    @GetMapping("/getWithDrawHistory")
+    @ApiOperation(value = "거래 내역 조회")
+    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getWithDrawHistory(@AuthenticationPrincipal String email){
+        return bankTransactionService.getAllHistory(email,TrasnactionType.WITHDRAW);
     }
 }

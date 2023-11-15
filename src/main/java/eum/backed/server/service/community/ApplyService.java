@@ -76,13 +76,15 @@ public class ApplyService {
 //        return applyListResponses;
 //    }
 
-    public DataResponse accept(Long applyId,String email) {
+    public DataResponse accept(ApplyRequestDTO.AcceptList acceptList, String email) {
         Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
-        Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid id"));
-        if (getApply.getTransactionPost().getUser() != getUser) throw new IllegalArgumentException("해당 게시글에 대한 권한이 없다");
-        getApply.updateAccepted(true);
-        applyRepository.save(getApply);
-        chatService.createChatRoom(applyId);
+        acceptList.getApplyIds().stream().forEach(applyId -> {
+            Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid id"));
+            if (getApply.getTransactionPost().getUser() != getUser) throw new IllegalArgumentException("해당 게시글에 대한 권한이 없다");
+            getApply.updateAccepted(true);
+            applyRepository.save(getApply);
+            chatService.createChatRoom(applyId);
+        });
         return new DataResponse<>().success("선정성공");
     }
 }
