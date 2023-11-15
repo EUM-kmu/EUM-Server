@@ -32,4 +32,11 @@ public class TransactionComment extends BaseTimeEntity {
     public void updateContent(String content) {
         this.content = content;
     }
+
+    public static TransactionComment toEntity(String content, Users user, TransactionPost transactionPost){
+        return TransactionComment.builder()
+                .content(content)
+                .user(user)
+                .transactionPost(transactionPost).build();
+    }
 }

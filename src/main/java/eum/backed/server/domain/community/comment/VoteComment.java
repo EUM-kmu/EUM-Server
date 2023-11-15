@@ -26,6 +26,17 @@ public class VoteComment extends BaseTimeEntity {
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name="vote_post_id")
+    @JoinColumn(name = "vote_post_id")
     private VotePost votePost;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public static VoteComment toEntity(String content, Users user, VotePost votePost){
+        return VoteComment.builder()
+                .content(content)
+                .user(user)
+                .votePost(votePost).build();
+    }
 }
