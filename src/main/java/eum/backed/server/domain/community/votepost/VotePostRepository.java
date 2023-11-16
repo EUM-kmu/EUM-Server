@@ -11,4 +11,6 @@ public interface VotePostRepository extends JpaRepository<VotePost,Long> {
     Optional<List<VotePost>> findByDongOrderByCreateDate(Dong dong);
 
     Optional<List<VotePost>> findByUserOrderByCreateDateDesc(Users users);
+
+    Optional<List<VotePost>> findByDongAndTitleContainingOrderByCreateDateDesc(Dong dong, String title);
 }

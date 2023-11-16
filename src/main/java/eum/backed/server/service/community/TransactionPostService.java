@@ -164,4 +164,11 @@ public class TransactionPostService {
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(transactionPosts);
         return new DataResponse<>(transactionPostDTOs).success(transactionPostDTOs,"내가 작성한 거래게시글 조회 성공");
     }
+
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        List<TransactionPost> transactionPosts = transactionPostRepository.findByDongAndTitleContainingOrderByCreateDateDesc(getUser.getProfile().getDong(), keyWord).orElse(Collections.emptyList());
+        List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(transactionPosts);
+        return new DataResponse<>(transactionPostDTOs).success(transactionPostDTOs,"내가 작성한 거래게시글 조회 성공");
+    }
 }

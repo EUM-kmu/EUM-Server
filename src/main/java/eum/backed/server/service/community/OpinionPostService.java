@@ -101,6 +101,13 @@ public class OpinionPostService {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         List<OpinionPost> opinionPosts = opinionPostRepository.findByUserOrderByCreateDate(getUser).orElse(Collections.emptyList());
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
-        return new DataResponse<>(allOpinionPostsResponses).success(allOpinionPostsResponses, "내가 작성한 의견 게시글");
+        return new DataResponse<>(allOpinionPostsResponses).success(allOpinionPostsResponses, "내가 작성한 의견 게시글 조회");
+    }
+
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByKeyWord(String keyWord, String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        List<OpinionPost> opinionPosts = opinionPostRepository.findByDongAndTitleContainingOrderByCreateDateDesc(getUser.getProfile().getDong(), keyWord).orElse(Collections.emptyList());
+        List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
+        return new DataResponse<>(allOpinionPostsResponses).success(allOpinionPostsResponses, "내가 작성한 의견 게시글 조회");
     }
 }

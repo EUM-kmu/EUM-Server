@@ -88,7 +88,7 @@ public class VotePostService {
         votePostRepository.save(getVotePost);
         return new DataResponse().success("투표 성공");
     }
-    @Scheduled(cron = "0 * * * * *")
+//    @Scheduled(cron = "0 * * * * *")
     public DataResponse<VotePostResponseDTO.VotePostWithComment> getVotePostWithComment(Long postId, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         VotePost getVotePost = votePostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
@@ -122,6 +122,13 @@ public class VotePostService {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         List<VotePost> votePosts = votePostRepository.findByUserOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
-        return new DataResponse<>(votePostResponses).success(votePostResponses,"전체 투표 게시글 조회");
+        return new DataResponse<>(votePostResponses).success(votePostResponses," 내가 작성한 투표 게시글 조회");
+    }
+
+    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(String keyWord, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        List<VotePost> votePosts = votePostRepository.findByDongAndTitleContainingOrderByCreateDateDesc(getUser.getProfile().getDong(), keyWord).orElse(Collections.emptyList());
+        List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
+        return new DataResponse<>(votePostResponses).success(votePostResponses,"투표 게시글 키워드 검색");
     }
 }

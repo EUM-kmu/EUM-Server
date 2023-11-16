@@ -75,14 +75,19 @@ public class TransactionPostController {
 
     @ApiOperation(value = "관심게시글 목록 조회", notes = "나의 관심 게시글 목록 최신 정렬")
     @GetMapping("/findByScrap")
-    public DataResponse<List<PostResponseDTO.PostResponse>> findByScrap(String email){
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByScrap(@AuthenticationPrincipal String email){
         return transactionPostService.findByScrap(email);
     }
 
     @GetMapping("/myposts")
     @ApiOperation(value = "내가 작성한 거래 게시글")
-    public DataResponse<List<PostResponseDTO.PostResponse>> getMyPosts(String email){
+    public DataResponse<List<PostResponseDTO.PostResponse>> getMyPosts(@AuthenticationPrincipal String email){
         return transactionPostService.getMyPosts(email);
+    }
+    @GetMapping("/search")
+    @ApiOperation(value = "거래게시글 검색")
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(@RequestParam String keyWord,@AuthenticationPrincipal String email){
+        return transactionPostService.findByKeyWord(keyWord, email);
     }
 
 

@@ -57,6 +57,12 @@ public class VotePostController {
         return votePostService.getMyPosts(email);
     }
 
+    @GetMapping("/search")
+    @ApiOperation(value = "투표 게시글 키워드 검색")
+    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(@RequestParam String keyWord, @AuthenticationPrincipal String email) {
+        return votePostService.findByKeyWord(keyWord, email);
+    }
+
 
 
 }

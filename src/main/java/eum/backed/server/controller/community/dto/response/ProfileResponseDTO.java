@@ -35,7 +35,7 @@ public class ProfileResponseDTO {
                 .address(fullAddress)
                 .totalSunrisePay(profile.getTotalSunrisePay())
                 .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
-                .balance(user.getUserBankAccount().getBalance())
+//                .balance(user.get().getBalance())
                 .build();
     }
 

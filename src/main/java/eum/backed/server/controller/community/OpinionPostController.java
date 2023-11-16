@@ -6,9 +6,11 @@ import eum.backed.server.controller.community.dto.response.OpinionResponseDTO;
 import eum.backed.server.service.community.OpinionPostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.List;
 
@@ -53,6 +55,11 @@ public class OpinionPostController {
     @ApiOperation(value = "내가 작성한 의견 게시물")
     public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getMyOpinionPosts(@AuthenticationPrincipal String email){
         return opinionPostService.getMyOpinionPosts(email);
+    }
+    @GetMapping("/search")
+    @ApiOperation(value = "의견 게시글 키워드 검색")
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByKeyword(@RequestParam String keyWord, @AuthenticationPrincipal String email){
+        return opinionPostService.findByKeyWord(keyWord, email);
     }
 
 

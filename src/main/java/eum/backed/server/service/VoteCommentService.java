@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class VoteCommentService {
     private final VoteCommentRepository voteCommentRepository;
-
-    public DataResponse create(CommentRequestDTO.Create create, String email) {
-    }
+//
+//    public DataResponse create(CommentRequestDTO.Create create, String email) {
+//    }
 }

@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface OpinionCommentRepository extends JpaRepository<OpinionComment, Long> {
     Optional<List<OpinionComment>> findByOpinionPostOrderByCreateDateDesc(OpinionPost opinionPost);
+
 }
 

@@ -12,4 +12,8 @@ public interface OpinionPostRepository extends JpaRepository<OpinionPost,Long> {
     Optional <List<OpinionPost>> findByLikeCountGreaterThanOrderByLikeCountDesc(int likeCount);
 
     Optional<List<OpinionPost>> findByUserOrderByCreateDate(Users users);
+
+    Optional<List<OpinionPost>> findByDongAndTitleContainingOrderByCreateDateDesc(Dong dong, String title);
+
+
 }
