@@ -20,7 +20,7 @@ public class PostRequestDTO {
         private String startTime;
         private Slot slot;
         @NotEmpty(message = "금액을 입력하세요;")
-        private int pay;
+        private Long pay;
         private String location;
         private int volunteerTime;
         private boolean providingHelp;

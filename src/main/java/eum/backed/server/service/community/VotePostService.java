@@ -14,13 +14,11 @@ import eum.backed.server.domain.community.votepost.VotePostRepository;
 import eum.backed.server.domain.community.voteresult.VoteResult;
 import eum.backed.server.domain.community.voteresult.VoteResultRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;

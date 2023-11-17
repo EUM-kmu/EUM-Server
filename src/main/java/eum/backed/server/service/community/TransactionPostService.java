@@ -171,4 +171,7 @@ public class TransactionPostService {
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(transactionPosts);
         return new DataResponse<>(transactionPostDTOs).success(transactionPostDTOs,"내가 작성한 거래게시글 조회 성공");
     }
+
+    public DataResponse<List<PostResponseDTO.PostResponse>> findByFilter(Long categoryId) {
+    }
 }

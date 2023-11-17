@@ -11,6 +11,8 @@ import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
 import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccountRepository;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccountRepository;
+import eum.backed.server.domain.community.chat.ChatRoom;
+import eum.backed.server.domain.community.chat.ChatRoomRepository;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.user.Users;
@@ -31,6 +33,7 @@ public class BankAccountService {
     private final PasswordEncoder passwordEncoder;
     private final ProfileRepository profileRepository;
     private final UsersRepository usersRepository;
+    private final ChatRoomRepository chatRoomRepository;
     //일반 유저 계정 생성
     public void createUserBankAccount(String nickname, String password,Users user){
         UserBankAccount userBankAccount = UserBankAccount.toEntity(nickname,passwordEncoder.encode(password),user);
@@ -82,5 +85,23 @@ public class BankAccountService {
     }
 
 
+    public DataResponse remittanceByChat(Long ChatRoomId, String email) {
+        ChatRoom getChatRoom = chatRoomRepository.findById(ChatRoomId).orElseThrow(() -> new NullPointerException("Invalid id"));
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
 
+        UserBankAccount myBankAccount = getChatRoom.getPostWriter().getUserBankAccount();
+        if(getUser.getUserBankAccount() != myBankAccount) throw new IllegalArgumentException("유저의 잘못된 채팅 송금 접근");
+        UserBankAccount applicantBankAccount = getChatRoom.getApplicant().getUserBankAccount();
+
+        Long amount = getChatRoom.getTransactionPost().getPay();
+//        송금 결과 각 계좌 반영
+        remittance(myBankAccount, applicantBankAccount, amount);
+//        각 거래 로그 작성
+        BankTransactionDTO.Transaction myTransaction = BankTransactionDTO.toUserTransactionDTO(Code.SUCCESS, Status.TRADING, TrasnactionType.WITHDRAW, amount, myBankAccount, null,applicantBankAccount);
+        BankTransactionDTO.Transaction opponentTransaction = BankTransactionDTO.toUserTransactionDTO(Code.SUCCESS, Status.TRADING,TrasnactionType.DEPOSIT, amount, applicantBankAccount,myBankAccount,null);
+
+        bankTransactionService.createTransactionWithUserBankAccount(myTransaction);
+        bankTransactionService.createTransactionWithUserBankAccount(opponentTransaction);
+        return new DataResponse<>().success("채팅 송금 성공");
+    }
 }

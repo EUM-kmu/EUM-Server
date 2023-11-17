@@ -31,7 +31,7 @@ public class ProfileService {
         Avatar getAvatar = avatarRepository.findByName(createProfile.getAvatar()).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());
 
-        Profile profile = Profile.t0Entity(createProfile,getDong, getAvatar,getUser);
+        Profile profile = Profile.t0Entity(createProfile, getDong, getAvatar,getUser);
         profileRepository.save(profile);
 
         getUser.updateRole(Role.ROLE_USER);

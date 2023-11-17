@@ -6,7 +6,6 @@ import eum.backed.server.domain.community.avatar.Avatar;
 import eum.backed.server.domain.community.region.DONG.Dong;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
-import org.hibernate.mapping.ToOne;
 
 import javax.persistence.*;
 
@@ -61,7 +60,7 @@ public class Profile extends BaseTimeEntity {
         this.avatar = avatar;
     }
 
-    public static Profile t0Entity(ProfileRequestDTO.CreateProfile createProfile, Dong dong , Avatar avatar, Users user){
+    public static Profile t0Entity(ProfileRequestDTO.CreateProfile createProfile, Dong dong, Avatar avatar, Users user){
         return Profile.builder()
                 .nickname(createProfile.getNickname())
                 .dong(dong)

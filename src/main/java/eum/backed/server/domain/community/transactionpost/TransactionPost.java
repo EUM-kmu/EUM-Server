@@ -29,7 +29,7 @@ public class TransactionPost extends BaseTimeEntity {
     @Column
     private String title;
     private String contents;
-    private int pay;
+    private Long pay;
     private String location;
     private int volunteerTime;
     private Boolean providingHelp;

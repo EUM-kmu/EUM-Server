@@ -23,12 +23,12 @@ public class PostResponseDTO {
     @Builder
     @Getter
     @AllArgsConstructor
-    @ApiModel(value = "전체 거래 게시글 데이터 ")
+    @ApiModel(value = "거래 게시글 모음 ")
     public static class PostResponse {
         private Long postId;
         private String title;
         private String location;
-        private int pay;
+        private Long pay;
         private int volunteerTime;
         private boolean providingHelp;
         private String category;
@@ -45,7 +45,7 @@ public class PostResponseDTO {
         private String title;
         private String content;
         private Date startDate;
-        private int pay;
+        private Long pay;
         private String location;
         private int volunteerTime;
         private boolean providingHelp;

@@ -34,19 +34,9 @@ public class BankAccountController {
     public DataResponse remittance(@RequestBody BankAccountRequestDTO.Remittance remittance, @AuthenticationPrincipal String email){
         return bankAccountService.remittance(remittance, email);
     }
-    @GetMapping("/getAllHistory")
-    @ApiOperation(value = "거래 내역 조회")
-    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getAllHistory(@AuthenticationPrincipal String email){
-        return bankTransactionService.getAllHistory(email,null);
-    }
-    @GetMapping("/getDePositHistory")
-    @ApiOperation(value = "입금 내역 조회")
-    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getDePositHistory(@AuthenticationPrincipal String email){
-        return bankTransactionService.getAllHistory(email, TrasnactionType.DEPOSIT);
-    }
-    @GetMapping("/getWithDrawHistory")
-    @ApiOperation(value = "출금 내역 조회")
-    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getWithDrawHistory(@AuthenticationPrincipal String email){
-        return bankTransactionService.getAllHistory(email,TrasnactionType.WITHDRAW);
+    @GetMapping("/getHistory")
+    @ApiOperation(value = "거래 내역 조회",notes = "transactionType 별 전체 입출금 필터")
+    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getAllHistory(@RequestParam TrasnactionType trasnactionType,@AuthenticationPrincipal String email){
+        return bankTransactionService.getAllHistory(email,trasnactionType);
     }
 }
