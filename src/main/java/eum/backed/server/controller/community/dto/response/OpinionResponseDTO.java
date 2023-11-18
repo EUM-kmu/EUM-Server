@@ -49,7 +49,7 @@ public class OpinionResponseDTO {
                 .nickName(opinionPost.getUser().getProfile().getNickname())
                 .userAddress(opinionPost.getUser().getProfile().getTownship().getName())
                 .title(opinionPost.getTitle())
-                .likeCount(opinionPost.getLikeOpinionPosts().size())
+                .likeCount(opinionPost.getLikeCount())
                 .content(opinionPost.getContent())
                 .createdTime(opinionPost.getCreateDate())
                 .build();
@@ -62,7 +62,7 @@ public class OpinionResponseDTO {
                 .title(opinionPost.getTitle())
                 .postContent(opinionPost.getContent())
                 .createdTime(opinionPost.getCreateDate())
-                .likeCount(opinionPost.getLikeOpinionPosts().size())
+                .likeCount(opinionPost.getLikeCount())
                 .commentCount(commentResponseDTO.size())
                 .commentResponses(commentResponseDTO).build();
     }

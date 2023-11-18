@@ -35,10 +35,15 @@ public class OpinionPostController {
     public DataResponse delete(@PathVariable Long postId,@AuthenticationPrincipal String email){
         return opinionPostService.delete(postId, email);
     }
+//    @GetMapping
+//    @ApiOperation(value = "전체 의견 게시글 조회", notes = "전체 의견게시글 조회(동한정)")
+//    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getAllOpinionPosts(@AuthenticationPrincipal String email){
+//        return opinionPostService.getAllOpinionPosts(email);
+//    }
     @GetMapping
-    @ApiOperation(value = "전체 의견 게시글 조회", notes = "전체 의견게시글 조회(동한정)")
-    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getAllOpinionPosts(@AuthenticationPrincipal String email){
-        return opinionPostService.getAllOpinionPosts(email);
+    @ApiOperation(value = "전체 의견 게시글 조회 및 필터 ", notes = "전체 의견게시글 조회 동한정, 뜨거운마을, 검색어")
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@RequestParam(name = "hottest",required = false ) String isShow, @AuthenticationPrincipal String email){
+        return opinionPostService.findByFilter(keyword,isShow,email);
     }
 
     @GetMapping("/{postId}")
@@ -51,17 +56,17 @@ public class OpinionPostController {
     public DataResponse like(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         return likeOpinionPostService.like(postId, email);
     }
-    @GetMapping("/hottest")
-    @ApiOperation(value = "상위 좋아요 개수",notes = "주민의 과반수 이상")
-    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(@AuthenticationPrincipal String email){
-        return opinionPostService.getHottestPosts(email);
-    }
+//    @GetMapping("/hottest")
+//    @ApiOperation(value = "상위 좋아요 개수",notes = "주민의 과반수 이상")
+//    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(@AuthenticationPrincipal String email){
+//        return opinionPostService.getHottestPosts(email);
+//    }
 
-    @GetMapping("/search")
-    @ApiOperation(value = "의견 게시글 키워드 검색")
-    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByKeyword(@RequestParam String keyword, @AuthenticationPrincipal String email){
-        return opinionPostService.findByKeyWord(keyword, email);
-    }
+//    @GetMapping("/search")
+//    @ApiOperation(value = "의견 게시글 키워드 검색")
+//    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByKeyword(@RequestParam String keyword, @AuthenticationPrincipal String email){
+//        return opinionPostService.findByKeyWord(keyword, email);
+//    }
 
 
 

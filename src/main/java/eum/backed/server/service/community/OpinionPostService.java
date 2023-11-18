@@ -13,6 +13,7 @@ import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OpinionPostService {
     private final OpinionPostRepository opinionPostRepository;
@@ -55,9 +57,9 @@ public class OpinionPostService {
         return new DataResponse().success("삭제 성공");
     }
 
-    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getAllOpinionPosts(String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-        List<OpinionPost> opinionPosts = opinionPostRepository.findByTownshipOrderByCreateDateDesc(getUser.getProfile().getTownship()).orElse(Collections.emptyList());
+    private DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getAllOpinionPosts(Township township) {
+//        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        List<OpinionPost> opinionPosts = opinionPostRepository.findByTownshipOrderByCreateDateDesc(township).orElse(Collections.emptyList());
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsRespons = getAllOpinionResponseDTO(opinionPosts);
         return new DataResponse<>(allOpinionPostsRespons).success(allOpinionPostsRespons, "마을 별 게시글 조회");
     }
@@ -88,11 +90,11 @@ public class OpinionPostService {
     }
 
 
-    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-        Township getTownship = getUser.getProfile().getTownship();
-        int majorityCounts = getTownship.getProfiles().size()/2;
-        List<OpinionPost> opinionPosts = opinionPostRepository.findByLikeCountGreaterThanOrderByLikeCountDesc(majorityCounts).orElse(Collections.emptyList());
+    private DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(Township township) {
+//        Users getUser = userRepository.findByEmail(township).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+//        Township getTownship = getUser.getProfile().getTownship();
+//        int majorityCounts = township.getProfiles().size()/2;
+        List<OpinionPost> opinionPosts = opinionPostRepository.findByLikeCountGreaterThanOrderByLikeCountDesc(10).orElse(Collections.emptyList());
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
         return new DataResponse<>(allOpinionPostsResponses).success(allOpinionPostsResponses, "좋아요 과반주 정렬 + 좋아요 순");
     }
@@ -104,10 +106,22 @@ public class OpinionPostService {
         return new DataResponse<>(allOpinionPostsResponses).success(allOpinionPostsResponses, "내가 작성한 의견 게시글 조회");
     }
 
-    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByKeyWord(String keyWord, String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-        List<OpinionPost> opinionPosts = opinionPostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(getUser.getProfile().getTownship(), keyWord).orElse(Collections.emptyList());
+    private DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByKeyWord(String keyWord, Township township) {
+//        Users getUser = userRepository.findByEmail(township).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        List<OpinionPost> opinionPosts = opinionPostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(township, keyWord).orElse(Collections.emptyList());
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
         return new DataResponse<>(allOpinionPostsResponses).success(allOpinionPostsResponses, "내가 작성한 의견 게시글 조회");
+    }
+
+    public DataResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByFilter(String keyword, String isShow, String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        Township getTownship = getUser.getProfile().getTownship();
+        if(!(keyword == null || keyword.isBlank())) {
+            return findByKeyWord(keyword, getTownship);
+        }else if (isShow!=null &&isShow.equals("true") ){
+            log.info(">>>>>."+isShow);
+            return getHottestPosts(getTownship);
+        }
+        return getAllOpinionPosts(getTownship);
     }
 }
