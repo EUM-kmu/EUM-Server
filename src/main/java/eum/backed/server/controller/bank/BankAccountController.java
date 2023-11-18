@@ -16,27 +16,27 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bankAccount")
+@RequestMapping("/bank-account")
 @RequiredArgsConstructor
-@Api(tags = "계좌관련 api")
+@Api(tags = "bank account ")
 @Slf4j
 public class BankAccountController {
     private final BankAccountService bankAccountService;
     private final BankTransactionService bankTransactionService;
 
-    @PostMapping("/updatePassword")
+    @PutMapping("/password")
     @ApiOperation(value = "카드 비밀 번호 바꾸기")
-    public DataResponse updatePassword(@RequestBody BankAccountResponseDTO.UpdatePassword updatePassword,@AuthenticationPrincipal String email){
-        return bankAccountService.updatePassword(updatePassword.getPassword(),email);
+    public DataResponse updatePassword(@RequestBody BankAccountRequestDTO.UpdatePassword updatePassword,@AuthenticationPrincipal String email){
+        return bankAccountService.updatePassword(updatePassword,email);
     }
     @PostMapping("/remittance")
     @ApiOperation(value = "거래(송금하기)")
     public DataResponse remittance(@RequestBody BankAccountRequestDTO.Remittance remittance, @AuthenticationPrincipal String email){
         return bankAccountService.remittance(remittance, email);
     }
-    @GetMapping("/getHistory")
+    @GetMapping("/{transactionType}")
     @ApiOperation(value = "거래 내역 조회",notes = "transactionType 별 전체 입출금 필터")
-    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getAllHistory(@RequestParam TrasnactionType trasnactionType,@AuthenticationPrincipal String email){
-        return bankTransactionService.getAllHistory(email,trasnactionType);
+    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getAllHistory(@PathVariable TrasnactionType transactionType,@AuthenticationPrincipal String email){
+        return bankTransactionService.getAllHistory(email,transactionType);
     }
 }

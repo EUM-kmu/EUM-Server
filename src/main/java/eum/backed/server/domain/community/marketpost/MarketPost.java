@@ -1,10 +1,11 @@
-package eum.backed.server.domain.community.transactionpost;
+package eum.backed.server.domain.community.marketpost;
 
 import eum.backed.server.common.BaseTimeEntity;
+import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.community.apply.Apply;
-import eum.backed.server.domain.community.category.TransactionCategory;
+import eum.backed.server.domain.community.category.MarketCategory;
 import eum.backed.server.domain.community.comment.TransactionComment;
-import eum.backed.server.domain.community.region.DONG.Dong;
+import eum.backed.server.domain.community.region.DONG.Township;
 import eum.backed.server.domain.community.user.Users;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -20,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class TransactionPost extends BaseTimeEntity {
+public class MarketPost extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,11 +33,13 @@ public class TransactionPost extends BaseTimeEntity {
     private Long pay;
     private String location;
     private int volunteerTime;
-    private Boolean providingHelp;
     private int maxNumOfPeople;
     private int currentAcceptedPeople;
     private Date startDate;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private MarketType marketType;
     @Column
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(value = "Status", allowableValues = "RECRUITING, TRADING, COMPLETED")
@@ -53,16 +56,16 @@ public class TransactionPost extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name="category_id")
-    private TransactionCategory transactionCategory;
+    private MarketCategory marketCategory;
 
-    @OneToMany(mappedBy = "transactionPost", orphanRemoval = true)
+    @OneToMany(mappedBy = "marketPost", orphanRemoval = true)
     private List<Apply> applies = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "dong_id")
-    private Dong dong;
+    @JoinColumn(name = "township_id")
+    private Township township;
 
-    @OneToMany(mappedBy = "transactionPost")
+    @OneToMany(mappedBy = "marketPost")
     private List<TransactionComment> transactionComments = new ArrayList<>();
 
     public void updateTitle(String title) {
@@ -82,5 +85,6 @@ public class TransactionPost extends BaseTimeEntity {
     public void updateStartDate(Date startDate) {this.startDate = startDate;}
     public void updateSlot(Slot slot) {this.slot = slot;}
     public  void updateLocation(String location) {this.location = location;}
-    public  void updateDong(Dong dong){this.dong = dong;}
+    public  void updateDong(Township townShip){this.township = townShip;}
+
 }

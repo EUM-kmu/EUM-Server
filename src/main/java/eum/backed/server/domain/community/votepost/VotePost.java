@@ -2,7 +2,7 @@ package eum.backed.server.domain.community.votepost;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.comment.VoteComment;
-import eum.backed.server.domain.community.region.DONG.Dong;
+import eum.backed.server.domain.community.region.DONG.Township;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.voteresult.VoteResult;
 import lombok.*;
@@ -38,7 +38,7 @@ public class VotePost extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name="dong_id")
-    private Dong dong;
+    private Township township;
 
     @OneToMany(mappedBy = "votePost", orphanRemoval = true)
     private List<VoteResult> voteResults = new ArrayList<>();
@@ -74,6 +74,6 @@ public class VotePost extends BaseTimeEntity {
                 .total(0)
                 .endTime(endTime)
                 .user(user)
-                .dong(user.getProfile().getDong()).build();
+                .township(user.getProfile().getTownship()).build();
     }
 }

@@ -3,7 +3,7 @@ package eum.backed.server.controller.community.dto.response;
 import eum.backed.server.common.DTO.Time;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.profile.Profile;
-import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.Users;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,16 +28,16 @@ public class ApplyResponseDTO {
         private Long postId;
         private Boolean isAccepted;
     }
-    public ApplyListResponse newApplyListResponse(TransactionPost transactionPost, Users applicant, Profile profile, Apply apply){
+    public ApplyListResponse newApplyListResponse(MarketPost marketPost, Users applicant, Profile profile, Apply apply){
         Date date = Date.from(apply.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
         return ApplyListResponse.builder()
                 .applyId(apply.getApplyId())
                 .applicantId(applicant.getUserId())
                 .applicantNickName(profile.getNickname())
-                .applicantAddress(profile.getDong().getDong())
+                .applicantAddress(profile.getTownship().getName())
                 .customCreatedTime(time.calculateTime(date))
                 .introduction(apply.getContent())
-                .postId(transactionPost.getTransactionPostId())
+                .postId(marketPost.getTransactionPostId())
                 .isAccepted(apply.getIsAccepted()).build();
     }
 }

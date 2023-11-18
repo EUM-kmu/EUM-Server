@@ -18,12 +18,12 @@ public class ProfileResponseDTO {
     private String address;
     private int totalSunrisePay;
     private String avatarPhotoURL;
-    private int balance;
+    private Long balance;
 
     public static ProfileResponseDTO toNewProfileResponseDTO(Users user, Profile profile){
-        String si = profile.getDong().getGu().getSi().getSi();
-        String gu = profile.getDong().getGu().getGu();
-        String dong = profile.getDong().getDong();
+        String si = profile.getTownship().getTown().getCity().getName();
+        String gu = profile.getTownship().getTown().getName();
+        String dong = profile.getTownship().getName();
         String fullAddress = si + " " + gu + " " + dong;
 
 
@@ -35,7 +35,7 @@ public class ProfileResponseDTO {
                 .address(fullAddress)
                 .totalSunrisePay(profile.getTotalSunrisePay())
                 .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
-//                .balance(user.get().getBalance())
+                .balance(user.getUserBankAccount().getBalance())
                 .build();
     }
 

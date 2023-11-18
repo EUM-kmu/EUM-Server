@@ -9,25 +9,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/opinionComment")
+@RequestMapping("/post/opinion")
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "의견 댓글")
+@Api(tags = "opinion comment")
 public class OpinionCommentController {
     private final CommentServiceImpl commentService;
-    @PostMapping()
-    public DataResponse create(@RequestBody CommentRequestDTO.Create create, @AuthenticationPrincipal String email){
-        return commentService.createComment(create, email, CommentType.OPINION);
+    @PostMapping("/{postId}/comment")
+    public DataResponse create(@PathVariable Long postId,@RequestBody CommentRequestDTO.Create create, @AuthenticationPrincipal String email){
+        return commentService.createComment(postId,create, email, CommentType.OPINION);
     }
 
-    @PutMapping()
-    public DataResponse update(@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal String email){
-        return commentService.updateComment(update, email,CommentType.OPINION);
+    @PutMapping("/{postId}/comment/{commentId}")
+    public DataResponse update(@PathVariable Long commentId,@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal String email){
+        return commentService.updateComment(commentId,update, email,CommentType.OPINION);
     }
 
-    @DeleteMapping
-    public DataResponse delete(@RequestParam Long opinionPostId,@AuthenticationPrincipal String email){
-        return commentService.deleteComment(opinionPostId, email,CommentType.OPINION);
+    @DeleteMapping("/{postId}/comment/{commentId}")
+    public DataResponse delete(@PathVariable Long commentId,@AuthenticationPrincipal String email){
+        return commentService.deleteComment(commentId, email,CommentType.OPINION);
     }
 
 }

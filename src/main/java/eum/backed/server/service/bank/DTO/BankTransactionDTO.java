@@ -5,6 +5,7 @@ import eum.backed.server.domain.bank.bankacounttransaction.Status;
 import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
 import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
+import eum.backed.server.domain.community.user.Users;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,22 @@ public class BankTransactionDTO {
         private UserBankAccount receiverBankAccount;
         private UserBankAccount senderBankAccount;
         private BranchBankAccount branchBankAccount;
+    }
+    @Getter
+    @Setter
+    @Builder
+    public static class TransactionAccount{
+        private UserBankAccount sender;
+        private UserBankAccount receiver;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class UpdateTotalSunrise{
+        private Users me;
+        private Users receiver;
+        private Long amount;
     }
 
     public static Transaction toInitialDTO(Code code, Status status, Long amount, UserBankAccount userBankAccount, BranchBankAccount branchBankAccount){

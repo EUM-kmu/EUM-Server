@@ -14,7 +14,6 @@ public class OpinionPostRequestDTO {
     @Getter
     @Setter
     public static class Update {
-        private Long opinionPostId;
         private String title;
         private String content;
     }

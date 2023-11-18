@@ -14,48 +14,43 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/votepost")
+@RequestMapping("/post/vote")
 @RequiredArgsConstructor
-@Api(tags = "투표 게시글 작성")
+@Api(tags = "vote")
 public class VotePostController {
     private final VotePostService votePostService;
-    @PostMapping("/create")
+    @PostMapping
     @ApiOperation(value = "투표 게시글 작성")
     public DataResponse create(@RequestBody VotePostRequestDTO.Create create, @AuthenticationPrincipal String email) throws ParseException {
         return votePostService.create(create, email);
     }
-    @PutMapping("/update")
+    @PutMapping("{postId}")
     @ApiOperation(value = "투표 게시글 수정")
-    public DataResponse update(@RequestBody VotePostRequestDTO.Update update, @AuthenticationPrincipal String email) throws ParseException {
-        return votePostService.update(update,email);
+    public DataResponse update(@PathVariable Long postId,@RequestBody VotePostRequestDTO.Update update, @AuthenticationPrincipal String email) throws ParseException {
+        return votePostService.update(postId,update,email);
     }
-    @DeleteMapping("/delete")
+    @DeleteMapping("/{postId}")
     @ApiOperation(value = "투표 게시글 삭제")
-    public DataResponse delete(@RequestParam Long votePostId, @AuthenticationPrincipal String email){
-        return votePostService.delete(votePostId, email);
+    public DataResponse delete(@PathVariable Long postId, @AuthenticationPrincipal String email){
+        return votePostService.delete(postId, email);
     }
-    @GetMapping("/getAllPosts")
+    @GetMapping()
     @ApiOperation(value = "전체 투표 게시글 조회")
     public DataResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(@AuthenticationPrincipal String email){
         return votePostService.getAllVotePosts(email);
     }
 
-    @GetMapping("/getPostWithComments")
+    @GetMapping("/{postId}")
     @ApiOperation(value = "게시글아이디별 출력", notes = "게시글 정보 + 댓글")
-    public DataResponse<VotePostResponseDTO.VotePostWithComment> getVotePostWithComment(@RequestParam Long postId,@AuthenticationPrincipal String email){
+    public DataResponse<VotePostResponseDTO.VotePostWithComment> getVotePostWithComment(@PathVariable Long postId,@AuthenticationPrincipal String email){
         return votePostService.getVotePostWithComment(postId, email);
     }
-    @PostMapping("/voting")
+    @PostMapping("/{postId}/voting")
     @ApiOperation(value = "투표하기")
-    public DataResponse voting(@RequestParam VotePostRequestDTO.Voting voting,@AuthenticationPrincipal String email){
-        return votePostService.voting(voting, email);
+    public DataResponse voting(@PathVariable Long postId,@RequestBody VotePostRequestDTO.Voting voting,@AuthenticationPrincipal String email){
+        return votePostService.voting(postId,voting, email);
     }
 
-    @GetMapping("/mypost")
-    @ApiOperation(value = "내가 작성한 투표 게시글")
-    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> getMyPosts(@AuthenticationPrincipal String email){
-        return votePostService.getMyPosts(email);
-    }
 
     @GetMapping("/search")
     @ApiOperation(value = "투표 게시글 키워드 검색")

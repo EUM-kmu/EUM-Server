@@ -20,6 +20,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -39,18 +41,18 @@ public class VotePostService {
 
     public DataResponse create(VotePostRequestDTO.Create create, String email) throws ParseException {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        if(getUser.getRole() != Role.ROLE_USER) throw new IllegalArgumentException("프로필이 없는 유저");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
+        if(getUser.getRole() == Role.ROLE_TEMPORARY_USER) throw new IllegalArgumentException("프로필이 없는 유저");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.KOREAN);
         VotePost votePost = VotePost.toEntity(create.getTitle(), create.getContent(), simpleDateFormat.parse(create.getEndDate()), getUser);
         votePostRepository.save(votePost);
         return new DataResponse().success("게시글 작성 성공");
     }
 
-    public DataResponse update(VotePostRequestDTO.Update update,String email) throws ParseException {
+    public DataResponse update(Long postId,VotePostRequestDTO.Update update,String email) throws ParseException {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        VotePost getVotePost = votePostRepository.findById(update.getVotePostId()).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+        VotePost getVotePost = votePostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
         if(getVotePost.getUser() != getUser) throw new IllegalArgumentException("수정권한이 없는 유저");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.KOREAN);
         getVotePost.updateContent(update.getContent());
         getVotePost.updateTitle(update.getTitle());
         getVotePost.updateEndTime(simpleDateFormat.parse(update.getEndDate()));
@@ -67,17 +69,18 @@ public class VotePostService {
     }
     public DataResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<VotePost> votePosts = votePostRepository.findByDongOrderByCreateDate(getUser.getProfile().getDong()).orElse(Collections.emptyList());
+        List<VotePost> votePosts = votePostRepository.findByTownshipOrderByCreateDate(getUser.getProfile().getTownship()).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return new DataResponse<>(votePostResponses).success(votePostResponses,"전체 투표 게시글 조회");
     }
 
-    public DataResponse voting(VotePostRequestDTO.Voting voting, String email) {
+    public DataResponse voting(Long postId,VotePostRequestDTO.Voting voting, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        VotePost getVotePost = votePostRepository.findById(voting.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+        VotePost getVotePost = votePostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
         if (voteResultRepository.existsByUserAndVotePost(getUser,getVotePost)) throw new IllegalArgumentException("이미 투표한 사람");
         LocalDateTime now = LocalDateTime.now();
-        Date currentDate = Date.from(Instant.from(now));
+        ZonedDateTime zonedDateTime = now.atZone(ZoneId.systemDefault());
+        Date currentDate = Date.from(zonedDateTime.toInstant());
         if(currentDate.after(getVotePost.getEndTime())) throw new RuntimeException("시간이 지나서 투표를 할 수 없습니다");
 
         VoteResult voteResult = VoteResult.toEntity(voting.getAgree(), getUser, getVotePost);
@@ -97,14 +100,14 @@ public class VotePostService {
                     .postId(postId)
                     .commentId(voteComment.getVoteCommentId())
                     .commentNickName(voteComment.getUser().getProfile().getNickname())
-                    .commentUserAddress(voteComment.getUser().getProfile().getDong().getDong())
+                    .commentUserAddress(voteComment.getUser().getProfile().getTownship().getName())
                     .isPostWriter(getVotePost.getUser() == voteComment.getUser())
                     .createdTime(voteComment.getCreateDate())
                     .commentContent(voteComment.getContent()).build();
             return commentResponse;
         }).collect(Collectors.toList());
         VotePostResponseDTO.VotePostWithComment votePostWithComment = votePostResponseDTO.newVotePostWithComment(getVotePost,commentResponses,amIVote);
-        return new DataResponse<>(votePostWithComment).success("게시글 조회 + 댓글 목록");
+        return new DataResponse<>(votePostWithComment).success(votePostWithComment,"게시글 조회 + 댓글 목록");
     }
     private void reflectResult(VotePost votePost, Boolean IsAgree){
         if (IsAgree) {
@@ -125,7 +128,7 @@ public class VotePostService {
 
     public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(String keyWord, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<VotePost> votePosts = votePostRepository.findByDongAndTitleContainingOrderByCreateDateDesc(getUser.getProfile().getDong(), keyWord).orElse(Collections.emptyList());
+        List<VotePost> votePosts = votePostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(getUser.getProfile().getTownship(), keyWord).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return new DataResponse<>(votePostResponses).success(votePostResponses,"투표 게시글 키워드 검색");
     }

@@ -1,7 +1,8 @@
 package eum.backed.server.controller.community.dto.request;
 
-import eum.backed.server.domain.community.transactionpost.Slot;
-import eum.backed.server.domain.community.transactionpost.Status;
+import eum.backed.server.controller.community.dto.request.enums.MarketType;
+import eum.backed.server.domain.community.marketpost.Slot;
+import eum.backed.server.domain.community.marketpost.Status;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,10 +21,9 @@ public class PostRequestDTO {
         private String startTime;
         private Slot slot;
         @NotEmpty(message = "금액을 입력하세요;")
-        private Long pay;
         private String location;
         private int volunteerTime;
-        private boolean providingHelp;
+        private MarketType marketType;
         private int maxNumOfPeople;
         @NotEmpty(message = "카테고리를 선택")
         private Long categoryId;
@@ -43,7 +43,6 @@ public class PostRequestDTO {
 //        @NotEmpty(message = "금액을 입력하세요;")
         private Slot slot;
         private String startDate;
-        private int pay; //undefineE도 있음,,
         private String location;
         private int providingHelp;
         private int maxNumOfPeople;

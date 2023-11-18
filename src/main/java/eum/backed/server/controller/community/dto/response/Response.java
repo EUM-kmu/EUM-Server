@@ -1,4 +1,4 @@
-package eum.backed.server.controller.community.dto;
+package eum.backed.server.controller.community.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

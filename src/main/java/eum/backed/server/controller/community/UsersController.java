@@ -1,20 +1,19 @@
 package eum.backed.server.controller.community;
 
 import eum.backed.server.common.DTO.DataResponse;
-import eum.backed.server.controller.community.dto.Response;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
+import eum.backed.server.controller.community.dto.response.Response;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
+import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.lib.Helper;
 import eum.backed.server.service.community.UsersService;
 import io.swagger.annotations.Api;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Api(tags = "user")
 public class UsersController {
-    @Autowired
-    private UsersService usersService;
+    private final UsersService usersService;
     private final Response response;
     @ApiOperation(value = "자체 회원가입", notes = "자체 회원가입")
     @PostMapping("/auth/signup")

@@ -3,8 +3,8 @@ package eum.backed.server.domain.community.region.DONG;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.profile.Profile;
-import eum.backed.server.domain.community.region.GU.Gu;
-import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.region.GU.Town;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.votepost.VotePost;
 import lombok.*;
 
@@ -18,28 +18,28 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Dong extends BaseTimeEntity {
+public class Township extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long DongId;
+    private Long townshipId;
 
     @Column
-    private String dong;
+    private String name;
 
     @ManyToOne
-    @JoinColumn(name="gu_id")
-    private Gu gu;
+    @JoinColumn(name="town_id")
+    private Town town;
 
-    @OneToMany(mappedBy = "dong")
+    @OneToMany(mappedBy = "township")
     private List<Profile> profiles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "dong")
-    private List<TransactionPost> transactionPosts = new ArrayList<>();
+    @OneToMany(mappedBy = "township")
+    private List<MarketPost> marketPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "dong")
+    @OneToMany(mappedBy = "township")
     private List<OpinionPost> opinionPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "dong")
+    @OneToMany(mappedBy = "township")
     private List<VotePost> votePosts = new ArrayList<>();
 
 }

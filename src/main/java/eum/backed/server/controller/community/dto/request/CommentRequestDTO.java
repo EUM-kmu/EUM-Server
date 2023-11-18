@@ -9,7 +9,6 @@ public class CommentRequestDTO {
     @Setter
     @Getter
     public static class Create{
-        private Long postId;
         @NotEmpty
         private String content;
     }
@@ -17,7 +16,6 @@ public class CommentRequestDTO {
     @Getter
     @Setter
     public static class Update{
-        private Long commentId;
         private String content;
 
     }

@@ -1,9 +1,7 @@
 package eum.backed.server.common.DTO;
 
-import eum.backed.server.controller.community.dto.Response;
 import lombok.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;

@@ -3,7 +3,7 @@ package eum.backed.server.domain.community.opinionpost;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.comment.OpinionComment;
 import eum.backed.server.domain.community.likeopinionpost.LikeOpinionPost;
-import eum.backed.server.domain.community.region.DONG.Dong;
+import eum.backed.server.domain.community.region.DONG.Township;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
 
@@ -32,8 +32,8 @@ public class OpinionPost extends BaseTimeEntity {
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name="dong_id")
-    private Dong dong;
+    @JoinColumn(name="township_id")
+    private Township township;
 
     @OneToMany(mappedBy = "opinionPost", orphanRemoval = true)
     private List<OpinionComment> opinionComments = new ArrayList<>();
@@ -53,9 +53,9 @@ public class OpinionPost extends BaseTimeEntity {
         this.likeCount = likeCount;
     }
 
-    public static OpinionPost toEntity(String title, String content, Users user, Dong dong){
+    public static OpinionPost toEntity(String title, String content, Users user, Township townShip){
         return OpinionPost.builder()
-                .dong(dong)
+                .township(townShip)
                 .title(title)
                 .content(content)
                 .user(user).build();

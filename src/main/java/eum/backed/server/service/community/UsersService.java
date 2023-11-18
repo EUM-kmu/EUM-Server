@@ -2,8 +2,8 @@ package eum.backed.server.service.community;
 
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.config.jwt.JwtTokenProvider;
-import eum.backed.server.controller.community.dto.Response;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
+import eum.backed.server.controller.community.dto.response.Response;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;

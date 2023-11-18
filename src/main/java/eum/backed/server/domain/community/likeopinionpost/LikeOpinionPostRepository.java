@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface LikeOpinionPostRepository extends JpaRepository<LikeOpinionPost,Long> {
     Boolean existsByUserAndOpinionPost(Users user, OpinionPost opinionPost);
 
-    Optional<LikeOpinionPost> findByUserAndOpinionPost(Users user, OpinionPost opinionPost);
+    LikeOpinionPost findByUserAndOpinionPost(Users user, OpinionPost opinionPost);
 }

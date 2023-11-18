@@ -1,7 +1,7 @@
 package eum.backed.server.domain.community.comment;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
 
@@ -27,16 +27,16 @@ public class TransactionComment extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name="transaction_post_id")
-    private TransactionPost transactionPost;
+    private MarketPost marketPost;
 
     public void updateContent(String content) {
         this.content = content;
     }
 
-    public static TransactionComment toEntity(String content, Users user, TransactionPost transactionPost){
+    public static TransactionComment toEntity(String content, Users user, MarketPost marketPost){
         return TransactionComment.builder()
                 .content(content)
                 .user(user)
-                .transactionPost(transactionPost).build();
+                .marketPost(marketPost).build();
     }
 }

@@ -13,7 +13,7 @@ import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.promotionpost.PromotionPost;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.sleeperuser.SleeperUser;
-import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.votepost.VotePost;
 import eum.backed.server.domain.community.voteresult.VoteResult;
 import io.swagger.annotations.ApiModelProperty;
@@ -65,7 +65,7 @@ public class Users extends BaseTimeEntity implements UserDetails {
 
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<TransactionPost> transactionPosts = new ArrayList<>();
+    private List<MarketPost> marketPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<OpinionPost> opinionPosts = new ArrayList<>();

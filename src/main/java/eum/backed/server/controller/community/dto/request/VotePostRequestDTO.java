@@ -16,7 +16,6 @@ public class VotePostRequestDTO {
     @Getter
     @Setter
     public static class Update {
-        private Long votePostId;
         private String title;
         private String content;
         private String endDate;
@@ -25,7 +24,6 @@ public class VotePostRequestDTO {
     @Getter
     @Setter
     public static class Voting {
-        private Long postId;
         private Boolean agree;
     }
 }

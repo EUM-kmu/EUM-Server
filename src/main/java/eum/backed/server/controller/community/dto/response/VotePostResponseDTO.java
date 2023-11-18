@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 @Component
@@ -15,7 +17,7 @@ public class VotePostResponseDTO {
     @Getter
     @Setter
     public static class VotePostResponses{
-        private Long userId;
+        private Long postId;
         private String postTitle;
         private Boolean isVoting;
         private int commentCount;
@@ -23,9 +25,9 @@ public class VotePostResponseDTO {
 
         public VotePostResponses(VotePost votePost) {
             LocalDateTime now = LocalDateTime.now();
-            Date currentDate = Date.from(Instant.from(now));
-
-            this.userId = votePost.getUser().getUserId();
+            ZonedDateTime zonedDateTime = now.atZone(ZoneId.systemDefault());
+            Date currentDate = Date.from(zonedDateTime.toInstant());
+            this.postId = votePost.getVotePostId();
             this.postTitle = votePost.getTitle();
             this.isVoting = currentDate.before(votePost.getEndTime());
             this.commentCount = votePost.getVoteComments().size();
@@ -53,11 +55,12 @@ public class VotePostResponseDTO {
 
     public static VotePostWithComment newVotePostWithComment(VotePost votePost, List<CommentResponseDTO.CommentResponse> commentResponses,Boolean amIVote){
         LocalDateTime now = LocalDateTime.now();
-        Date currentDate = Date.from(Instant.from(now));
+        ZonedDateTime zonedDateTime = now.atZone(ZoneId.systemDefault());
+        Date currentDate = Date.from(zonedDateTime.toInstant());
         return VotePostWithComment.builder()
                 .writerId(votePost.getUser().getUserId())
                 .writerNickName(votePost.getUser().getProfile().getNickname())
-                .writerAddress(votePost.getUser().getProfile().getAddress())
+                .writerAddress(votePost.getUser().getProfile().getTownship().getName())
                 .agreeCounts(votePost.getAgreeCount())
                 .disagreeCount(votePost.getDisagreeCount())
                 .postTitle(votePost.getTitle())

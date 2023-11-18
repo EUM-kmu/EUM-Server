@@ -1,7 +1,7 @@
 package eum.backed.server.domain.community.scrap;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
 
@@ -24,5 +24,5 @@ public class Scrap extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name="transaction_post_id")
-    private TransactionPost transactionPost;
+    private MarketPost marketPost;
 }

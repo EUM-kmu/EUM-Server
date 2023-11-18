@@ -1,9 +1,11 @@
 package eum.backed.server.controller.community.dto.response;
 
 import eum.backed.server.common.DTO.Time;
-import eum.backed.server.domain.community.transactionpost.Slot;
-import eum.backed.server.domain.community.transactionpost.TransactionPost;
-import eum.backed.server.domain.community.transactionpost.Status;
+import eum.backed.server.controller.community.dto.request.enums.MarketType;
+import eum.backed.server.domain.community.marketpost.Slot;
+import eum.backed.server.domain.community.marketpost.MarketPost;
+import eum.backed.server.domain.community.marketpost.Status;
+import eum.backed.server.domain.community.user.Users;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +32,7 @@ public class PostResponseDTO {
         private String location;
         private Long pay;
         private int volunteerTime;
-        private boolean providingHelp;
+        private MarketType marketType;
         private String category;
         private Status status;
         private LocalDateTime createdDate;
@@ -39,16 +41,17 @@ public class PostResponseDTO {
     @Builder
     @Getter
     @AllArgsConstructor
-    @ApiModel(value = "전체 거래 게시글 데이터 ")
+    @ApiModel(value = "id 별 게시글 + 댓글 ")
     public static class TransactionPostWithComment {
         private Long postId;
+        private Boolean isWriter;
         private String title;
         private String content;
         private Date startDate;
         private Long pay;
         private String location;
         private int volunteerTime;
-        private boolean providingHelp;
+        private MarketType marketType;
         private int currentApplicant;
         private int maxNumOfPeople;
         private String category;
@@ -58,35 +61,36 @@ public class PostResponseDTO {
         private LocalDateTime createdDate;
         private List<CommentResponseDTO.CommentResponse> commentResponses;
     }
-    public PostResponseDTO.PostResponse newPostResponse(TransactionPost transactionPost){
+    public PostResponseDTO.PostResponse newPostResponse(MarketPost marketPost){
         return PostResponse.builder()
-                .postId(transactionPost.getTransactionPostId())
-                .title(transactionPost.getTitle())
-                .createdDate(transactionPost.getCreateDate())
-                .pay(transactionPost.getPay())
-                .volunteerTime(transactionPost.getVolunteerTime())
-                .providingHelp(transactionPost.getProvidingHelp())
-                .category(transactionPost.getTransactionCategory().getContents())
-                .status(transactionPost.getStatus())
-                .commentCount(transactionPost.getTransactionComments().size())
+                .postId(marketPost.getTransactionPostId())
+                .title(marketPost.getTitle())
+                .createdDate(marketPost.getCreateDate())
+                .pay(marketPost.getPay())
+                .volunteerTime(marketPost.getVolunteerTime())
+                .marketType(marketPost.getMarketType())
+                .category(marketPost.getMarketCategory().getContents())
+                .status(marketPost.getStatus())
+                .commentCount(marketPost.getTransactionComments().size())
                 .build();
     }
-    public TransactionPostWithComment newTransactionPostWithComment(TransactionPost transactionPost, List<CommentResponseDTO.CommentResponse> commentResponses){
+    public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses){
         return TransactionPostWithComment.builder()
-                .postId(transactionPost.getTransactionPostId())
-                .title(transactionPost.getTitle())
-                .content(transactionPost.getContents())
-                .startDate(transactionPost.getStartDate())
-                .createdDate(transactionPost.getCreateDate())
-                .pay(transactionPost.getPay())
-                .location(transactionPost.getLocation())
-                .volunteerTime(transactionPost.getVolunteerTime())
-                .providingHelp(transactionPost.getProvidingHelp())
-                .currentApplicant(transactionPost.getCurrentAcceptedPeople())
-                .maxNumOfPeople(transactionPost.getMaxNumOfPeople())
-                .category(transactionPost.getTransactionCategory().getContents())
-                .status(transactionPost.getStatus())
-                .slot(transactionPost.getSlot())
+                .postId(marketPost.getTransactionPostId())
+                .isWriter(user == marketPost.getUser())
+                .title(marketPost.getTitle())
+                .content(marketPost.getContents())
+                .startDate(marketPost.getStartDate())
+                .createdDate(marketPost.getCreateDate())
+                .pay(marketPost.getPay())
+                .location(marketPost.getLocation())
+                .volunteerTime(marketPost.getVolunteerTime())
+                .marketType(marketPost.getMarketType())
+                .currentApplicant(marketPost.getCurrentAcceptedPeople())
+                .maxNumOfPeople(marketPost.getMaxNumOfPeople())
+                .category(marketPost.getMarketCategory().getContents())
+                .status(marketPost.getStatus())
+                .slot(marketPost.getSlot())
                 .commentResponses(commentResponses)
                 .commentCount(commentResponses.size())
                 .build();

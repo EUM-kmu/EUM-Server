@@ -2,7 +2,7 @@ package eum.backed.server.domain.community.chat;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.apply.Apply;
-import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
 
@@ -25,7 +25,7 @@ public class ChatRoom extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "transaciton_post_id")
-    private TransactionPost transactionPost;
+    private MarketPost marketPost;
 
     @ManyToOne
     @JoinColumn(name="apply_id")
@@ -41,13 +41,13 @@ public class ChatRoom extends BaseTimeEntity {
 
 
 
-    public static ChatRoom toEntity(String chatRoomKeyFB, TransactionPost transactionPost, Apply apply){
+    public static ChatRoom toEntity(String chatRoomKeyFB, MarketPost marketPost, Apply apply){
         return ChatRoom.builder()
                 .chatRoomKeyFB(chatRoomKeyFB)
-                .transactionPost(transactionPost)
+                .marketPost(marketPost)
                 .apply(apply)
                 .isDeleted(false)
-                .postWriter(transactionPost.getUser())
+                .postWriter(marketPost.getUser())
                 .applicant(apply.getUser())
                 .build();
 

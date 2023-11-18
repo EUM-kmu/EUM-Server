@@ -3,7 +3,7 @@ package eum.backed.server.domain.community.profile;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.domain.community.avatar.Avatar;
-import eum.backed.server.domain.community.region.DONG.Dong;
+import eum.backed.server.domain.community.region.DONG.Township;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
 
@@ -29,15 +29,15 @@ public class Profile extends BaseTimeEntity {
 
 
     @ManyToOne
-    @JoinColumn(name = "dong_id")
-    private Dong dong;
+    @JoinColumn(name = "township_id")
+    private Township township;
 
     @ManyToOne
-    @JoinColumn(name="my_leve_id")
+    @JoinColumn(name="avatar_id")
     private Avatar avatar;
 
     @OneToOne
-    @JoinColumn(name="ueer_id")
+    @JoinColumn(name="user_id")
     private Users user;
 
     public void updateInstroduction(String introduction) {
@@ -52,18 +52,22 @@ public class Profile extends BaseTimeEntity {
         this.address = address;
     }
 
-    public void updateDong(Dong dong) {
-        this.dong = dong;
+    public void updateTownship(Township township) {
+        this.township = township;
     }
 
     public void upDateAvatar(Avatar avatar) {
         this.avatar = avatar;
     }
 
-    public static Profile t0Entity(ProfileRequestDTO.CreateProfile createProfile, Dong dong, Avatar avatar, Users user){
+    public void addTotalSunrisePay(int totalSunrisePay) {
+        this.totalSunrisePay += totalSunrisePay;
+    }
+
+    public static Profile t0Entity(ProfileRequestDTO.CreateProfile createProfile, Township townShip, Avatar avatar, Users user){
         return Profile.builder()
                 .nickname(createProfile.getNickname())
-                .dong(dong)
+                .township(townShip)
                 .introduction(createProfile.getIntroduction())
                 .totalSunrisePay(0)
                 .avatar(avatar)

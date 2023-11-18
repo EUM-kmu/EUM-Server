@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/apply")
 @RequiredArgsConstructor
-@Api(tags = "지원 api")
+@Api(tags = "apply")
 public class ApplyController {
     private final ApplyService applyService;
     @ApiOperation(value = "지원하기", notes = "도움 게시글에 지원")
@@ -29,9 +29,9 @@ public class ApplyController {
         return applyService.getApplyList(postId);
     }
     @ApiOperation(value = "선정하기", notes = "해당 신청자 선정")
-    @PostMapping("/accept")
-    public DataResponse accept(@RequestBody ApplyRequestDTO.AcceptList acceptList,@AuthenticationPrincipal String email){
-        return applyService.accept(acceptList,email);
+    @PostMapping("/{applyIds}")
+    public DataResponse accept(@PathVariable List<Long> applyIds,@AuthenticationPrincipal String email){
+        return applyService.accept(applyIds,email);
     }
 
 }

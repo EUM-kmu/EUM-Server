@@ -12,24 +12,24 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/transactionComment")
+@RequestMapping("/post/market")
 @RequiredArgsConstructor
-@Api(tags = "거래 게시글 댓글")
-public class TransactionCommentController {
+@Api(tags = "market comment")
+public class MarketCommentController {
     private final CommentServiceImpl commentServiceImpl;
     @ApiOperation(value = "거래 댓글 작성", notes = "댓글 작성")
-    @PostMapping
-    DataResponse create(@RequestBody @Validated CommentRequestDTO.Create create, @AuthenticationPrincipal String email){
-        return commentServiceImpl.createComment(create, email, CommentType.TRANSACTION);
+    @PostMapping("/{postId}/comment")
+    DataResponse create(@PathVariable Long postId,@RequestBody @Validated CommentRequestDTO.Create create, @AuthenticationPrincipal String email){
+        return commentServiceImpl.createComment(postId,create, email, CommentType.TRANSACTION);
     }
     @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
-    @PutMapping
-    DataResponse update(@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal String email){
-        return commentServiceImpl.updateComment(update, email,CommentType.TRANSACTION);
+    @PutMapping("{postId}/comment/{commentId}")
+    DataResponse update(@PathVariable Long commentId,@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal String email){
+        return commentServiceImpl.updateComment(commentId,update, email,CommentType.TRANSACTION);
     }
     @ApiOperation(value = "댓글 삭제", notes = "댓글 삭제")
-    @DeleteMapping
-    DataResponse delete(@RequestParam Long commentId, @AuthenticationPrincipal String email){
+    @DeleteMapping("/{postId}/comment/{commentId}")
+    DataResponse delete(@PathVariable Long commentId, @AuthenticationPrincipal String email){
         return commentServiceImpl.deleteComment(commentId, email,CommentType.TRANSACTION);
     }
 

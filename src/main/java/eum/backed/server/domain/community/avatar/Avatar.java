@@ -14,17 +14,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Avatar extends BaseTimeEntity {
+public class Avatar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long avatarId;
 
     @Column
-    private String name;
     private String avatarPhotoUrl;
-//    @Column
-//    @Enumerated(EnumType.STRING)
-//    private AvatarName avatarName;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private AvatarLevelName avatarLevelName;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private AvatarName avatarName;
 
     @OneToMany(mappedBy = "avatar")
     private List<Profile> profiles = new ArrayList<>();

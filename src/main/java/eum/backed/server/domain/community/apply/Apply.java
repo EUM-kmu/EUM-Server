@@ -1,8 +1,7 @@
 package eum.backed.server.domain.community.apply;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.controller.community.dto.request.ApplyRequestDTO;
-import eum.backed.server.domain.community.transactionpost.TransactionPost;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
 
@@ -29,17 +28,17 @@ public class Apply extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name="transaction_post_id")
-    private TransactionPost transactionPost;
+    private MarketPost marketPost;
 
     public void updateAccepted(Boolean accepted) {
         isAccepted = accepted;
     }
 
-    public static Apply toEntity(String introduction, Users user, TransactionPost transactionPost){
+    public static Apply toEntity(String introduction, Users user, MarketPost marketPost){
         return Apply.builder()
                 .content(introduction)
                 .user(user)
                 .isAccepted(Boolean.FALSE)
-                .transactionPost(transactionPost).build();
+                .marketPost(marketPost).build();
     }
 }

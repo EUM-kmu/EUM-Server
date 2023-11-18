@@ -1,9 +1,10 @@
 package eum.backed.server.controller.community.dto.request;
 
+import eum.backed.server.domain.community.avatar.Avatar;
+import eum.backed.server.domain.community.avatar.AvatarName;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.OneToMany;
 import javax.validation.constraints.NotEmpty;
 
 public class ProfileRequestDTO {
@@ -13,9 +14,9 @@ public class ProfileRequestDTO {
         @NotEmpty
         private String nickname;
         private String introduction;
-        private String dong;
+        private String townShip;
         private String accountPassword;
-        private String avatar;
+        private AvatarName avatarName;
 
     }
     @Getter
@@ -24,9 +25,9 @@ public class ProfileRequestDTO {
         @NotEmpty
         private String nickname;
         private String introduction;
-        private String dong;
+        private String townShip;
         private String accountPassword;
-        private String avatar;
+        private AvatarName avatarName;
 
     }
 
