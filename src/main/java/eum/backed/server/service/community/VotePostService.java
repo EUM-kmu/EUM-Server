@@ -6,6 +6,7 @@ import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.VotePostResponseDTO;
 import eum.backed.server.domain.community.VoteCommentRepository;
 import eum.backed.server.domain.community.comment.VoteComment;
+import eum.backed.server.domain.community.region.DONG.Township;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
@@ -67,9 +68,8 @@ public class VotePostService {
         votePostRepository.delete(getVotePost);
         return new DataResponse().success("게시글 삭제 성공");
     }
-    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<VotePost> votePosts = votePostRepository.findByTownshipOrderByCreateDate(getUser.getProfile().getTownship()).orElse(Collections.emptyList());
+    private DataResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(Township township) {
+        List<VotePost> votePosts = votePostRepository.findByTownshipOrderByCreateDateDesc(township).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return new DataResponse<>(votePostResponses).success(votePostResponses,"전체 투표 게시글 조회");
     }
@@ -126,10 +126,18 @@ public class VotePostService {
         return new DataResponse<>(votePostResponses).success(votePostResponses," 내가 작성한 투표 게시글 조회");
     }
 
-    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(String keyWord, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<VotePost> votePosts = votePostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(getUser.getProfile().getTownship(), keyWord).orElse(Collections.emptyList());
+    private DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(String keyWord, Township township) {
+        List<VotePost> votePosts = votePostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(township, keyWord).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return new DataResponse<>(votePostResponses).success(votePostResponses,"투표 게시글 키워드 검색");
+    }
+
+    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByFilter(String keyword, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        Township getTownship = getUser.getProfile().getTownship();
+        if(!(keyword == null || keyword.isBlank())) {
+            return findByKeyWord(keyword, getTownship);
+        }
+        return getAllVotePosts(getTownship);
     }
 }

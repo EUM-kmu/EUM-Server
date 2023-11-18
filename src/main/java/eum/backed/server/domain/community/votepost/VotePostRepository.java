@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VotePostRepository extends JpaRepository<VotePost,Long> {
-    Optional<List<VotePost>> findByTownshipOrderByCreateDate(Township townShip);
+    Optional<List<VotePost>> findByTownshipOrderByCreateDateDesc(Township townShip);
 
     Optional<List<VotePost>> findByUserOrderByCreateDateDesc(Users users);
 

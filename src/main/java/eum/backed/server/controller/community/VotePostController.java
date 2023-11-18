@@ -34,10 +34,15 @@ public class VotePostController {
     public DataResponse delete(@PathVariable Long postId, @AuthenticationPrincipal String email){
         return votePostService.delete(postId, email);
     }
+//    @GetMapping()
+//    @ApiOperation(value = "전체 투표 게시글 조회")
+//    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(@AuthenticationPrincipal String email){
+//        return votePostService.getAllVotePosts(email);
+//    }
     @GetMapping()
-    @ApiOperation(value = "전체 투표 게시글 조회")
-    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(@AuthenticationPrincipal String email){
-        return votePostService.getAllVotePosts(email);
+    @ApiOperation(value = "전체 투표 게시글 조회 , 검색 필터")
+    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@AuthenticationPrincipal String email){
+        return votePostService.findByFilter(keyword,email);
     }
 
     @GetMapping("/{postId}")
@@ -52,11 +57,11 @@ public class VotePostController {
     }
 
 
-    @GetMapping("/search")
-    @ApiOperation(value = "투표 게시글 키워드 검색")
-    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(@RequestParam String keyWord, @AuthenticationPrincipal String email) {
-        return votePostService.findByKeyWord(keyWord, email);
-    }
+//    @GetMapping("/search")
+//    @ApiOperation(value = "투표 게시글 키워드 검색")
+//    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(@RequestParam String keyWord, @AuthenticationPrincipal String email) {
+//        return votePostService.findByKeyWord(keyWord, email);
+//    }
 
 
 
