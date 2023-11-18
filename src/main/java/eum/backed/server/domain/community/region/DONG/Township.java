@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Township extends BaseTimeEntity {
+public class Township  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long townshipId;

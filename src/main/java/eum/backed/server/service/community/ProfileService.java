@@ -3,10 +3,7 @@ package eum.backed.server.service.community;
 import eum.backed.server.common.DTO.DataResponse;
 import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
-import eum.backed.server.domain.community.avatar.Avatar;
-import eum.backed.server.domain.community.avatar.AvatarRepository;
-import eum.backed.server.domain.community.avatar.Standard;
-import eum.backed.server.domain.community.avatar.StandardRepository;
+import eum.backed.server.domain.community.avatar.*;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.region.DONG.Township;
@@ -74,10 +71,12 @@ public class ProfileService {
     }
 
     public void updateTotalSunrise(Profile profile, Long amount){
-        int sunrise = amount.intValue();
-        profile.addTotalSunrisePay(sunrise);
-        Profile updatedProfile=profileRepository.save(profile);
+        if(profile.getAvatar().getAvatarName() != AvatarName.ORGANIZATION){
+            int sunrise = amount.intValue();
+            profile.addTotalSunrisePay(sunrise);
+            Profile updatedProfile=profileRepository.save(profile);
 
-        levelService.levelUp(updatedProfile);
+            levelService.levelUp(updatedProfile);
+        }
     }
 }

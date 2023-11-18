@@ -32,11 +32,14 @@ public class LevelService {
         Standard cloud = standardRepository.findById(1L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         Standard babySun = standardRepository.findById(2L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         Standard sun = standardRepository.findById(3L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
+        Standard organization = standardRepository.findById(4L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         log.info(String.valueOf(totalSunrise));
-         if ( cloud.getStandard() < totalSunrise && totalSunrise<=babySun.getStandard()  ) {
+        if(totalSunrise <=cloud.getStandard() && totalSunrise > 0){
+            return cloud;
+        } else if ( cloud.getStandard() < totalSunrise && totalSunrise<=babySun.getStandard()  ) {
             return babySun;
         } else if (babySun.getStandard()< totalSunrise ) {
             return sun;
-        }return cloud;
+        }return organization;
     }
 }

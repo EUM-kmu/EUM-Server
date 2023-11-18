@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class City extends BaseTimeEntity {
+public class City{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cityId;
