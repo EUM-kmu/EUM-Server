@@ -5,7 +5,7 @@ import eum.backed.server.domain.admin.inquiry.Inquiry;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.comment.OpinionComment;
-import eum.backed.server.domain.community.comment.TransactionComment;
+import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.comment.VoteComment;
 import eum.backed.server.domain.community.likeopinionpost.LikeOpinionPost;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
@@ -71,7 +71,7 @@ public class Users extends BaseTimeEntity implements UserDetails {
     private List<OpinionPost> opinionPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<TransactionComment> transactionComments = new ArrayList<>();
+    private List<MarketComment> marketComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Scrap> scraps = new ArrayList<>();

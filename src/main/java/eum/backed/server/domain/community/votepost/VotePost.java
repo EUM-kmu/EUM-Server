@@ -29,7 +29,7 @@ public class VotePost extends BaseTimeEntity {
     private int agreeCount;
     private int disagreeCount;
     private int total;
-    private int likeCount;
+//    private int likeCount;
     private Date endTime;
 
     @ManyToOne
@@ -37,7 +37,7 @@ public class VotePost extends BaseTimeEntity {
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name="dong_id")
+    @JoinColumn(name="township_id")
     private Township township;
 
     @OneToMany(mappedBy = "votePost", orphanRemoval = true)

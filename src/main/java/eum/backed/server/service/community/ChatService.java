@@ -41,7 +41,7 @@ public class ChatService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String timestamp = currentTime.format(formatter);
 
-        Chat chat = Chat.toEntity(transactionPostUserNickName, apply.getUser().getProfile().getNickname(), apply.getMarketPost().getTransactionPostId(), apply.getApplyId());
+        Chat chat = Chat.toEntity(transactionPostUserNickName, apply.getUser().getProfile().getNickname(), apply.getMarketPost().getMarketPostId(), apply.getApplyId());
         Message message = Message.toEntity(transactionPostUserNickName, "채팅방이 개설되었어요", timestamp, "");
         String chatRoomKey = chat.saveToFirebase(chat,message);
 

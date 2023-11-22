@@ -37,7 +37,7 @@ public class ApplyResponseDTO {
                 .applicantAddress(profile.getTownship().getName())
                 .customCreatedTime(time.calculateTime(date))
                 .introduction(apply.getContent())
-                .postId(marketPost.getTransactionPostId())
+                .postId(marketPost.getMarketPostId())
                 .isAccepted(apply.getIsAccepted()).build();
     }
 }

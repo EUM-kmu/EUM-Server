@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-    private final TransactionCommentRepository transactionCommentRepository;
+    private final MarketCommentRepository marketCommentRepository;
     private final MarketPostRepository marketPostRepository;
     private final OpinionCommentRepository opinionCommentRepository;
     private final OpinionPostRepository opinionPostRepository;
@@ -31,8 +31,8 @@ public class CommentServiceImpl implements CommentService {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if(commentType == CommentType.TRANSACTION){
             MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
-            TransactionComment transactionComment = TransactionComment.toEntity(create.getContent(), getUser, getMarketPost);
-            transactionCommentRepository.save(transactionComment);
+            MarketComment marketComment = MarketComment.toEntity(create.getContent(), getUser, getMarketPost);
+            marketCommentRepository.save(marketComment);
         }else if(commentType == CommentType.OPINION){
             OpinionPost getOpinionPost = opinionPostRepository.findById(postId).orElseThrow(()-> new NullPointerException("Invalid argument"));
             OpinionComment opinionComment = OpinionComment.toEntity(create.getContent(), getUser, getOpinionPost);
@@ -49,10 +49,10 @@ public class CommentServiceImpl implements CommentService {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
 
         if(commentType == CommentType.TRANSACTION){
-            TransactionComment getTransactionComment = transactionCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
-            if(getUser.getUserId() != getTransactionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-            getTransactionComment.updateContent(update.getContent());
-            transactionCommentRepository.save(getTransactionComment);;
+            MarketComment getMarketComment = marketCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
+            if(getUser.getUserId() != getMarketComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+            getMarketComment.updateContent(update.getContent());
+            marketCommentRepository.save(getMarketComment);;
         }else if(commentType == CommentType.OPINION){
             OpinionComment getOpinionComment = opinionCommentRepository.findById(commentId).orElseThrow(() -> new NullPointerException("Invalid argument"));
             if(getUser.getUserId() != getOpinionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");if(getUser.getUserId() != getOpinionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
@@ -70,9 +70,9 @@ public class CommentServiceImpl implements CommentService {
     public DataResponse deleteComment(Long commentId, String email,CommentType commentType) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if(commentType == CommentType.TRANSACTION){
-            TransactionComment getTransactionComment = transactionCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
-            if(getUser.getUserId() != getTransactionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-            transactionCommentRepository.delete(getTransactionComment);;
+            MarketComment getMarketComment = marketCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
+            if(getUser.getUserId() != getMarketComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+            marketCommentRepository.delete(getMarketComment);;
         }else if(commentType == CommentType.OPINION){
             OpinionComment getOpinionComment = opinionCommentRepository.findById(commentId).orElseThrow(() -> new NullPointerException("Invalid argument"));
             if(getUser.getUserId() != getOpinionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");if(getUser.getUserId() != getOpinionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
