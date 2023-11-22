@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
         return new DataResponse().fail(exception.getMessage(), HttpStatus.FORBIDDEN);
     }
     @ExceptionHandler(NullPointerException.class)
-    public DataResponse handlerNullPointerException(ExpiredJwtException exception){
+    public DataResponse handlerNullPointerException(NullPointerException exception){
         return new DataResponse().fail(exception.getMessage(), HttpStatus.FORBIDDEN);
     }
     @ExceptionHandler(IllegalAccessException.class)

@@ -36,7 +36,7 @@ public class ChatRoomResponseDTO {
                 .opponentNickName(opponent.getProfile().getNickname())
                 .chatRoomKeyFB(chatRoom.getChatRoomKeyFB())
                 .applyId(chatRoom.getApply().getApplyId())
-                .transactionPostId(chatRoom.getMarketPost().getTransactionPostId())
+                .transactionPostId(chatRoom.getMarketPost().getMarketPostId())
                 .build();
     }
 }

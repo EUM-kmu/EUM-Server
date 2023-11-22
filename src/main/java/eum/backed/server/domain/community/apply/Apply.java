@@ -27,7 +27,7 @@ public class Apply extends BaseTimeEntity {
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name="transaction_post_id")
+    @JoinColumn(name="market_post_id")
     private MarketPost marketPost;
 
     public void updateAccepted(Boolean accepted) {

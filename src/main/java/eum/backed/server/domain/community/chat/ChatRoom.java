@@ -24,7 +24,7 @@ public class ChatRoom extends BaseTimeEntity {
     private Boolean isDeleted;
 
     @ManyToOne
-    @JoinColumn(name = "transaciton_post_id")
+    @JoinColumn(name = "market_post_id")
     private MarketPost marketPost;
 
     @ManyToOne

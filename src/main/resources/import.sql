@@ -1,4 +1,4 @@
-INSERT INTO market_category (category_id,contents) VALUES (1,"이동"),(2,"심부름"),(3,"교육"),(4,"청소"),(5,"돌봄"),(6,"수리"),(7,"물건"),(8,"의견"),(9,"기타");
+INSERT INTO market_category (category_id,contents) VALUES (1,"이동"),(2,"심부름"),(3,"교육"),(4,"청소"),(5,"돌봄"),(6,"수리"),(7,"기타");
 
 INSERT INTO branch_bank_account (branch_bank_account_id,account_name,owner,password) VALUES (1,"[햇살마을] 시작 햇살","ADMIN","admin");
 
@@ -17,13 +17,24 @@ INSERT INTO users(user_id,email,password,role,banned) values (3,"Jeong3Organizat
 insert into profile(profile_id,nickname,introduction,total_sunrise_pay,avatar_id,township_id,user_id)values (1,"세윤","저는 세윤 황씨죠",0,1,10,1),(2,"정환","저는 정환 박씨죠",0,4,10,2);
 insert into profile(profile_id,nickname,introduction,total_sunrise_pay,avatar_id,township_id,user_id)values (3,"[정릉3동]주민센터","정릉 3동 공식주민센터 계정",-1,13,1,3);
 
-insert into user_bank_account(user_bank_account_id,account_name,balance,password,user_id) values (1,"솔","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",1),(2,"버섯모둠","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",2);
-insert into user_bank_account(user_bank_account_id,account_name,balance,password,user_id) values (3,"[정릉3동]주민센터","10000000","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",3);
+insert into user_bank_account(user_bank_account_id,account_name,balance,password,user_id)values (1,"솔","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",1),(2,"버섯모둠","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",2);
+insert into user_bank_account(user_bank_account_id,account_name,balance,password,user_id)values (3,"[정릉3동]주민센터","10000000","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",3);
 
--- insert into market_post()
---     transaction_post_id,contents                ,current_accepted_people,location,market_type,max_num_of_people ,pay,slot,start_date
--- | title
--- | volunteer_time
--- | category_id
--- | township_id
--- | user_id
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (1, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "바퀴벌레 잡아주세요", "30", 4,10, 2, "RECRUITING",now());
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (2, "과외 구함", 0, "국민 빌라", "PROVIDE_HELP", 4, 30, "ALL", "2024-08-13 00:00:00", "바퀴벌레 잡아주세요", "30", 4,10, 2, "RECRUITING",now());
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (3, "된장찌개 재료 장 봐와주세요", 0, "국민 빌라", "PROVIDE_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "장보기", "30", 4,10, 2, "RECRUITING",now());
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (4, "연탄 나르기 ", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "연탄을 날라보자", "30", 1,10, 2, "RECRUITING",now());
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (5, "바퀴벌레 잡아 줄 사람 구해요", 1, "국민 빌라", "REQUEST_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "바퀴벌레 잡아주세요", "30", 4,10, 2, "RECRUITMENT_COMPLETED",now());
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (6, "바퀴벌레 잡아 줄 사람 구해요", 1, "국민 빌라", "PROVIDE_HELP", 1, 30, "AM", "2024-08-13 00:00:00", "바퀴벌레 잡아주세요", "30", 2,10, 2, "RECRUITMENT_COMPLETED",now());
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (7, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "PM", "2024-08-13 00:00:00", "바퀴벌레 잡아주세요", "30", 4,10, 2, "RECRUITING",now());
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (8, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "PROVIDE_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "바퀴벌레 잡아주세요", "30", 5,10, 2, "RECRUITING",now());
+insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id, township_id, user_id, status,create_date)values (19, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "바퀴벌레 잡아주세요", "30", 4,10, 2, "RECRUITING",now());
+
+insert into opinion_post(opinion_post_id,create_date,content,like_count,title,township_id,user_id) values (1,now(),"얼죽아 회원 모집합니다.관심 있으신분",0,"얼죽아 회원",10,1);
+insert into opinion_post(opinion_post_id,create_date,content,like_count,title,township_id,user_id) values (2,now(),"집에 가고싶어요",0,"집",10,2);
+insert into opinion_post(opinion_post_id,create_date,content,like_count,title,township_id,user_id) values (3,now(),"피곤합니다",0,"커피 수혈해서 다닐까",10,2);
+insert into opinion_post(opinion_post_id,create_date,content,like_count,title,township_id,user_id) values (4,now(),"학교를 왜 와야하는 걸까요 휴강해주세요",0,"i'm 휴강 원해요",10,1);
+
+insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,township_id,user_id) values (1,now(),3,"학교에서 꼭 와야하는가",10,"2020-11-13 18:14:48","학교에 와야할까요",13,10,1);
+insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,township_id,user_id) values (2,now(),10,"당신은 지금 졸린가요",2,"2020-11-13 18:14:48","학교에 와야할까요",12,10,2);
+insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,township_id,user_id) values (3,now(),10,"학교에서 꼭 와야하는가",10,"2020-11-13 18:14:48","학교에 와야할까요",20,10,1);

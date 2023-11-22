@@ -13,10 +13,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class TransactionComment extends BaseTimeEntity {
+public class MarketComment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
-    private Long transactionCommentId;
+    private Long marketCommentId;
 
     @Column
     private String content;
@@ -33,8 +33,8 @@ public class TransactionComment extends BaseTimeEntity {
         this.content = content;
     }
 
-    public static TransactionComment toEntity(String content, Users user, MarketPost marketPost){
-        return TransactionComment.builder()
+    public static MarketComment toEntity(String content, Users user, MarketPost marketPost){
+        return MarketComment.builder()
                 .content(content)
                 .user(user)
                 .marketPost(marketPost).build();

@@ -4,7 +4,7 @@ import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.category.MarketCategory;
-import eum.backed.server.domain.community.comment.TransactionComment;
+import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.region.DONG.Township;
 import eum.backed.server.domain.community.user.Users;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,7 +25,7 @@ public class MarketPost extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long transactionPostId;
+    private Long marketPostId;
 
     @Column
     private String title;
@@ -66,7 +66,7 @@ public class MarketPost extends BaseTimeEntity {
     private Township township;
 
     @OneToMany(mappedBy = "marketPost")
-    private List<TransactionComment> transactionComments = new ArrayList<>();
+    private List<MarketComment> marketComments = new ArrayList<>();
 
     public void updateTitle(String title) {
         this.title = title;

@@ -63,7 +63,7 @@ public class PostResponseDTO {
     }
     public PostResponseDTO.PostResponse newPostResponse(MarketPost marketPost){
         return PostResponse.builder()
-                .postId(marketPost.getTransactionPostId())
+                .postId(marketPost.getMarketPostId())
                 .title(marketPost.getTitle())
                 .createdDate(marketPost.getCreateDate())
                 .pay(marketPost.getPay())
@@ -71,12 +71,12 @@ public class PostResponseDTO {
                 .marketType(marketPost.getMarketType())
                 .category(marketPost.getMarketCategory().getContents())
                 .status(marketPost.getStatus())
-                .commentCount(marketPost.getTransactionComments().size())
+                .commentCount(marketPost.getMarketComments().size())
                 .build();
     }
     public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses){
         return TransactionPostWithComment.builder()
-                .postId(marketPost.getTransactionPostId())
+                .postId(marketPost.getMarketPostId())
                 .isWriter(user == marketPost.getUser())
                 .title(marketPost.getTitle())
                 .content(marketPost.getContents())

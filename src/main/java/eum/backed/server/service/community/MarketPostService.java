@@ -11,8 +11,8 @@ import eum.backed.server.domain.community.apply.ApplyRepository;
 import eum.backed.server.domain.community.category.MarketCategory;
 import eum.backed.server.domain.community.category.MarketCategoryRepository;
 import eum.backed.server.domain.community.chat.ChatRoomRepository;
-import eum.backed.server.domain.community.comment.TransactionComment;
-import eum.backed.server.domain.community.comment.TransactionCommentRepository;
+import eum.backed.server.domain.community.comment.MarketComment;
+import eum.backed.server.domain.community.comment.MarketCommentRepository;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.MarketPostRepository;
 import eum.backed.server.domain.community.marketpost.Status;
@@ -41,7 +41,7 @@ public class MarketPostService {
     private final PostResponseDTO postResponseDTO;
     private final UsersRepository usersRepository;
     private final TownshipRepository townShipRepository;
-    private final TransactionCommentRepository transactionCommentRepository;
+    private final MarketCommentRepository marketCommentRepository;
 
     private final ApplyRepository applyRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -109,11 +109,11 @@ public class MarketPostService {
     public DataResponse<PostResponseDTO.TransactionPostWithComment> getTransactionPostWithComment(Long postId,String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
-        List<TransactionComment> transactionComments = transactionCommentRepository.findByMarketPostOrderByCreateDateDesc(getMarketPost).orElse(Collections.emptyList());
-        List<CommentResponseDTO.CommentResponse> commentResponses = transactionComments.stream().map(transactionComment -> {
+        List<MarketComment> marketComments = marketCommentRepository.findByMarketPostOrderByCreateDateDesc(getMarketPost).orElse(Collections.emptyList());
+        List<CommentResponseDTO.CommentResponse> commentResponses = marketComments.stream().map(transactionComment -> {
             CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
                     .postId(postId)
-                    .commentId(transactionComment.getTransactionCommentId())
+                    .commentId(transactionComment.getMarketCommentId())
                     .commentNickName(transactionComment.getUser().getProfile().getNickname())
                     .commentUserAddress(transactionComment.getUser().getProfile().getTownship().getName())
                     .isPostWriter(getMarketPost.getUser() == transactionComment.getUser())
