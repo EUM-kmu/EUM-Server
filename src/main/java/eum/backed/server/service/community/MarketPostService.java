@@ -1,6 +1,7 @@
 package eum.backed.server.service.community;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.dto.request.PostRequestDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.controller.community.dto.request.enums.ServiceType;
@@ -46,7 +47,7 @@ public class MarketPostService {
     private final ApplyRepository applyRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-    public DataResponse create(PostRequestDTO.Create create,String email) throws Exception {
+    public APIResponse create(PostRequestDTO.Create create, String email) throws Exception {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         Township townShip = townShipRepository.findByName(create.getDong()).orElseThrow(() -> new NullPointerException("Invalid address"));
         MarketCategory getMarketCategory = marketCategoryRepository.findById(create.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
@@ -69,19 +70,19 @@ public class MarketPostService {
                 .marketCategory(getMarketCategory)
                 .build();
         marketPostRepository.save(marketPost);
-        return new DataResponse<>().success("게시글 작성 성공");
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS);
     }
 
 
-    public DataResponse delete(Long postId,String email) {
+    public  APIResponse delete(Long postId,String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         marketPostRepository.delete(getMarketPost);
-        return new DataResponse().success("게시글 삭제 성공");
+        return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
 
-    public DataResponse update(PostRequestDTO.Update update,String email) throws ParseException {
+    public  APIResponse update(PostRequestDTO.Update update,String email) throws ParseException {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         Township townShip = townShipRepository.findByName(update.getDong()).orElseThrow(() -> new NullPointerException("Invalid address"));
         MarketPost getMarketPost = marketPostRepository.findById(update.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
@@ -94,19 +95,19 @@ public class MarketPostService {
         getMarketPost.updateLocation(update.getLocation());
         getMarketPost.updateDong(townShip);
         marketPostRepository.save(getMarketPost);
-        return new DataResponse<>().success("게시글 수정 성공");
+        return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"게시글 정보 변경");
 
     }
 
-    public DataResponse updateState(Long postId,Status status, String email) {
+    public  APIResponse updateState(Long postId,Status status, String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         getMarketPost.updateStatus(status);
         marketPostRepository.save(getMarketPost);
-        return new DataResponse<>().success("게시글 상태 수정 성공");
+        return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"게시글 상태 변경");
     }
-    public DataResponse<PostResponseDTO.TransactionPostWithComment> getTransactionPostWithComment(Long postId,String email) {
+    public  APIResponse<PostResponseDTO.TransactionPostWithComment> getTransactionPostWithComment(Long postId,String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         List<MarketComment> marketComments = marketCommentRepository.findByMarketPostOrderByCreateDateDesc(getMarketPost).orElse(Collections.emptyList());
@@ -122,10 +123,10 @@ public class MarketPostService {
             return commentResponse;
         }).collect(Collectors.toList());
         PostResponseDTO.TransactionPostWithComment singlePostResponse = postResponseDTO.newTransactionPostWithComment(user,getMarketPost,commentResponses);
-        return new DataResponse<>(singlePostResponse).success(singlePostResponse, "id에 따른 게시글 정보조회 + 댓글");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,singlePostResponse);
 
     }
-    public DataResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, Long categoryId, MarketType marketType, Status status, String email) {
+    public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, Long categoryId, MarketType marketType, Status status, String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         Township townShip = user.getProfile().getTownship();
         if(!(keyword == null || keyword.isBlank())) {
@@ -135,7 +136,7 @@ public class MarketPostService {
         List<MarketPost> marketPosts = getMarketPosts(marketCategory, townShip, marketType, status);
         List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
 
-        return new DataResponse<>(postResponses).success(postResponses, "상태별 데이터 조회 성공");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
     }
 
     private List<MarketPost> getMarketPosts(MarketCategory marketCategory, Township townShip, MarketType marketType, Status status) {
@@ -160,7 +161,7 @@ public class MarketPostService {
         }
     }
 
-    private DataResponse<List<PostResponseDTO.PostResponse>> findByScrap(String email) {
+    private  APIResponse<List<PostResponseDTO.PostResponse>> findByScrap(String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         List<Scrap> scraps = scrapRepository.findByUserOrderByCreateDateDesc(user).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
@@ -169,7 +170,7 @@ public class MarketPostService {
             PostResponseDTO.PostResponse singlePostResponse = postResponseDTO.newPostResponse(marketPost);
             postResponseArrayList.add(singlePostResponse);
         }
-        return new DataResponse<>(postResponseArrayList).success(postResponseArrayList, "내가 스크랩한 게시글 조회)");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, postResponseArrayList);
     }
     private List<PostResponseDTO.PostResponse> getAllPostResponse(List<MarketPost> marketPosts){
         List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
@@ -181,22 +182,22 @@ public class MarketPostService {
     }
 
 
-    private DataResponse<List<PostResponseDTO.PostResponse>> getMyPosts(String email) {
+    private APIResponse<List<PostResponseDTO.PostResponse>> getMyPosts(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         List<MarketPost> marketPosts = marketPostRepository.findByUserOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
-        return new DataResponse<>(transactionPostDTOs).success(transactionPostDTOs,"내가 작성한 거래게시글 조회 성공");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
 
-    private DataResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord, Township getTownship) {
+    private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord, Township getTownship) {
 //        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         List<MarketPost> marketPosts = marketPostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(getTownship, keyWord).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
-        return new DataResponse<>(transactionPostDTOs).success(transactionPostDTOs,"키워드 조회");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
 
 
-    public DataResponse<List<PostResponseDTO.PostResponse>> findByServiceType(ServiceType serviceType, String email) {
+    public APIResponse<List<PostResponseDTO.PostResponse>> findByServiceType(ServiceType serviceType, String email) {
         if(serviceType == ServiceType.scrap){
             return findByScrap(email);
         } else if (serviceType == ServiceType.market) {
@@ -207,7 +208,7 @@ public class MarketPostService {
         return null;
     }
 
-    private DataResponse<List<PostResponseDTO.PostResponse>> getMyApplyList(String email) {
+    private APIResponse<List<PostResponseDTO.PostResponse>> getMyApplyList(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         List<Apply> applies = applyRepository.findByUser(getUser).orElse(Collections.emptyList());
         List<MarketPost> marketPosts = new ArrayList<>();
@@ -216,7 +217,7 @@ public class MarketPostService {
             marketPosts.add(marketPost);
         }
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
-        return new DataResponse<>(transactionPostDTOs).success(transactionPostDTOs, "나의 거래게시글 신청 리스트");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
     public void updateStatusCompleted(Long chatRoomId){
         MarketPost marketPost = chatRoomRepository.findById(chatRoomId).orElseThrow(()->new NullPointerException("invalid chatRoomdId")).getMarketPost();

@@ -10,6 +10,12 @@ import javax.validation.constraints.Pattern;
 import java.sql.Date;
 
 public class UsersRequestDTO {
+    @Getter
+    @Setter
+    public static class Token{
+        @NotEmpty
+        private String token;
+    }
     //자체회원가입 폼
     @Getter
     @Setter
@@ -38,11 +44,7 @@ public class UsersRequestDTO {
             return new UsernamePasswordAuthenticationToken(email, password);
         }
     }
-    @Getter
-    @Setter
-    public static class AuthSignin{
-        private String idtoken;
-    }
+
     @Getter
     @Setter
     public static class Reissue {

@@ -1,18 +1,20 @@
 package eum.backed.server.service.community;
 
 import com.google.firebase.database.DatabaseReference;
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.dto.request.enums.ChatType;
+import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.controller.community.dto.response.ChatRoomResponseDTO;
+import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.apply.ApplyRepository;
-import eum.backed.server.domain.community.chat.Chat;
-import eum.backed.server.domain.community.chat.ChatRoom;
-import eum.backed.server.domain.community.chat.ChatRoomRepository;
-import eum.backed.server.domain.community.chat.Message;
+import eum.backed.server.domain.community.chat.*;
 import eum.backed.server.domain.community.marketpost.MarketPostRepository;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.service.bank.BankAccountService;
+import eum.backed.server.service.bank.DTO.BankTransactionDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,17 @@ public class ChatService {
     private final ApplyRepository applyRepository;
     private final MarketPostRepository marketPostRepository;
     private final UsersRepository usersRepository;
+    private final ChatDAO chatDAO;
+    private final BankAccountService bankAccountService;
+    private final ProfileResponseDTO profileResponseDTO;
+    public void createChatRoomWithFireStore(Long applyId) throws ExecutionException, InterruptedException {
+        Apply apply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid Id"));
+        if(apply.getIsAccepted() == false) throw new IllegalArgumentException("선정되지 않은 유저와는 채팅을 만들 수 없습니다");
+        String chatRoomKey = chatDAO.createChat(apply);
+
+        ChatRoom chatRoom = ChatRoom.toEntity(chatRoomKey, apply.getMarketPost(), apply);
+        chatRoomRepository.save(chatRoom);
+    }
 
     public void createChatRoom(Long applyId){
         Apply apply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid Id"));
@@ -49,31 +63,47 @@ public class ChatService {
         chatRoomRepository.save(chatRoom);
     }
 
-    private DataResponse<List<ChatRoomResponseDTO>> getChatListInMyPost(String email) {
+    private APIResponse<List<ChatRoomResponseDTO>> getChatListInMyPost(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
         List<ChatRoom> chatRooms = chatRoomRepository.findByPostWriter(getUser).orElse(Collections.emptyList());
-        List<ChatRoomResponseDTO> chatRoomResponseDTOS = getChatRoomResponses(chatRooms, getUser);
-        return new DataResponse<>(chatRoomResponseDTOS).success(chatRoomResponseDTOS, "내 게시글 채팅 조회");
+        List<ChatRoomResponseDTO> chatRoomResponseDTOS = getChatRoomResponses(chatRooms, getUser,true);
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,chatRoomResponseDTOS);
     }
-    private DataResponse<List<ChatRoomResponseDTO>> getChatListInOtherPost(String email){
+    private APIResponse<List<ChatRoomResponseDTO>> getChatListInOtherPost(String email){
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
         List<ChatRoom> chatRooms = chatRoomRepository.findByApplicant(getUser).orElse(Collections.emptyList());
-        List<ChatRoomResponseDTO> chatRoomResponseDTOS = getChatRoomResponses(chatRooms, getUser);
-        return new DataResponse<>(chatRoomResponseDTOS).success(chatRoomResponseDTOS, "내 신청 게시글 채팅 조회");
+        List<ChatRoomResponseDTO> chatRoomResponseDTOS = getChatRoomResponses(chatRooms, getUser,false);
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,chatRoomResponseDTOS);
     }
-    private List<ChatRoomResponseDTO> getChatRoomResponses(List<ChatRoom> chatRooms,Users mine){
+    private List<ChatRoomResponseDTO> getChatRoomResponses(List<ChatRoom> chatRooms,Users mine,Boolean amIWriter){
         List<ChatRoomResponseDTO> chatRoomResponseDTOS = new ArrayList<>();
         for (ChatRoom chatRoom : chatRooms) {
-            ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(mine,chatRoom.getApplicant(),chatRoom);
+            BankTransactionDTO.TransactionUser transactionUser = checkSender(chatRoom);
+            if(amIWriter){
+                ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(transactionUser,mine,chatRoom.getApplicant(),chatRoom);
+                chatRoomResponseDTOS.add(chatRoomResponseDTO);
+            }
+            ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(transactionUser,mine, chatRoom.getPostWriter(), chatRoom);
             chatRoomResponseDTOS.add(chatRoomResponseDTO);
         }
         return chatRoomResponseDTOS;
     }
 
-    public DataResponse<List<ChatRoomResponseDTO>> getChatListFilter(ChatType chatType, String email) {
+    public APIResponse<List<ChatRoomResponseDTO>> getChatListFilter(ChatType chatType, String email) {
         if(chatType == ChatType.mine){
             return getChatListInMyPost(email);
         }
         return getChatListInOtherPost(email);
+    }
+    private BankTransactionDTO.TransactionUser checkSender(ChatRoom chatRoom){
+//        true인경우 도움 요청, 작성자가 송금
+        if(chatRoom.getMarketPost().getMarketType()== MarketType.REQUEST_HELP){
+            Users sender = chatRoom.getPostWriter();
+            Users receiver = chatRoom.getApplicant();
+            return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
+        }
+        Users sender = chatRoom.getApplicant();
+        Users receiver = chatRoom.getPostWriter();
+        return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
     }
 }

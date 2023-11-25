@@ -1,6 +1,7 @@
 package eum.backed.server.service.community;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.config.jwt.JwtTokenProvider;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
 import eum.backed.server.controller.community.dto.response.Response;
@@ -9,12 +10,12 @@ import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.enums.Authority;
+import eum.backed.server.exception.ResourceConflictException;
+import eum.backed.server.exception.TokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,12 +36,11 @@ public class UsersService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisTemplate redisTemplate;
     private final Response response;
-    private final DataResponse dataResponse;
 
 
-    public DataResponse signUp(UsersRequestDTO.SignUp signUp){
+    public APIResponse signUp(UsersRequestDTO.SignUp signUp){
         if(usersRepository.existsByEmail(signUp.getEmail())){
-            return dataResponse.fail("이미 있는 이메일입니다", HttpStatus.BAD_REQUEST);
+            throw new ResourceConflictException("이미 존재하는 이메일 입니다");
         }
         Users users = Users.builder()
                 .email(signUp.getEmail())
@@ -49,10 +49,10 @@ public class UsersService {
                 .role(Role.ROLE_USER)
                 .authorities(Collections.singletonList(Authority.ROLE_USER.name())).build();
         usersRepository.save(users);
-        return dataResponse.success("자체 회원가입에 성공");
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS,"자체 회원가입 성공");
     }
 
-    public DataResponse<UsersResponseDTO.TokenInfo> signIn(UsersRequestDTO.SignIn signIn) {
+    public APIResponse<UsersResponseDTO.TokenInfo> signIn(UsersRequestDTO.SignIn signIn) {
         Users getUser = usersRepository.findByEmail(signIn.getEmail()).orElseThrow(() -> new IllegalArgumentException("잘못된 이메일 정보"));
         if(!passwordEncoder.matches(signIn.getPassword(),getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         UsersResponseDTO.TokenInfo  tokenInfo = jwtTokenProvider.generateToken(getUser.getEmail(),getUser.getRole());
@@ -62,13 +62,13 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set("RT:" + getUser.getEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        return dataResponse.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,"로그인 성공");
     }
 
-    public DataResponse<UsersResponseDTO.TokenInfo> reissue(UsersRequestDTO.Reissue reissue) {
+    public APIResponse<UsersResponseDTO.TokenInfo> reissue(UsersRequestDTO.Reissue reissue) {
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(reissue.getRefreshToken())) {
-            return dataResponse.fail("Refresh Token 정보가 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+            throw new TokenException("Refresh Token 정보가 유효하지 않습니다.");
         }
 
         // 2. Access Token 에서 User email 을 가져옵니다.
@@ -78,10 +78,10 @@ public class UsersService {
         String refreshToken = (String)redisTemplate.opsForValue().get("RT:" + authentication.getName());
         // (추가) 로그아웃되어 Redis 에 RefreshToken 이 존재하지 않는 경우 처리
         if(ObjectUtils.isEmpty(refreshToken)) {
-            return dataResponse.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+            throw new TokenException("Redis 에 RefreshToken 이 존재하지 않습니다");
         }
         if(!refreshToken.equals(reissue.getRefreshToken())) {
-            return dataResponse.fail("Refresh Token 정보가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+            throw new TokenException("refresh정보가 일치 하지 않습니다");
         }
 
         // 4. 새로운 토큰 생성
@@ -91,13 +91,13 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        return dataResponse.success(tokenInfo, "Token 정보가 갱신되었습니다.", HttpStatus.OK);
+        return APIResponse.of(SuccessCode.UPDATE_SUCCESS,tokenInfo);
     }
 
-    public ResponseEntity<?> logout(UsersRequestDTO.Logout logout) {
+    public APIResponse logout(UsersRequestDTO.Logout logout) {
         // 1. Access Token 검증
         if (!jwtTokenProvider.validateToken(logout.getAccessToken())) {
-            return response.fail("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+            throw new TokenException("잘못된 토큰 입니다");
         }
 
         // 2. Access Token 에서 User email 을 가져옵니다.
@@ -114,10 +114,10 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set(logout.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
 
-        return response.success("로그아웃 되었습니다.");
+        return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"로그아웃 되었습니다.");
     }
 
-    public DataResponse<UsersResponseDTO.TokenInfo> getToken(String email){
+    public APIResponse<UsersResponseDTO.TokenInfo> getToken(String email){
         UsersResponseDTO.TokenInfo tokenInfo = null;
         if(email.isBlank()) throw new IllegalArgumentException("email is empty");
         Role role = null;
@@ -138,6 +138,6 @@ public class UsersService {
         }
         redisTemplate.opsForValue()
                 .set("RT:" +email, tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
-        return dataResponse.success(tokenInfo, role.toString());
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, tokenInfo);
     }
 }

@@ -1,7 +1,7 @@
 package eum.backed.server.config.jwt;
 
 
-import eum.backed.server.exception.TokenExpiredException;
+import eum.backed.server.exception.TokenException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }else{
-                throw new TokenExpiredException("Token is expired");}
+                throw new TokenException("Token is expired");}
             }
         chain.doFilter(request, response);
 

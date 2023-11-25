@@ -1,6 +1,7 @@
 package eum.backed.server.service.community;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.domain.community.likeopinionpost.LikeOpinionPost;
 import eum.backed.server.domain.community.likeopinionpost.LikeOpinionPostRepository;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
@@ -17,19 +18,19 @@ public class LikeOpinionPostService {
     private final OpinionPostRepository opinionPostRepository;
     private final UsersRepository userRepository;
 
-    public DataResponse like(Long postId, String email) {
+    public APIResponse like(Long postId, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
         OpinionPost getOpinionPost = opinionPostRepository.findById(postId).orElseThrow(()->new IllegalArgumentException("Invalid postId"));
         if(likeOpinionPostRepository.existsByUserAndOpinionPost(getUser,getOpinionPost)){
             LikeOpinionPost getLikeOpinionPost = likeOpinionPostRepository.findByUserAndOpinionPost(getUser,getOpinionPost);
             likeOpinionPostRepository.delete(getLikeOpinionPost);
             getOpinionPost.updateLikeCount(getOpinionPost.getOpinionComments().size());
-            return new DataResponse().success("좋아요 취소 성공");
+            return APIResponse.of(SuccessCode.DELETE_SUCCESS,"좋아요 취소");
         }
         LikeOpinionPost likeOpinionPost = LikeOpinionPost.toEntity(getUser, getOpinionPost);
         likeOpinionPostRepository.save(likeOpinionPost);
         getOpinionPost.updateLikeCount(getOpinionPost.getOpinionComments().size());
-        return new DataResponse().success("좋아요 성공");
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS, "좋아요 성공");
     }
 
 }

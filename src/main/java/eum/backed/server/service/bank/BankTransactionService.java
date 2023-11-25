@@ -1,6 +1,7 @@
 package eum.backed.server.service.bank;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.bank.dto.response.BankAccountResponseDTO;
 import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransaction;
 import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransactionRepository;
@@ -34,17 +35,17 @@ public class BankTransactionService {
         bankAccountTransactionRepository.save(bankAccountTransaction);
 
     }
-    public DataResponse<List<BankAccountResponseDTO.GetAllHistory>> getAllHistory(String email, TrasnactionType trasnactionType) {
+    public APIResponse<List<BankAccountResponseDTO.GetAllHistory>> getAllHistory(String email, TrasnactionType trasnactionType) {
         Users geUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount bankAccount = userBankAccountRepository.findByUser(geUser).orElseThrow(() -> new NullPointerException("Invalid user"));
         if (trasnactionType == TrasnactionType.DEPOSIT || trasnactionType == TrasnactionType.WITHDRAW){
             List<BankAccountTransaction> bankAccountTransactions = bankAccountTransactionRepository.findByMyBankAccountAndTrasnactionTypeOrderByCreateDateDesc(bankAccount,trasnactionType).orElse(Collections.emptyList());
             List<BankAccountResponseDTO.GetAllHistory> getAllHistories = getAllHistories(bankAccountTransactions);
-            return new DataResponse<>(getAllHistories).success(getAllHistories, "거래 내역 조회성공");
+            return APIResponse.of(SuccessCode.SELECT_SUCCESS, getAllHistories);
         }
         List<BankAccountTransaction> bankAccountTransactions = bankAccountTransactionRepository.findByMyBankAccountOrderByCreateDateDesc(bankAccount).orElse(Collections.emptyList());
         List<BankAccountResponseDTO.GetAllHistory> getAllHistories = getAllHistories(bankAccountTransactions);
-        return new DataResponse<>(getAllHistories).success(getAllHistories, "거래 내역 조회성공");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, getAllHistories);
     }
     private List<BankAccountResponseDTO.GetAllHistory> getAllHistories(List<BankAccountTransaction> bankAccountTransactions){
         List<BankAccountResponseDTO.GetAllHistory> allHistories = new ArrayList<>();
