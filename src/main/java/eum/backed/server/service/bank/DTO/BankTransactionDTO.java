@@ -27,9 +27,9 @@ public class BankTransactionDTO {
     @Getter
     @Setter
     @Builder
-    public static class TransactionAccount{
-        private UserBankAccount sender;
-        private UserBankAccount receiver;
+    public static class TransactionUser {
+        private Users sender;
+        private Users receiver;
     }
 
     @Getter

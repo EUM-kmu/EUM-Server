@@ -1,6 +1,7 @@
 package eum.backed.server.service.community;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.MarketPostRepository;
 import eum.backed.server.domain.community.scrap.Scrap;
@@ -17,17 +18,17 @@ public class ScrapService {
     private final MarketPostRepository marketPostRepository;
     private final UsersRepository userRepository;
 
-    public DataResponse scrap(Long postId, String email) {
+    public APIResponse scrap(Long postId, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(()->new IllegalArgumentException("Invalid postId"));
         if(scrapRepository.existsByMarketPostAndUser(getMarketPost,getUser)) {
             Scrap getScrap = scrapRepository.findByMarketPostAndUser(getMarketPost, getUser);
             scrapRepository.delete(getScrap);
-            return new DataResponse<>().success("관심 게시글 취소 성공");
+            return APIResponse.of(SuccessCode.DELETE_SUCCESS, "관심 게시글 삭제");
         }
         Scrap scrap = Scrap.builder().marketPost(getMarketPost).user(getUser).build();
         scrapRepository.save(scrap);
-        return new DataResponse<>().success("관심 게시글 등록 성공");
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS, "관심 게시글 등록");
     }
 
 }

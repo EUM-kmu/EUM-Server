@@ -7,10 +7,7 @@ import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.domain.community.user.Users;
 import io.swagger.annotations.ApiModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -43,25 +40,26 @@ public class PostResponseDTO {
     @AllArgsConstructor
     @ApiModel(value = "id 별 게시글 + 댓글 ")
     public static class TransactionPostWithComment {
-        private Long postId;
+        private ProfileResponseDTO.UserInfo writerInfo;
         private Boolean isWriter;
+        private MarketType marketType;
+        private Long postId;
         private String title;
         private String content;
+        private Slot slot;
         private Date startDate;
         private Long pay;
-        private String location;
         private int volunteerTime;
-        private MarketType marketType;
+        private String location;
         private int currentApplicant;
         private int maxNumOfPeople;
         private String category;
         private Status status;
-        private Slot slot;
-        private int commentCount;
         private LocalDateTime createdDate;
+        private int commentCount;
         private List<CommentResponseDTO.CommentResponse> commentResponses;
     }
-    public PostResponseDTO.PostResponse newPostResponse(MarketPost marketPost){
+    public static PostResponseDTO.PostResponse newPostResponse(MarketPost marketPost){
         return PostResponse.builder()
                 .postId(marketPost.getMarketPostId())
                 .title(marketPost.getTitle())
@@ -69,6 +67,7 @@ public class PostResponseDTO {
                 .pay(marketPost.getPay())
                 .volunteerTime(marketPost.getVolunteerTime())
                 .marketType(marketPost.getMarketType())
+                .location(marketPost.getLocation())
                 .category(marketPost.getMarketCategory().getContents())
                 .status(marketPost.getStatus())
                 .commentCount(marketPost.getMarketComments().size())
@@ -76,6 +75,7 @@ public class PostResponseDTO {
     }
     public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses){
         return TransactionPostWithComment.builder()
+                .writerInfo(ProfileResponseDTO.toUserInfo(marketPost.getUser()))
                 .postId(marketPost.getMarketPostId())
                 .isWriter(user == marketPost.getUser())
                 .title(marketPost.getTitle())

@@ -1,6 +1,7 @@
 package eum.backed.server.service.bank;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.bank.bankacounttransaction.Code;
@@ -12,14 +13,12 @@ import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccountRepository;
 import eum.backed.server.domain.community.chat.ChatRoom;
 import eum.backed.server.domain.community.chat.ChatRoomRepository;
-import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.service.bank.DTO.BankTransactionDTO;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,17 +46,17 @@ public class BankAccountService {
         BankTransactionDTO.Transaction transaction = BankTransactionDTO.toInitialDTO(Code.SUCCESS, Status.INITIAL, 300L, savedUserBankAccount, initialBankAccount);
         bankTransactionService.createTransactionWithBranchBank(transaction);
     }
-    public DataResponse updatePassword(BankAccountRequestDTO.UpdatePassword updatePassword, String email) {
+    public APIResponse updatePassword(BankAccountRequestDTO.UpdatePassword updatePassword, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
         if(!passwordEncoder.matches(updatePassword.getCurrentPassword(),getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         myBankAccount.updatePassword(passwordEncoder.encode(updatePassword.getNewPassword()));
         userBankAccountRepository.save(myBankAccount);
-        return new DataResponse().success("비밀번호 변경완료");
+        return APIResponse.of(SuccessCode.UPDATE_SUCCESS, "비밀번호 업데이트");
     }
 
 
-    public DataResponse remittance(BankAccountRequestDTO.Remittance remittance, String email) {
+    public APIResponse remittance(BankAccountRequestDTO.Remittance remittance, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
 
         Profile getProfile = profileRepository.findByNickname(remittance.getReceiverNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
@@ -73,7 +72,7 @@ public class BankAccountService {
 
         bankTransactionService.createTransactionWithUserBankAccount(myTransaction);
         bankTransactionService.createTransactionWithUserBankAccount(opponentTransaction);
-        return new DataResponse<>().success("송금 성공");
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS, "송금 성공");
     }
     private void remittance(UserBankAccount myBankAccount,UserBankAccount receiverAccount, Long amount){
         if(myBankAccount.getBalance() < amount){
@@ -90,11 +89,10 @@ public class BankAccountService {
     public BankTransactionDTO.UpdateTotalSunrise remittanceByChat(String password,Long ChatRoomId, String email) {
         ChatRoom getChatRoom = chatRoomRepository.findById(ChatRoomId).orElseThrow(() -> new NullPointerException("Invalid id"));
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
-        MarketPost marketPost = getChatRoom.getMarketPost();
 
-        BankTransactionDTO.TransactionAccount transactionAccount = checkSender(getChatRoom, marketPost, getUser);
-        UserBankAccount myBankAccount = transactionAccount.getSender();
-        UserBankAccount receiverAccount = transactionAccount.getReceiver();
+        BankTransactionDTO.TransactionUser transactionUser = checkSender(getChatRoom, getUser);
+        UserBankAccount myBankAccount = transactionUser.getSender().getUserBankAccount();
+        UserBankAccount receiverAccount = transactionUser.getReceiver().getUserBankAccount();
 
         if(!passwordEncoder.matches(password,getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
 
@@ -113,19 +111,19 @@ public class BankAccountService {
 
     }
 //    도움 제공, 요청에 따른 송금 자 설정 예외처리
-    private BankTransactionDTO.TransactionAccount checkSender(ChatRoom chatRoom,MarketPost marketPost,Users user){
+    private BankTransactionDTO.TransactionUser checkSender(ChatRoom chatRoom, Users user){
 //        true인경우 도움 요청, 작성자가 송금
-        if(marketPost.getMarketType()==MarketType.REQUEST_HELP){
-            UserBankAccount sender = chatRoom.getPostWriter().getUserBankAccount();
-            UserBankAccount receiver = chatRoom.getApplicant().getUserBankAccount();
-            if(user.getUserBankAccount() !=sender) throw new IllegalArgumentException("송금해야할 유저가 잘못되었습니다");
-            log.info(String.valueOf((user.getUserBankAccount() !=sender)));
-            return BankTransactionDTO.TransactionAccount.builder().sender(sender).receiver(receiver).build();
+        if(chatRoom.getMarketPost().getMarketType()==MarketType.REQUEST_HELP){
+            Users sender = chatRoom.getPostWriter();
+            Users receiver = chatRoom.getApplicant();
+            if(user !=sender) throw new IllegalArgumentException("송금해야할 유저가 잘못되었습니다");
+            log.info(String.valueOf((user !=sender)));
+            return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
         }
-        UserBankAccount sender = chatRoom.getApplicant().getUserBankAccount();
-        UserBankAccount receiver = chatRoom.getPostWriter().getUserBankAccount();
-        if(user.getUserBankAccount() !=sender) throw new IllegalArgumentException("송금해야할 유저가 잘못되었습니다");
-        return BankTransactionDTO.TransactionAccount.builder().sender(sender).receiver(receiver).build();
+        Users sender = chatRoom.getApplicant();
+        Users receiver = chatRoom.getPostWriter();
+        if(user !=sender) throw new IllegalArgumentException("송금해야할 유저가 잘못되었습니다");
+        return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
     }
 
 }

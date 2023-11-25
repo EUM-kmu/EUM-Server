@@ -1,6 +1,6 @@
 package eum.backed.server.controller.community;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.service.community.ProfileService;
@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,19 +25,18 @@ public class ProfileController {
 
     @PostMapping("")
     @ApiOperation(value = "프로필 생성", notes = "프로필 생성, ROLE_TEMPORARY_USER -> ROLE_USER 전환")
-    public DataResponse createProfile(@Valid @RequestBody ProfileRequestDTO.CreateProfile createProfile, @AuthenticationPrincipal String email){
-        log.info(email);
-        return profileService.create(createProfile, email);
+    public ResponseEntity<APIResponse> createProfile(@Valid @RequestBody ProfileRequestDTO.CreateProfile createProfile, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(profileService.create(createProfile, email));
     }
     @GetMapping("")
     @ApiOperation(value = "내 프로필 조회")
-    public DataResponse<ProfileResponseDTO> getMyProfile(@AuthenticationPrincipal String email){
-        return profileService.getMyProfile(email);
+    public ResponseEntity<APIResponse<ProfileResponseDTO.AllProfile>> getMyProfile(@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(profileService.getMyProfile(email));
     }
     @PutMapping("")
     @ApiOperation(value = "프로필 수정")
-    public DataResponse updateMyProfile(@RequestBody ProfileRequestDTO.UpdateProfile updateProfile, @AuthenticationPrincipal String email){
-        return profileService.updateMyProfile(updateProfile,email);
+    public ResponseEntity<APIResponse> updateMyProfile(@RequestBody ProfileRequestDTO.UpdateProfile updateProfile, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(profileService.updateMyProfile(updateProfile,email));
     }
 //    @ApiOperation(value = "관심게시글 목록 조회", notes = "나의 관심 게시글 목록 최신 정렬")
 //    @GetMapping("/{serviceName}")

@@ -1,10 +1,9 @@
 package eum.backed.server.controller.community;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.community.dto.request.PostRequestDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
-import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.service.community.MarketPostService;
 import eum.backed.server.service.community.ScrapService;
@@ -12,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,34 +30,34 @@ public class MarketPostController {
 
     @ApiOperation(value = "게시글 작성", notes = "도움요청, 받기 게시글 작성")
     @PostMapping()
-    public DataResponse create(@RequestBody PostRequestDTO.Create create, @AuthenticationPrincipal String email ) throws Exception {
-        return marketPostService.create(create, email);
+    public ResponseEntity<APIResponse> create(@RequestBody PostRequestDTO.Create create, @AuthenticationPrincipal String email ) throws Exception {
+        return ResponseEntity.ok(marketPostService.create(create, email));
     }
     @ApiOperation(value = "게시글 삭제", notes = "게시글 아이디로 삭제")
     @DeleteMapping("/{postId}")
-    public DataResponse delete(@PathVariable Long postId,@AuthenticationPrincipal String email){
-        return marketPostService.delete(postId,email);
+    public  ResponseEntity<APIResponse> delete(@PathVariable Long postId,@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(marketPostService.delete(postId,email));
     }
 
     @ApiOperation(value = "게시글 수정", notes = "게시글 아이디 받고 수정")
     @PutMapping("/{postId}")
-    public DataResponse update(@RequestBody PostRequestDTO.Update update, @AuthenticationPrincipal String email) throws ParseException {
-        return marketPostService.update(update,email);
+    public  ResponseEntity<APIResponse> update(@RequestBody PostRequestDTO.Update update, @AuthenticationPrincipal String email) throws ParseException {
+        return ResponseEntity.ok(marketPostService.update(update,email));
     }
     @ApiOperation(value = "게시글 상태 수정", notes = "게시글 아이디받고 거래 상태 상태 수정")
     @PutMapping("/{postId}/state")
-    public DataResponse updateState(@PathVariable Long postId,@RequestParam Status status, @AuthenticationPrincipal String email){
-        return marketPostService.updateState(postId,status, email);
+    public  ResponseEntity<APIResponse> updateState(@PathVariable Long postId,@RequestParam Status status, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(marketPostService.updateState(postId,status, email));
     }
     @ApiOperation(value = "단일 게시글 조회", notes = "게시글 정보 + 댓글  조회")
     @GetMapping("{postId}")
-    public DataResponse<PostResponseDTO.TransactionPostWithComment> findById(@PathVariable Long postId,@AuthenticationPrincipal String email){
-        return marketPostService.getTransactionPostWithComment(postId,email);
+    public  ResponseEntity<APIResponse<PostResponseDTO.TransactionPostWithComment>> findById(@PathVariable Long postId,@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(marketPostService.getTransactionPostWithComment(postId,email));
     }
     @ApiOperation(value = "필터 조회", notes = "필터 별 게시글 리스트 조회")
     @GetMapping("")
-    public DataResponse<List<PostResponseDTO.PostResponse>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@RequestParam(name = "category",required = false) Long categoryId, @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status, @AuthenticationPrincipal String email){
-        return marketPostService.findByFilter(keyword,categoryId,marketType,status,email);
+    public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@RequestParam(name = "category",required = false) Long categoryId, @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(marketPostService.findByFilter(keyword,categoryId,marketType,status,email));
     }
 //    @ApiOperation(value = "카테고리 별 게시글 조회", notes = "카테고리별 게시글 최신정렬")
 //    @GetMapping("")
@@ -77,8 +77,8 @@ public class MarketPostController {
 //    }
     @GetMapping("/{postId}/scrap")
     @ApiOperation(value = "거래 게시글 관심설정", notes = "관심 설정")
-    public DataResponse doScrap(@PathVariable Long postId, @AuthenticationPrincipal String email) {
-        return scrapService.scrap(postId, email);
+    public  ResponseEntity<APIResponse> doScrap(@PathVariable Long postId, @AuthenticationPrincipal String email) {
+        return ResponseEntity.ok(scrapService.scrap(postId, email));
     }
 
 //

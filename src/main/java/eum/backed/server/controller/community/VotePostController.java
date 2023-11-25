@@ -1,12 +1,13 @@
 package eum.backed.server.controller.community;
 
-import eum.backed.server.common.DTO.DataResponse;
+import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.community.dto.request.VotePostRequestDTO;
 import eum.backed.server.controller.community.dto.response.VotePostResponseDTO;
 import eum.backed.server.service.community.VotePostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,18 +22,18 @@ public class VotePostController {
     private final VotePostService votePostService;
     @PostMapping
     @ApiOperation(value = "투표 게시글 작성")
-    public DataResponse create(@RequestBody VotePostRequestDTO.Create create, @AuthenticationPrincipal String email) throws ParseException {
-        return votePostService.create(create, email);
+    public ResponseEntity<APIResponse> create(@RequestBody VotePostRequestDTO.Create create, @AuthenticationPrincipal String email) throws ParseException {
+        return ResponseEntity.ok(votePostService.create(create, email));
     }
     @PutMapping("{postId}")
     @ApiOperation(value = "투표 게시글 수정")
-    public DataResponse update(@PathVariable Long postId,@RequestBody VotePostRequestDTO.Update update, @AuthenticationPrincipal String email) throws ParseException {
-        return votePostService.update(postId,update,email);
+    public  ResponseEntity<APIResponse> update(@PathVariable Long postId,@RequestBody VotePostRequestDTO.Update update, @AuthenticationPrincipal String email) throws ParseException {
+        return ResponseEntity.ok(votePostService.update(postId,update,email));
     }
     @DeleteMapping("/{postId}")
     @ApiOperation(value = "투표 게시글 삭제")
-    public DataResponse delete(@PathVariable Long postId, @AuthenticationPrincipal String email){
-        return votePostService.delete(postId, email);
+    public  ResponseEntity<APIResponse> delete(@PathVariable Long postId, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(votePostService.delete(postId, email));
     }
 //    @GetMapping()
 //    @ApiOperation(value = "전체 투표 게시글 조회")
@@ -41,19 +42,19 @@ public class VotePostController {
 //    }
     @GetMapping()
     @ApiOperation(value = "전체 투표 게시글 조회 , 검색 필터")
-    public DataResponse<List<VotePostResponseDTO.VotePostResponses>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@AuthenticationPrincipal String email){
-        return votePostService.findByFilter(keyword,email);
+    public  ResponseEntity<APIResponse<List<VotePostResponseDTO.VotePostResponses>>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(votePostService.findByFilter(keyword,email));
     }
 
     @GetMapping("/{postId}")
     @ApiOperation(value = "게시글아이디별 출력", notes = "게시글 정보 + 댓글")
-    public DataResponse<VotePostResponseDTO.VotePostWithComment> getVotePostWithComment(@PathVariable Long postId,@AuthenticationPrincipal String email){
-        return votePostService.getVotePostWithComment(postId, email);
+    public  ResponseEntity<APIResponse<VotePostResponseDTO.VotePostWithComment>> getVotePostWithComment(@PathVariable Long postId,@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(votePostService.getVotePostWithComment(postId, email));
     }
     @PostMapping("/{postId}/voting")
     @ApiOperation(value = "투표하기")
-    public DataResponse voting(@PathVariable Long postId,@RequestBody VotePostRequestDTO.Voting voting,@AuthenticationPrincipal String email){
-        return votePostService.voting(postId,voting, email);
+    public  ResponseEntity<APIResponse> voting(@PathVariable Long postId,@RequestBody VotePostRequestDTO.Voting voting,@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(votePostService.voting(postId,voting, email));
     }
 
 
