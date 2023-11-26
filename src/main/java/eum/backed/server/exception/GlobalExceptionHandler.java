@@ -192,6 +192,19 @@ public class GlobalExceptionHandler {
         final ErrorResponse response = ErrorResponse.of(ErrorCode.REQUEST_BODY_MISSING_ERROR, ex.getMessage());
         return new ResponseEntity<>(response, HTTP_STATUS_OK);
     }
+    /**
+     * [Exception] 잘못된 인수로 요청 한 경우
+     *
+     * @param ex IllegalArgumentException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<ErrorResponse> IllegalArgumentExceptionHandler(IllegalArgumentException ex) {
+        log.error("IllegalArgumentException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_PARAMETER, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 
 
     // ==================================================================================================================

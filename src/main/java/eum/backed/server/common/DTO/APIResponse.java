@@ -1,6 +1,7 @@
 package eum.backed.server.common.DTO;
 
 import eum.backed.server.common.DTO.enums.SuccessCode;
+import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,8 +48,6 @@ public class APIResponse<T> {
     public static APIResponse of(final SuccessCode code, String detailMsg){
         return new APIResponse(code, detailMsg);
     }
-
-
 
 
 }
