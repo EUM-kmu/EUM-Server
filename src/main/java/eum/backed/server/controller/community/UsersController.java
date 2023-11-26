@@ -56,12 +56,12 @@ public class UsersController {
     }
     @ApiOperation(value = "소셜 타입별 로그인",notes = "kakao,google,apple")
     @PostMapping("/auth/{type}")
-    public ResponseEntity<APIResponse<UsersResponseDTO.TokenInfo>> getToken(@PathVariable SignInType signInType ,@RequestBody @Validated UsersRequestDTO.Token token) throws IOException, FirebaseAuthException {
+    public ResponseEntity<APIResponse<UsersResponseDTO.TokenInfo>> getToken(@PathVariable SignInType type ,@RequestBody @Validated UsersRequestDTO.Token token) throws IOException, FirebaseAuthException {
 //        String access = kakaoService.getKakaoAccessT(code);
         String email = "";
-        if(signInType == SignInType.kakao){
+        if(type == SignInType.kakao){
             email = kakaoService.createKakaoUser(token.getToken());
-        } else if (signInType == SignInType.firebase) {
+        } else if (type == SignInType.firebase) {
             email = FirebaseAuth.getInstance().verifyIdToken(token.getToken()).getEmail();
         }
 //        log.info(token.);
