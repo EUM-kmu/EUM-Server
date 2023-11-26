@@ -1,6 +1,5 @@
 package eum.backed.server.controller.community.dto.request;
 
-import eum.backed.server.domain.community.avatar.Avatar;
 import eum.backed.server.domain.community.avatar.AvatarName;
 import lombok.Getter;
 import lombok.Setter;

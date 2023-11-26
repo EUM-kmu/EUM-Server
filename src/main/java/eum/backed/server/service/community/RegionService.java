@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,34 +24,49 @@ public class RegionService {
     private final TownRepository townRepository;
     private final TownshipRepository townshipRepository;
 
-    public APIResponse<RegionResponseDTO.Region> getRegionByType(String si, String gu) {
-        if(si == null || si.isBlank()){
+    public APIResponse<RegionResponseDTO.Region> getRegionByType(Long si, Long gu) {
+        if(si == null ){
             return getCity();
-        } else if (gu == null || gu.isBlank()) {
+        } else if (gu == null ) {
             return getGu(si);
         }
         return getDong(gu);
     }
 
-    private APIResponse<RegionResponseDTO.Region> getDong(String gu) {
-        Town town = townRepository.findByName(gu).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
+    private APIResponse<RegionResponseDTO.Region> getDong(Long gu) {
+        Town town = townRepository.findById(gu).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         List<Township> townshipList = townshipRepository.findByTown(town).orElse(Collections.emptyList());
-        List<String> nameList = townshipList.stream().map(township -> township.getName()).toList();
+        List<Map<Long, String>> nameList = townshipList.stream()
+                .map(township -> {
+                    Map < Long, String > map = new HashMap<>();
+                    map.put(township.getTownshipId(), township.getName());
+                    return map;}
+                ).toList();
         RegionResponseDTO.Region region = RegionResponseDTO.Region.builder().region(nameList).build();
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,region);
     }
 
-    private APIResponse<RegionResponseDTO.Region> getGu(String si) {
-        City city = cityRepository.findByName(si).orElseThrow(()->new NullPointerException("초기 데이터 미 설정"));
+    private APIResponse<RegionResponseDTO.Region> getGu(Long si) {
+        City city = cityRepository.findById(si).orElseThrow(()->new NullPointerException("초기 데이터 미 설정"));
         List<Town> townList = townRepository.findByCity(city).orElse(Collections.emptyList());
-        List<String> nameList = townList.stream().map(town -> town.getName()).toList();
+        List<Map<Long, String>> nameList = townList.stream()
+                .map(town -> {
+                    Map < Long, String > map = new HashMap<>();
+                    map.put(town.getTownId(), town.getName());
+                    return map;}
+                ).toList();
         RegionResponseDTO.Region region = RegionResponseDTO.Region.builder().region(nameList).build();
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,region);
     }
 
     private APIResponse<RegionResponseDTO.Region> getCity(){
         List<City> cityList = cityRepository.findAll();
-        List<String> nameList = cityList.stream().map(city -> city.getName()).toList();
+        List<Map<Long, String>> nameList = cityList.stream()
+                .map(city -> {
+                    Map < Long, String > map = new HashMap<>();
+                    map.put(city.getCityId(), city.getName());
+                    return map;}
+                ).toList();
         RegionResponseDTO.Region region = RegionResponseDTO.Region.builder().region(nameList).build();
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,region);
     }

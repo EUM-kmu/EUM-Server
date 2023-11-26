@@ -1,13 +1,10 @@
 package eum.backed.server.common.DTO;
 
 import eum.backed.server.common.DTO.enums.ErrorCode;
-import eum.backed.server.controller.community.dto.response.Response;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
 import java.util.*;
