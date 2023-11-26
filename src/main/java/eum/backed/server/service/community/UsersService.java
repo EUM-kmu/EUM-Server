@@ -32,7 +32,6 @@ public class UsersService {
     private final PasswordEncoder passwordEncoder;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisTemplate redisTemplate;
 
 
@@ -60,7 +59,7 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set("RT:" + getUser.getEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        return APIResponse.of(SuccessCode.SELECT_SUCCESS,"로그인 성공");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,tokenInfo);
     }
 
     public APIResponse<UsersResponseDTO.TokenInfo> reissue(UsersRequestDTO.Reissue reissue) {
