@@ -4,7 +4,6 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.config.jwt.JwtTokenProvider;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
-import eum.backed.server.controller.community.dto.response.Response;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
@@ -35,7 +34,6 @@ public class UsersService {
     private JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisTemplate redisTemplate;
-    private final Response response;
 
 
     public APIResponse signUp(UsersRequestDTO.SignUp signUp){

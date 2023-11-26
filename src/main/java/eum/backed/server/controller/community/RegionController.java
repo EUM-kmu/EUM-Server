@@ -20,7 +20,7 @@ public class RegionController {
     private final RegionService regionService;
     @ApiOperation(value = "지역 정보 조회")
     @GetMapping("")
-    public ResponseEntity<APIResponse<RegionResponseDTO.Region>> getRegionByType(@RequestParam(name = "si",required = false) String si, @RequestParam(name = "gu",required = false) String gu){
-        return ResponseEntity.ok(regionService.getRegionByType(si, gu));
+    public ResponseEntity<APIResponse<RegionResponseDTO.Region>> getRegionByType(@RequestParam(name = "si",required = false) Long siId, @RequestParam(name = "gu",required = false) Long guId){
+        return ResponseEntity.ok(regionService.getRegionByType(siId, guId));
     }
 }

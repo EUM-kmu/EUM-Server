@@ -7,7 +7,6 @@ import eum.backed.server.common.DTO.ErrorResponse;
 import eum.backed.server.common.DTO.enums.ErrorCode;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
 import eum.backed.server.controller.community.dto.request.enums.SignInType;
-import eum.backed.server.controller.community.dto.response.Response;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
 import eum.backed.server.lib.Helper;
 import eum.backed.server.service.community.KakaoService;
@@ -31,7 +30,6 @@ import java.io.IOException;
 public class UsersController {
     private final UsersService usersService;
     private final KakaoService kakaoService;
-    private final Response response;
     @ApiOperation(value = "자체 회원가입", notes = "자체 회원가입")
     @PostMapping("/auth/signup")
     public ResponseEntity<APIResponse> signup(@RequestBody @Validated UsersRequestDTO.SignUp signUp) {

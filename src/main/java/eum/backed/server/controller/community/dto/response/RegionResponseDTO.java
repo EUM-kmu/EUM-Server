@@ -5,12 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 public class RegionResponseDTO {
     @Getter
     @Setter
     @Builder
     public static class Region{
-        List<String> region;
+        List<Map<Long,String>> region;
     }
 }
