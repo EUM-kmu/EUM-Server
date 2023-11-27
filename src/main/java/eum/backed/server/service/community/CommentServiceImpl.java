@@ -28,41 +28,41 @@ public class CommentServiceImpl implements CommentService {
     private final UsersRepository userRepository;
 
     @Override
-    public APIResponse createComment(Long postId, CommentRequestDTO.Create create, String email, CommentType commentType) {
+    public APIResponse createComment(Long postId, CommentRequestDTO.CommentCreate commentCreate, String email, CommentType commentType) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if(commentType == CommentType.TRANSACTION){
             MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
-            MarketComment marketComment = MarketComment.toEntity(create.getContent(), getUser, getMarketPost);
+            MarketComment marketComment = MarketComment.toEntity(commentCreate.getContent(), getUser, getMarketPost);
             marketCommentRepository.save(marketComment);
         }else if(commentType == CommentType.OPINION){
             OpinionPost getOpinionPost = opinionPostRepository.findById(postId).orElseThrow(()-> new NullPointerException("Invalid argument"));
-            OpinionComment opinionComment = OpinionComment.toEntity(create.getContent(), getUser, getOpinionPost);
+            OpinionComment opinionComment = OpinionComment.toEntity(commentCreate.getContent(), getUser, getOpinionPost);
             opinionCommentRepository.save(opinionComment);
         }else if (commentType == CommentType.VOTE){
             VotePost getVotePost = votePostRepository.findById(postId).orElseThrow(() -> new NullPointerException("Invalid argument"));
-            VoteComment voteComment = VoteComment.toEntity(create.getContent(), getUser, getVotePost);
+            VoteComment voteComment = VoteComment.toEntity(commentCreate.getContent(), getUser, getVotePost);
             voteCommentRepository.save(voteComment);
         }
         return APIResponse.of(SuccessCode.INSERT_SUCCESS);
     }
     @Override
-    public APIResponse updateComment(Long commentId,CommentRequestDTO.Update update, String email,CommentType commentType) {
+    public APIResponse updateComment(Long commentId, CommentRequestDTO.CommentUpdate commentUpdate, String email, CommentType commentType) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
 
         if(commentType == CommentType.TRANSACTION){
             MarketComment getMarketComment = marketCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
             if(getUser.getUserId() != getMarketComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-            getMarketComment.updateContent(update.getContent());
+            getMarketComment.updateContent(commentUpdate.getContent());
             marketCommentRepository.save(getMarketComment);;
         }else if(commentType == CommentType.OPINION){
             OpinionComment getOpinionComment = opinionCommentRepository.findById(commentId).orElseThrow(() -> new NullPointerException("Invalid argument"));
             if(getUser.getUserId() != getOpinionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");if(getUser.getUserId() != getOpinionComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-            getOpinionComment.updateComment(update.getContent());
+            getOpinionComment.updateComment(commentUpdate.getContent());
             opinionCommentRepository.save(getOpinionComment);
         }else if (commentType == CommentType.VOTE){
             VoteComment getVoteComment = voteCommentRepository.findById(commentId).orElseThrow(() -> new NullPointerException("Invalid argument"));
             if(getUser.getUserId() != getVoteComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-            getVoteComment.updateContent(update.getContent());
+            getVoteComment.updateContent(commentUpdate.getContent());
             voteCommentRepository.save(getVoteComment);
         }
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS);

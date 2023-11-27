@@ -29,7 +29,7 @@ public class ProfileService {
     public APIResponse create(ProfileRequestDTO.CreateProfile createProfile, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
-        Township getTownship = townShipRepository.findByName(createProfile.getTownShip()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
+        Township getTownship = townShipRepository.findById(createProfile.getTownShip()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
         Standard initialLevel = standardRepository.findById(1L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         Avatar getAvatar = avatarRepository.findByAvatarNameAndStandard(createProfile.getAvatarName(),initialLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());
@@ -58,7 +58,7 @@ public class ProfileService {
     public APIResponse updateMyProfile(ProfileRequestDTO.UpdateProfile updateProfile,String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
-        Township getTownship = townShipRepository.findByName(updateProfile.getTownShip()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
+        Township getTownship = townShipRepository.findById(updateProfile.getTownShip()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
 
         Standard currentLevel = getProfile.getAvatar().getStandard();
         Avatar getAvatar = avatarRepository.findByAvatarNameAndStandard(updateProfile.getAvatarName(),currentLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));

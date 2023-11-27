@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface CommentService {
-    public APIResponse createComment(Long postId, CommentRequestDTO.Create create, String email, CommentType commentType);
+    public APIResponse createComment(Long postId, CommentRequestDTO.CommentCreate commentCreate, String email, CommentType commentType);
 
-    public APIResponse updateComment(Long postId, CommentRequestDTO.Update update, String email, CommentType commentType);
+    public APIResponse updateComment(Long postId, CommentRequestDTO.CommentUpdate commentUpdate, String email, CommentType commentType);
 
     public APIResponse deleteComment(Long commentId,String email, CommentType commentType );
 }

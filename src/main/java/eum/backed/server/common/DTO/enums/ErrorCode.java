@@ -28,7 +28,8 @@ public enum ErrorCode {
     MISSING_REQUEST_PARAMETER_ERROR(400, "G004", "Missing Servlet RequestParameter Exception"),
 
     // 입력/출력 값이 유효하지 않음
-    IO_ERROR(400, "G005", "I/O Exception"),
+    IO_ERROR(500, "G005", "I/O Exception"),
+
 
     // com.google.gson JSON 파싱 실패
     JSON_PARSE_ERROR(400, "G006", "JsonParseException"),
@@ -43,18 +44,16 @@ public enum ErrorCode {
     NOT_FOUND_ERROR(404, "G009", "Not Found Exception"),
 
     // NULL Point Exception 발생
-    NULL_POINT_ERROR(404, "G010", "Null Point Exception"),
+    NULL_POINT_ERROR(500, "G010", "Null Point Exception"),
 
     // @RequestBody 및 @RequestParam, @PathVariable 값이 유효하지 않음
-    NOT_VALID_ERROR(404, "G011", "handle Validation Exception"),
+    NOT_VALID_ERROR(400, "G011", "handle Validation Exception"),
 
     // @RequestBody 및 @RequestParam, @PathVariable 값이 유효하지 않음
     NOT_VALID_HEADER_ERROR(404, "G012", "Header에 데이터가 존재하지 않는 경우 "),
-    // 이미 존재하는 값떄문에 생기는 에러
-    RESOURCES_CONFLICT(409, "G013", "Conflict Resources"),
-//    잘못된 인수를 인자로 받았을때
-    INVALID_PARAMETER(400, "G013", "Invalid parameter"),
 
+//토큰 관련 에러
+    UNAUTHORIZED_ERROR(401, "G008", "Forbidden Exception"),
 
     // 서버가 처리 할 방법을 모르는 경우 발생
     INTERNAL_SERVER_ERROR(500, "G999", "Internal Server Error Exception"),
@@ -62,11 +61,17 @@ public enum ErrorCode {
     /**
      * ******************************* Custom Error CodeList ***************************************
      */
+    // 이미 존재하는 값떄문에 생기는 에러
+//    잘못된 인수를 인자로 받았을때
+    INVALID_PARAMETER(400, "G014", "Invalid parameter"),
+    VALIDATION_CONSTRAINT_NOT_FOUND(400, "G015", "No validator found for validation constraint"),
+
+
     // Transaction Insert Error
     INSERT_ERROR(200, "9999", "Insert Transaction Error Exception"),
 
-    // Transaction Update Error
-    UPDATE_ERROR(200, "9999", "Update Transaction Error Exception"),
+    // Transaction CommentUpdate Error
+    UPDATE_ERROR(200, "9999", "CommentUpdate Transaction Error Exception"),
 
     // Transaction Delete Error
     DELETE_ERROR(200, "9999", "Delete Transaction Error Exception"),

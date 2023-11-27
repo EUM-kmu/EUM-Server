@@ -5,10 +5,12 @@ import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.enums.Authority;
+import eum.backed.server.exception.TokenException;
 import eum.backed.server.service.community.CustomUsersDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,20 +156,27 @@ public class JwtTokenProvider {
 
 
     // 토큰 정보를 검증하는 메서드
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token) throws SecurityException, ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, IllegalArgumentException {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
+            // 401 Unauthorized
+            throw e;
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
+            // 401 Expired
+            throw e;
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
+            // 400 Bad Request
+            throw e;
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
+            // 400 Bad Request
+            throw e;
         }
-        return false;
     }
 
     private Claims parseClaims(String accessToken) {
@@ -175,6 +184,8 @@ public class JwtTokenProvider {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        }catch (SignatureException e){
+            throw new TokenException("Invalid JWT Token");
         }
     }
 

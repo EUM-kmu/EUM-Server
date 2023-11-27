@@ -7,6 +7,7 @@ import eum.backed.server.service.community.VotePostService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +22,10 @@ import java.util.List;
 public class VotePostController {
     private final VotePostService votePostService;
     @PostMapping
+
     @ApiOperation(value = "투표 게시글 작성")
     public ResponseEntity<APIResponse> create(@RequestBody VotePostRequestDTO.Create create, @AuthenticationPrincipal String email) throws ParseException {
-        return ResponseEntity.ok(votePostService.create(create, email));
+        return new ResponseEntity<>(votePostService.create(create, email), HttpStatus.CREATED);
     }
     @PutMapping("{postId}")
     @ApiOperation(value = "투표 게시글 수정")

@@ -9,13 +9,11 @@ import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.enums.Authority;
-import eum.backed.server.exception.ResourceConflictException;
 import eum.backed.server.exception.TokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,7 @@ public class UsersService {
 
     public APIResponse signUp(UsersRequestDTO.SignUp signUp){
         if(usersRepository.existsByEmail(signUp.getEmail())){
-            throw new ResourceConflictException("이미 존재하는 이메일 입니다");
+            throw new IllegalArgumentException("이미 존재하는 이메일 입니다");
         }
         Users users = Users.builder()
                 .email(signUp.getEmail())
@@ -91,14 +89,14 @@ public class UsersService {
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,tokenInfo);
     }
 
-    public APIResponse logout(UsersRequestDTO.Logout logout) {
+    public APIResponse logout(String token) {
         // 1. Access Token 검증
-        if (!jwtTokenProvider.validateToken(logout.getAccessToken())) {
+        if (!jwtTokenProvider.validateToken(token)) {
             throw new TokenException("잘못된 토큰 입니다");
         }
 
         // 2. Access Token 에서 User email 을 가져옵니다.
-        Authentication authentication = jwtTokenProvider.getAuthentication(logout.getAccessToken());
+        Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
         // 3. Redis 에서 해당 User email 로 저장된 Refresh Token 이 있는지 여부를 확인 후 있을 경우 삭제합니다.
         if (redisTemplate.opsForValue().get("RT:" + authentication.getName()) != null) {
@@ -107,9 +105,9 @@ public class UsersService {
         }
 
         // 4. 해당 Access Token 유효시간 가지고 와서 BlackList 로 저장하기
-        Long expiration = jwtTokenProvider.getExpiration(logout.getAccessToken());
+        Long expiration = jwtTokenProvider.getExpiration(token);
         redisTemplate.opsForValue()
-                .set(logout.getAccessToken(), "logout", expiration, TimeUnit.MILLISECONDS);
+                .set(token, "logout", expiration, TimeUnit.MILLISECONDS);
 
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"로그아웃 되었습니다.");
     }

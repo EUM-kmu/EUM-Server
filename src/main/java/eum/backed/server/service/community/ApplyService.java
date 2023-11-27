@@ -32,9 +32,9 @@ public class ApplyService {
     private final ChatService chatService;
 
 
-    public APIResponse doApply(ApplyRequestDTO.Apply applyRequest, String email) {
+    public APIResponse doApply(Long postId,ApplyRequestDTO.Apply applyRequest, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
-        MarketPost getMarketPost = marketPostRepository.findById(applyRequest.getPostId()).orElseThrow(() -> new NullPointerException("Invalid postId"));
+        MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new NullPointerException("Invalid postId"));
         if(getMarketPost.getMarketType()== MarketType.PROVIDE_HELP && getMarketPost.getPay() > getUser.getUserBankAccount().getBalance())
             throw new IllegalArgumentException("잔액보다 큰 요구 햇살");
         if(getMarketPost.getCurrentAcceptedPeople() >= getMarketPost.getMaxNumOfPeople()) throw new RuntimeException("최대 신청자 수를 넘었습니다");

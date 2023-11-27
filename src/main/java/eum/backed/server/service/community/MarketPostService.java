@@ -47,24 +47,24 @@ public class MarketPostService {
     private final ApplyRepository applyRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-    public APIResponse create(PostRequestDTO.Create create, String email) throws Exception {
+    public APIResponse create(PostRequestDTO.MarketCreate marketCreate, String email) throws Exception {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Township townShip = townShipRepository.findByName(create.getDong()).orElseThrow(() -> new NullPointerException("Invalid address"));
-        MarketCategory getMarketCategory = marketCategoryRepository.findById(create.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
+        Township townShip = user.getProfile().getTownship();
+        MarketCategory getMarketCategory = marketCategoryRepository.findById(marketCreate.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.KOREAN);
-        Long pay = Long.valueOf(create.getVolunteerTime());
-        if(create.getMarketType()==MarketType.REQUEST_HELP && user.getUserBankAccount().getBalance() < pay) throw new IllegalArgumentException("잔액보다 크게 돈 설정 불가");
+        Long pay = Long.valueOf(marketCreate.getVolunteerTime());
+        if(marketCreate.getMarketType()==MarketType.REQUEST_HELP && user.getUserBankAccount().getBalance() < pay) throw new IllegalArgumentException("잔액보다 크게 돈 설정 불가");
         MarketPost marketPost = MarketPost.builder()
-                .title(create.getTitle())
-                .contents(create.getContent())
-                .startDate(simpleDateFormat.parse(create.getStartTime()))
-                .slot(create.getSlot())
+                .title(marketCreate.getTitle())
+                .contents(marketCreate.getContent())
+                .startDate(simpleDateFormat.parse(marketCreate.getStartTime()))
+                .slot(marketCreate.getSlot())
                 .pay(pay)
                 .township(townShip)
-                .location(create.getLocation())
-                .volunteerTime(create.getVolunteerTime())
-                .marketType(create.getMarketType())
-                .maxNumOfPeople(create.getMaxNumOfPeople())
+                .location(marketCreate.getLocation())
+                .volunteerTime(marketCreate.getVolunteerTime())
+                .marketType(marketCreate.getMarketType())
+                .maxNumOfPeople(marketCreate.getMaxNumOfPeople())
                 .status(Status.RECRUITING)
                 .user(user)
                 .marketCategory(getMarketCategory)
@@ -82,17 +82,17 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
 
-    public  APIResponse update(PostRequestDTO.Update update,String email) throws ParseException {
+    public  APIResponse update(Long postId,PostRequestDTO.MarketUpdate marketUpdate, String email) throws ParseException {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Township townShip = townShipRepository.findByName(update.getDong()).orElseThrow(() -> new NullPointerException("Invalid address"));
-        MarketPost getMarketPost = marketPostRepository.findById(update.getPostId()).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        Township townShip = user.getProfile().getTownship();
+        MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
-        getMarketPost.updateTitle(update.getTitle());
-        getMarketPost.updateContents(update.getContent());
-        getMarketPost.updateSlot(update.getSlot());
-        getMarketPost.updateStartDate(simpleDateFormat.parse(update.getStartDate()));
-        getMarketPost.updateLocation(update.getLocation());
+        getMarketPost.updateTitle(marketUpdate.getTitle());
+        getMarketPost.updateContents(marketUpdate.getContent());
+        getMarketPost.updateSlot(marketUpdate.getSlot());
+        getMarketPost.updateStartDate(simpleDateFormat.parse(marketUpdate.getStartDate()));
+        getMarketPost.updateLocation(marketUpdate.getLocation());
         getMarketPost.updateDong(townShip);
         marketPostRepository.save(getMarketPost);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"게시글 정보 변경");
