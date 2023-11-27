@@ -17,7 +17,6 @@ public class ProfileResponseDTO {
     public static class AllProfile{
         private Long userId;
         private Long profileId;
-        private String name;
         private String introduction;
         private String nickname;
         private String address;
@@ -27,7 +26,7 @@ public class ProfileResponseDTO {
 
     }
 
-    public static AllProfile toNewProfileResponseDTO(Users user, Profile profile){
+    public static AllProfile toNewProfileResponseDTO(Long balance,Users user, Profile profile){
         String si = profile.getTownship().getTown().getCity().getName();
         String gu = profile.getTownship().getTown().getName();
         String dong = profile.getTownship().getName();
@@ -42,7 +41,7 @@ public class ProfileResponseDTO {
                 .address(fullAddress)
                 .totalSunrisePay(profile.getTotalSunrisePay())
                 .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
-                .balance(user.getUserBankAccount().getBalance())
+                .balance(balance)
                 .build();
     }
     @Getter

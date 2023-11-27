@@ -16,7 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/post/market")
+@RequestMapping("/market/post")
 @RequiredArgsConstructor
 @Api(tags = "market comment")
 public class MarketCommentController {

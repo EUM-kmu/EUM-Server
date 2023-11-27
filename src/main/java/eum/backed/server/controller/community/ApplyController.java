@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/apply")
+@RequestMapping("/market/post")
 @RequiredArgsConstructor
-@Api(tags = "apply")
+@Api(tags = "market")
 public class ApplyController {
     private final ApplyService applyService;
-    @PostMapping("/{postId}")
+    @PostMapping("/{postId}/apply")
     @ApiOperation(value = "지원하기", notes = "도움 게시글에 지원")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "성공",content = @Content(schema = @Schema(implementation = APIResponse.class))),
@@ -36,7 +36,7 @@ public class ApplyController {
     public ResponseEntity<APIResponse> apply(@PathVariable Long postId,@RequestBody ApplyRequestDTO.Apply apply, @AuthenticationPrincipal String email){
         return new ResponseEntity<>(applyService.doApply(postId,apply, email), HttpStatus.CREATED);
     }
-    @GetMapping("/{postId}")
+    @GetMapping("/{postId}/apply")
     @ApiOperation(value ="지원리스트 조회", notes = "게시글 당 지원리스트 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -47,7 +47,7 @@ public class ApplyController {
     public ResponseEntity<APIResponse<List<ApplyResponseDTO.ApplyListResponse>>> getApplyList( @PathVariable Long postId){
         return ResponseEntity.ok(applyService.getApplyList(postId));
     }
-    @PostMapping("/accept/{applyIds}")
+    @PostMapping("/{postId}/apply/{applyIds}")
     @ApiOperation(value = "선정하기", notes = "해당 신청자 선정") @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
             @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
