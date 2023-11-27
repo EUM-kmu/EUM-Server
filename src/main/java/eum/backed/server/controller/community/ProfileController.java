@@ -38,7 +38,7 @@ public class ProfileController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @ApiOperation(value = "프로필 생성", notes = "프로필 생성, ROLE_TEMPORARY_USER -> ROLE_USER 전환")
-    public ResponseEntity<APIResponse> createProfile(@RequestBody @Validated ProfileRequestDTO.CreateProfile createProfile, @AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse<ProfileResponseDTO.AllProfile>> createProfile(@RequestBody @Validated ProfileRequestDTO.CreateProfile createProfile, @AuthenticationPrincipal String email){
         return new ResponseEntity<>(profileService.create(createProfile, email), HttpStatus.CREATED);
     }
     @GetMapping("")

@@ -26,7 +26,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/post/market")
+@RequestMapping("/market/post")
 @RequiredArgsConstructor
 @Slf4j
 @Api(tags = "market")
@@ -77,8 +77,8 @@ public class MarketPostController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    @PutMapping("/{postId}/state")
-    public  ResponseEntity<APIResponse> updateState(@PathVariable Long postId,@RequestParam Status status, @AuthenticationPrincipal String email){
+    @PutMapping("/{postId}/{status}")
+    public  ResponseEntity<APIResponse> updateState(@PathVariable Long postId,@PathVariable Status status, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(marketPostService.updateState(postId,status, email));
     }
     @ApiOperation(value = "단일 게시글 조회", notes = "게시글 정보 + 댓글  조회")

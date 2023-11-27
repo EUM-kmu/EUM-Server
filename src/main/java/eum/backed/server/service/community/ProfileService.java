@@ -4,6 +4,7 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
+import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.community.avatar.*;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
@@ -26,7 +27,7 @@ public class ProfileService {
     private final BankAccountService bankAccountService;
     private final StandardRepository standardRepository;
     private final LevelService levelService;
-    public APIResponse create(ProfileRequestDTO.CreateProfile createProfile, String email) {
+    public APIResponse<ProfileResponseDTO.AllProfile> create(ProfileRequestDTO.CreateProfile createProfile, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
         Township getTownship = townShipRepository.findById(createProfile.getTownShip()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
@@ -35,19 +36,21 @@ public class ProfileService {
         validateNickname(createProfile.getNickname());
 
         Profile profile = Profile.t0Entity(createProfile, getTownship, getAvatar,getUser);
-        profileRepository.save(profile);
+        Profile savedProfile = profileRepository.save(profile);
 
         getUser.updateRole(Role.ROLE_USER);
-        userRepository.save(getUser);
+        Users updatedUser= userRepository.save(getUser);
         bankAccountService.createUserBankAccount(createProfile.getNickname(), createProfile.getAccountPassword(),getUser);
-        return APIResponse.of(SuccessCode.INSERT_SUCCESS);
+
+        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(300L,updatedUser, savedProfile);
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS,profileResponseDTO);
 
     }
 
     public APIResponse<ProfileResponseDTO.AllProfile> getMyProfile(String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (!profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("프로필이 없는 유저");
-        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(getUser, getUser.getProfile());
+        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(getUser.getUserBankAccount().getBalance(),getUser, getUser.getProfile());
 //        final APIResponse successResponse = successResponsecessResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);
     }

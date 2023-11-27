@@ -35,16 +35,18 @@ public class BankAccountService {
     private final UsersRepository usersRepository;
     private final ChatRoomRepository chatRoomRepository;
     //일반 유저 계정 생성
-    public void createUserBankAccount(String nickname, String password,Users user){
+    public UserBankAccount createUserBankAccount(String nickname, String password,Users user){
         UserBankAccount userBankAccount = UserBankAccount.toEntity(nickname,passwordEncoder.encode(password),user);
         UserBankAccount savedUserBankAccount =  userBankAccountRepository.save(userBankAccount);
         BranchBankAccount initialBankAccount = branchBankAccountRepository.findById(1L).get(); //초기 300 포인트 제공 계좌
 
         userBankAccount.deposit(300L);
-        userBankAccountRepository.save(userBankAccount);
+        UserBankAccount UpdatedBankAccount= userBankAccountRepository.save(userBankAccount);
 
         BankTransactionDTO.Transaction transaction = BankTransactionDTO.toInitialDTO(Code.SUCCESS, Status.INITIAL, 300L, savedUserBankAccount, initialBankAccount);
         bankTransactionService.createTransactionWithBranchBank(transaction);
+        return UpdatedBankAccount;
+
     }
     public APIResponse updatePassword(BankAccountRequestDTO.UpdatePassword updatePassword, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
