@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,12 +28,12 @@ public class BankAccountController {
 
     @PutMapping("/password")
     @ApiOperation(value = "카드 비밀 번호 바꾸기")
-    public ResponseEntity<APIResponse> updatePassword(@RequestBody BankAccountRequestDTO.UpdatePassword updatePassword, @AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse> updatePassword(@RequestBody @Validated BankAccountRequestDTO.UpdatePassword updatePassword, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(bankAccountService.updatePassword(updatePassword,email));
     }
     @PostMapping("/remittance")
     @ApiOperation(value = "거래(송금하기)")
-    public ResponseEntity<APIResponse> remittance(@RequestBody BankAccountRequestDTO.Remittance remittance, @AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse> remittance(@RequestBody @Validated  BankAccountRequestDTO.Remittance remittance, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(bankAccountService.remittance(remittance, email));
     }
     @GetMapping("/{transactionType}")

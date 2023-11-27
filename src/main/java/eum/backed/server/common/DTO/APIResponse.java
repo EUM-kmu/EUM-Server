@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Collection;
+
 @Getter
 @NoArgsConstructor
 public class APIResponse<T> {
@@ -21,6 +23,8 @@ public class APIResponse<T> {
         this.msg = code.getMessage();
         this.status = code.getStatus();
         this.code = code.getCode();
+        this.detailMsg = "";
+        this.data = (T) "";
     }
     @Builder
     public APIResponse(final SuccessCode code, final T data) {
@@ -28,6 +32,7 @@ public class APIResponse<T> {
         this.status = code.getStatus();
         this.code = code.getCode();
         this.data = data;
+        this.detailMsg = "";
     }
     @Builder
         public APIResponse(final SuccessCode code, String detailMsg) {
@@ -35,6 +40,7 @@ public class APIResponse<T> {
             this.status = code.getStatus();
             this.code = code.getCode();
             this.detailMsg = detailMsg;
+            this.data = (T) "";
         }
 
 

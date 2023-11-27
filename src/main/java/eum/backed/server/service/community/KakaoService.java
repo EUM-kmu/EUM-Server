@@ -2,6 +2,7 @@ package eum.backed.server.service.community;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import eum.backed.server.exception.TokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -89,6 +90,7 @@ public class KakaoService {
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new TokenException("카카오 엑세스 토큰 오류");
         }
         return email;
     }

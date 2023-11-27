@@ -1,6 +1,8 @@
 package eum.backed.server.common.DTO;
 
 import eum.backed.server.common.DTO.enums.ErrorCode;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ApiModel(description = "Error response")
 public class ErrorResponse {
     private int status;                 // 에러 상태 코드
     private String divisionCode;        // 에러 구분 코드
@@ -28,7 +31,8 @@ public class ErrorResponse {
         this.resultMsg = code.getMessage();
         this.status = code.getStatus();
         this.divisionCode = code.getDivisionCode();
-        this.errors = new ArrayList<>();
+        this.errors = "";
+        this.reason = "";
     }
 
     /**
@@ -43,6 +47,7 @@ public class ErrorResponse {
         this.status = code.getStatus();
         this.divisionCode = code.getDivisionCode();
         this.reason = reason;
+        this.errors = "";
     }
 
     /**
@@ -57,6 +62,7 @@ public class ErrorResponse {
         this.status = code.getStatus();
         this.errors = errors;
         this.divisionCode = code.getDivisionCode();
+        this.reason = "";
     }
 
 
@@ -126,6 +132,7 @@ public class ErrorResponse {
             this.field = field;
             this.value = value;
             this.reason = reason;
+
         }
     }
     public ErrorResponse invalidFields(LinkedList<LinkedHashMap<String,String>> errors){

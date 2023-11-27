@@ -2,8 +2,12 @@ package eum.backed.server.exception;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.firebase.auth.FirebaseAuthException;
 import eum.backed.server.common.DTO.ErrorResponse;
 import eum.backed.server.common.DTO.enums.ErrorCode;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,30 +18,24 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.validation.UnexpectedTypeException;
 import java.io.IOException;
+import java.rmi.UnexpectedException;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
     private final HttpStatus HTTP_STATUS_OK = HttpStatus.OK;
+
+
     /**
-     * [Exception] API 호출 시 고유값이 중복되서 생긴 에러
-     *
-     * @param exception ResourceConflictException
-     * @return ResponseEntity<ErrorResponse>
-     */
-    @ExceptionHandler(ResourceConflictException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArguments(ResourceConflictException exception){
-        log.error("ResourceConflictException", exception);
-        final ErrorResponse response = ErrorResponse.of(ErrorCode.RESOURCES_CONFLICT, exception.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-    /**
-     * [Exception] API 호출 시 고유값이 중복되서 생긴 에러
+     * [Exception] API 호출 토큰 에러
      *
      * @param exception ResourceConflictException
      * @return ResponseEntity<ErrorResponse>
@@ -45,8 +43,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TokenException.class)
     public ResponseEntity<ErrorResponse> handleTokenException(TokenException exception){
         log.error("TokenException", exception);
-        final ErrorResponse response = ErrorResponse.of(ErrorCode.FORBIDDEN_ERROR, exception.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.UNAUTHORIZED_ERROR, exception.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
 
@@ -67,7 +65,7 @@ public class GlobalExceptionHandler {
             stringBuilder.append(", ");
         }
         final ErrorResponse response = ErrorResponse.of(ErrorCode.NOT_VALID_ERROR, String.valueOf(stringBuilder));
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -80,7 +78,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
         log.error("MissingRequestHeaderException", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.REQUEST_BODY_MISSING_ERROR, ex.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -94,6 +92,18 @@ public class GlobalExceptionHandler {
             HttpMessageNotReadableException ex) {
         log.error("HttpMessageNotReadableException", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.REQUEST_BODY_MISSING_ERROR, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }/**
+     * [Exception] 클라이언트에서 Body로 '객체' 데이터가 넘어오지 않았을 경우
+     *
+     * @param ex HttpMessageNotReadableException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException ex) {
+        log.error("MethodArgumentTypeMismatchException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_TYPE_VALUE, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -122,7 +132,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleBadRequestException(HttpClientErrorException e) {
         log.error("HttpClientErrorException.BadRequest", e);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.BAD_REQUEST_ERROR, e.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -136,7 +146,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleNoHandlerFoundExceptionException(NoHandlerFoundException e) {
         log.error("handleNoHandlerFoundExceptionException", e);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.NOT_FOUND_ERROR, e.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
 
@@ -150,7 +160,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException e) {
         log.error("handleNullPointerException", e);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.NULL_POINT_ERROR, e.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -163,7 +173,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
         log.error("handleIOException", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.IO_ERROR, ex.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
@@ -177,7 +187,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleJsonParseExceptionException(JsonParseException ex) {
         log.error("handleJsonParseExceptionException", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.JSON_PARSE_ERROR, ex.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -190,7 +200,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleJsonProcessingException(JsonProcessingException ex) {
         log.error("handleJsonProcessingException", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.REQUEST_BODY_MISSING_ERROR, ex.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
     /**
      * [Exception] 잘못된 인수로 요청 한 경우
@@ -204,7 +214,36 @@ public class GlobalExceptionHandler {
         final ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_PARAMETER, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-
+    /**
+     * [Exception] 잘못된 인수로 요청 한 경우
+     *
+     * @param ex IllegalArgumentException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(UnexpectedTypeException.class)
+    protected ResponseEntity<ErrorResponse> UnexpectedTypeExceptionHandler(UnexpectedTypeException ex) {
+        log.error("UnexpectedTypeException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.VALIDATION_CONSTRAINT_NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(FirebaseAuthException.class)
+    protected final ResponseEntity<ErrorResponse> handleFirebaseAuthException(FirebaseAuthException ex) {
+        log.error("FirebaseAuthException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.UNAUTHORIZED_ERROR, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+//    토큰 401에러
+    @ExceptionHandler({
+            io.jsonwebtoken.security.SecurityException.class,
+            MalformedJwtException.class,
+            ExpiredJwtException.class,
+            UnsupportedJwtException.class,
+    })
+    protected ResponseEntity<ErrorResponse> handleExpiredJwtException(Exception ex) {
+        log.error("handleExpiredJwtException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.UNAUTHORIZED_ERROR, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
 
 
     // ==================================================================================================================
@@ -219,8 +258,9 @@ public class GlobalExceptionHandler {
     protected final ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
         log.error("Exception", ex);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR, ex.getMessage());
-        return new ResponseEntity<>(response, HTTP_STATUS_OK);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
 
 }

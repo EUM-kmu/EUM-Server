@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/post/opinion")
@@ -17,13 +18,13 @@ import org.springframework.web.bind.annotation.*;
 public class OpinionCommentController {
     private final CommentServiceImpl commentService;
     @PostMapping("/{postId}/comment")
-    public ResponseEntity<APIResponse> create(@PathVariable Long postId, @RequestBody CommentRequestDTO.Create create, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(commentService.createComment(postId,create, email, CommentType.OPINION));
+    public ResponseEntity<APIResponse> create(@PathVariable Long postId, @RequestBody @Validated CommentRequestDTO.CommentCreate commentCreate, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(commentService.createComment(postId, commentCreate, email, CommentType.OPINION));
     }
 
     @PutMapping("/{postId}/comment/{commentId}")
-    public  ResponseEntity<APIResponse> update(@PathVariable Long commentId,@RequestBody CommentRequestDTO.Update update,@AuthenticationPrincipal String email){
-        return ResponseEntity.ok(commentService.updateComment(commentId,update, email,CommentType.OPINION));
+    public  ResponseEntity<APIResponse> update(@PathVariable Long commentId, @RequestBody @Validated CommentRequestDTO.CommentUpdate commentUpdate, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(commentService.updateComment(commentId, commentUpdate, email,CommentType.OPINION));
     }
 
     @DeleteMapping("/{postId}/comment/{commentId}")
