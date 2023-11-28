@@ -24,18 +24,18 @@ public class CommentResponseDTO {
         private String commentUserAddress;
         private String commentContent;
         private Boolean isPostWriter;
-        private LocalDateTime createdTime;
+        private String createdTime;
     }
 
-    public CommentResponse newCommentResponse(Long postId, Long commentId,String commentWriter,String commentWriterAddress,String content,LocalDateTime createdTime, boolean writer){
-        return CommentResponse.builder()
-                .postId(postId)
-                .commentId(commentId)
-                .commentNickName(commentWriter)
-                .commentUserAddress(commentWriterAddress)
-                .commentContent(content)
-                .createdTime(createdTime)
-                .isPostWriter(writer).build();
-    }
+//    public CommentResponse newCommentResponse(Long postId, Long commentId,String commentWriter,String commentWriterAddress,String content,LocalDateTime createdTime, boolean writer){
+//        return CommentResponse.builder()
+//                .postId(postId)
+//                .commentId(commentId)
+//                .commentNickName(commentWriter)
+//                .commentUserAddress(commentWriterAddress)
+//                .commentContent(content)
+//                .createdTime(createdTime)
+//                .isPostWriter(writer).build();
+//    }
 
 }

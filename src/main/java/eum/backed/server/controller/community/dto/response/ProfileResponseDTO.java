@@ -5,7 +5,6 @@ import eum.backed.server.domain.community.user.Users;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,6 +22,8 @@ public class ProfileResponseDTO {
         private int totalSunrisePay;
         private String avatarPhotoURL;
         private Long balance;
+        private String characterName;
+        private String levelName;
 
     }
 
@@ -42,6 +43,8 @@ public class ProfileResponseDTO {
                 .totalSunrisePay(profile.getTotalSunrisePay())
                 .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
                 .balance(balance)
+                .characterName(profile.getAvatar().getAvatarName().toString())
+                .levelName(profile.getAvatar().getStandard().getName())
                 .build();
     }
     @Getter

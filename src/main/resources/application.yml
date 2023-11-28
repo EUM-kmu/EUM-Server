@@ -1,4 +1,6 @@
 spring:
+  jackson:
+    time-zone: Asia/Seoul
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/eum?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
@@ -16,7 +18,8 @@ spring:
     hibernate:
       format-sql: true
       highlight-sql: true
-      ddl-auto: update
+      ddl-auto: create
+
       dialect: org.hibernate.dialect.MySQL5Dialect # 수정된 부분
     properties:
       hibernate:

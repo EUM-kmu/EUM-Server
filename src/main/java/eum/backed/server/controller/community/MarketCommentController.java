@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/market/post")
 @RequiredArgsConstructor
-@Api(tags = "market comment")
+@Api(tags = "market")
 public class MarketCommentController {
     private final CommentServiceImpl commentServiceImpl;
     @ApiOperation(value = "거래 댓글 작성", notes = "댓글 작성")

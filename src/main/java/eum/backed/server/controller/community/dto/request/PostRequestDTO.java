@@ -34,8 +34,8 @@ public class PostRequestDTO {
         @Max(value = 50, message = "최대값은 50이어야 합니다.")
         private int maxNumOfPeople;
 
-        @Positive(message = "카테고리 id 값은 양수")
-        private Long categoryId;
+        @NotNull(message = "카테고리를 입력해주세요")
+        private String category;
     }
     @Setter
     @Getter

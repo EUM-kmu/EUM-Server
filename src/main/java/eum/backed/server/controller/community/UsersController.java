@@ -24,7 +24,7 @@ import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping()
 @RestController
 @Api(tags = "user")
 public class UsersController {
