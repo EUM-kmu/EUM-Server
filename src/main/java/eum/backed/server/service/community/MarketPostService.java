@@ -141,15 +141,21 @@ public class MarketPostService {
     public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         Township townShip = user.getProfile().getTownship();
-        if(!(keyword == null || keyword.isBlank())) {
+        if (!(keyword == null || keyword.isBlank())) {
             return findByKeyWord(keyword, townShip);
+        } else if (!(category == null || category.isBlank())) {
+
+            MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
+            List<MarketPost> marketPosts = getMarketPosts(marketCategory, townShip, marketType, status);
+            List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
+
+            return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
         }
-        MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
-        List<MarketPost> marketPosts = getMarketPosts(marketCategory, townShip, marketType, status);
+        List<MarketPost> marketPosts = marketPostRepository.findAllByOrderByCreateDateDesc();
         List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
 
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
-    }
+     }
 
     private List<MarketPost> getMarketPosts(MarketCategory marketCategory, Township townShip, MarketType marketType, Status status) {
         if (marketType == MarketType.PROVIDE_HELP) {
