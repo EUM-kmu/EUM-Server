@@ -17,6 +17,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -68,13 +72,20 @@ public class OpinionPostService {
         OpinionPost getOpinionPost = opinionPostRepository.findById(opinionPostId).orElseThrow(() -> new NullPointerException("invalid id"));
         List<OpinionComment> opinionComments = opinionCommentRepository.findByOpinionPostOrderByCreateDateDesc(getOpinionPost).orElse(Collections.emptyList());
         List<CommentResponseDTO.CommentResponse> commentResponseDTOS = opinionComments.stream().map(opinionComment -> {
+            LocalDateTime utcDateTime = LocalDateTime.parse(opinionComment.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
+
+            // UTC 시간을 한국 시간대로 변환
+            ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
+
+            // 한국 시간대로 포맷팅
+            String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z"));
             CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
                     .postId(opinionPostId)
                     .commentId(opinionComment.getOpinionCommentId())
                     .commentNickName(opinionComment.getUser().getProfile().getNickname())
                     .commentUserAddress(opinionComment.getUser().getProfile().getTownship().getName())
                     .isPostWriter(getOpinionPost.getUser() == opinionComment.getUser())
-                    .createdTime(opinionComment.getCreateDate())
+                    .createdTime(formattedDateTime)
                     .commentContent(opinionComment.getComment()).build();
             return commentResponse;
         }).collect(Collectors.toList());

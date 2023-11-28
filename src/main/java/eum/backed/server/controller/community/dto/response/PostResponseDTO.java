@@ -10,14 +10,38 @@ import io.swagger.annotations.ApiModel;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class PostResponseDTO {
-    private final Time time;
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    public static class MarketPostResponse{
+        private Long postId;
+        private String title;
+        private String content;
+        private String  createdDate;
+        //        마감시간은 없애고, 시간은 오전, 오후, 상관없음.
+        private Status status;
+        private String startTime;
+        private Slot slot;
+        private String location;
+        private Long pay;
+        private int volunteerTime;
+        private MarketType marketType;
+        private int maxNumOfPeople;
+        private String category;
+        private int commentCount;
+    }
 
     @Builder
     @Getter
@@ -32,7 +56,7 @@ public class PostResponseDTO {
         private MarketType marketType;
         private String category;
         private Status status;
-        private LocalDateTime createdDate;
+        private String createdDate;
         private int commentCount;
     }
     @Builder
@@ -47,7 +71,7 @@ public class PostResponseDTO {
         private String title;
         private String content;
         private Slot slot;
-        private Date startDate;
+        private String startDate;
         private Long pay;
         private int volunteerTime;
         private String location;
@@ -55,15 +79,51 @@ public class PostResponseDTO {
         private int maxNumOfPeople;
         private String category;
         private Status status;
-        private LocalDateTime createdDate;
+        private String createdDate;
         private int commentCount;
         private List<CommentResponseDTO.CommentResponse> commentResponses;
     }
+    public static PostResponseDTO.MarketPostResponse singleMarketPost(MarketPost marketPost){
+        LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
+        Instant instant = marketPost.getStartDate().toInstant();
+        LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime startUTC = LocalDateTime.parse(localDateTime.toString(), DateTimeFormatter.ISO_DATE_TIME);
+
+        // UTC 시간을 한국 시간대로 변환
+        ZonedDateTime koreaZonedCreateime = createUTC.atZone(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime koreaZonedStartTime = startUTC.atZone(ZoneId.of("Asia/Seoul"));
+
+        // 한국 시간대로 포맷팅
+        String formattedCreateTime = koreaZonedCreateime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        String formattedStartTime = koreaZonedStartTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        return MarketPostResponse.builder()
+                .postId(marketPost.getMarketPostId())
+                .title(marketPost.getTitle())
+                .createdDate(formattedCreateTime)
+                .startTime(formattedStartTime)
+                .slot(marketPost.getSlot())
+                .content(marketPost.getContents())
+                .pay(marketPost.getPay())
+                .volunteerTime(marketPost.getVolunteerTime())
+                .marketType(marketPost.getMarketType())
+                .location(marketPost.getLocation())
+                .category(marketPost.getMarketCategory().getContents())
+                .status(marketPost.getStatus())
+                .commentCount(0)
+                .build();
+    }
     public static PostResponseDTO.PostResponse newPostResponse(MarketPost marketPost){
+        LocalDateTime utcDateTime = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
+
+        // UTC 시간을 한국 시간대로 변환
+        ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
+
+        // 한국 시간대로 포맷팅
+        String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z"));
         return PostResponse.builder()
                 .postId(marketPost.getMarketPostId())
                 .title(marketPost.getTitle())
-                .createdDate(marketPost.getCreateDate())
+                .createdDate(formattedDateTime)
                 .pay(marketPost.getPay())
                 .volunteerTime(marketPost.getVolunteerTime())
                 .marketType(marketPost.getMarketType())
@@ -74,14 +134,26 @@ public class PostResponseDTO {
                 .build();
     }
     public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses){
+        LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
+        Instant instant = marketPost.getStartDate().toInstant();
+        LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime startUTC = LocalDateTime.parse(localDateTime.toString(), DateTimeFormatter.ISO_DATE_TIME);
+
+        // UTC 시간을 한국 시간대로 변환
+        ZonedDateTime koreaZonedCreateime = createUTC.atZone(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime koreaZonedStartTime = startUTC.atZone(ZoneId.of("Asia/Seoul"));
+
+        // 한국 시간대로 포맷팅
+        String formattedCreateTime = koreaZonedCreateime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        String formattedStartTime = koreaZonedStartTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         return TransactionPostWithComment.builder()
                 .writerInfo(ProfileResponseDTO.toUserInfo(marketPost.getUser()))
                 .postId(marketPost.getMarketPostId())
                 .isWriter(user == marketPost.getUser())
                 .title(marketPost.getTitle())
                 .content(marketPost.getContents())
-                .startDate(marketPost.getStartDate())
-                .createdDate(marketPost.getCreateDate())
+                .startDate(formattedCreateTime)
+                .createdDate(formattedStartTime)
                 .pay(marketPost.getPay())
                 .location(marketPost.getLocation())
                 .volunteerTime(marketPost.getVolunteerTime())

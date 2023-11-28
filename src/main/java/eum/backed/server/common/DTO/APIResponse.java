@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 @Getter
 @NoArgsConstructor
@@ -24,7 +25,7 @@ public class APIResponse<T> {
         this.status = code.getStatus();
         this.code = code.getCode();
         this.detailMsg = "";
-        this.data = (T) "";
+        this.data = (T)new HashMap<String,String>();
     }
     @Builder
     public APIResponse(final SuccessCode code, final T data) {

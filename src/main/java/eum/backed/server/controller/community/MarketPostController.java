@@ -44,7 +44,7 @@ public class MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PostMapping()
-    public ResponseEntity<APIResponse> create(@RequestBody @Validated PostRequestDTO.MarketCreate marketCreate, @AuthenticationPrincipal String email ) throws Exception {
+    public ResponseEntity<APIResponse<PostResponseDTO.MarketPostResponse>> create(@RequestBody @Validated PostRequestDTO.MarketCreate marketCreate, @AuthenticationPrincipal String email ) throws Exception {
         return new ResponseEntity<>(marketPostService.create(marketCreate, email), HttpStatus.CREATED);
     }
     @ApiOperation(value = "게시글 삭제", notes = "게시글 아이디로 삭제")
@@ -100,8 +100,8 @@ public class MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("")
-    public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@RequestParam(name = "category",required = false) Long categoryId, @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(marketPostService.findByFilter(keyword,categoryId,marketType,status,email));
+    public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@RequestParam(name = "category",required = false) String category, @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,email));
     }
 
     @GetMapping("/{postId}/scrap")

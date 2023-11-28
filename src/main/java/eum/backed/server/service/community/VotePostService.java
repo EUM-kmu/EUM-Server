@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -95,13 +96,20 @@ public class VotePostService {
         List<VoteComment> voteComments = voteCommentRepository.findByVotePostOrderByCreateDateDesc(getVotePost).orElse(Collections.emptyList());
         Boolean amIVote = voteResultRepository.existsByUserAndVotePost(getUser,getVotePost);
         List<CommentResponseDTO.CommentResponse> commentResponses = voteComments.stream().map(voteComment ->{
+            LocalDateTime utcDateTime = LocalDateTime.parse(voteComment.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
+
+            // UTC 시간을 한국 시간대로 변환
+            ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
+
+            // 한국 시간대로 포맷팅
+            String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z"));
             CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
                     .postId(postId)
                     .commentId(voteComment.getVoteCommentId())
                     .commentNickName(voteComment.getUser().getProfile().getNickname())
                     .commentUserAddress(voteComment.getUser().getProfile().getTownship().getName())
                     .isPostWriter(getVotePost.getUser() == voteComment.getUser())
-                    .createdTime(voteComment.getCreateDate())
+                    .createdTime(formattedDateTime)
                     .commentContent(voteComment.getContent()).build();
             return commentResponse;
         }).collect(Collectors.toList());

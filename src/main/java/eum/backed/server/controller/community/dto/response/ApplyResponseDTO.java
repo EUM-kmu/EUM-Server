@@ -10,7 +10,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 @Component
 @RequiredArgsConstructor
@@ -21,21 +24,27 @@ public class ApplyResponseDTO {
     public static class ApplyListResponse {
         private Long applyId;
         private Long applicantId;
+        private String createdTime;
         private String applicantNickName;
-        private String customCreatedTime;
         private String applicantAddress;
         private String introduction;
         private Long postId;
         private Boolean isAccepted;
     }
     public ApplyListResponse newApplyListResponse(MarketPost marketPost, Users applicant, Profile profile, Apply apply){
-        Date date = Date.from(apply.getCreateDate().atZone(ZoneId.systemDefault()).toInstant());
+        LocalDateTime utcDateTime = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
+
+        // UTC 시간을 한국 시간대로 변환
+        ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
+
+        // 한국 시간대로 포맷팅
+        String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z"));
         return ApplyListResponse.builder()
                 .applyId(apply.getApplyId())
                 .applicantId(applicant.getUserId())
                 .applicantNickName(profile.getNickname())
                 .applicantAddress(profile.getTownship().getName())
-                .customCreatedTime(time.calculateTime(date))
+                .createdTime(formattedDateTime)
                 .introduction(apply.getContent())
                 .postId(marketPost.getMarketPostId())
                 .isAccepted(apply.getIsAccepted()).build();
