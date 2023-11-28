@@ -21,4 +21,6 @@ public interface MarketPostRepository extends JpaRepository<MarketPost,Long> {
     Optional<List<MarketPost>> findByUserOrderByCreateDateDesc(Users user);
 
     Optional<List<MarketPost>> findByTownshipAndTitleContainingOrderByCreateDateDesc(Township townShip, String title);
+
+    List<MarketPost> findAllByOrderByCreateDateDesc();
 }
