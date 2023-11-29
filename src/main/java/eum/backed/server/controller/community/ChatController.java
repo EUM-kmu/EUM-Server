@@ -32,7 +32,7 @@ public class ChatController {
     private final MarketPostService marketPostService;
     private final ProfileService profileService;
 
-    @GetMapping("/{chatType}")
+    @GetMapping("")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -40,7 +40,7 @@ public class ChatController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    public ResponseEntity<APIResponse<List<ChatRoomResponseDTO>>> getChatListFilter(@PathVariable ChatType chatType, @AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse<List<ChatRoomResponseDTO>>> getChatListFilter(@RequestParam(name = "type",required = false) ChatType chatType, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(chatService.getChatListFilter(chatType,email));
     }
 

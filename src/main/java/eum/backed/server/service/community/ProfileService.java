@@ -41,16 +41,17 @@ public class ProfileService {
         Users updatedUser= userRepository.save(getUser);
         bankAccountService.createUserBankAccount(createProfile.getNickname(), createProfile.getAccountPassword(),getUser);
 
-        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(300L,updatedUser, savedProfile);
+        int getNextStandard = standardRepository.findById(2L).orElseThrow(() -> new IllegalArgumentException("초기데이터 설정오류")).getStandard();
+
+        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(300L,updatedUser, savedProfile,getNextStandard);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,profileResponseDTO);
 
     }
 
-    public APIResponse<ProfileResponseDTO.AllProfile> getMyProfile(String email) {
+    public APIResponse<ProfileResponseDTO.AllProfile> getMyProfile(String email, int nextStandard) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (!profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("프로필이 없는 유저");
-        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(getUser.getUserBankAccount().getBalance(),getUser, getUser.getProfile());
-//        final APIResponse successResponse = successResponsecessResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);
+        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(getUser.getUserBankAccount().getBalance(),getUser, getUser.getProfile(),nextStandard);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);
     }
     private void validateNickname(String nickname){
@@ -83,4 +84,5 @@ public class ProfileService {
             levelService.levelUp(updatedProfile);
         }
     }
+
 }

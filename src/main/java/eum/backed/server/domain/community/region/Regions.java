@@ -38,8 +38,6 @@ public class Regions {
     @OneToMany(mappedBy = "regions")
     private List<Profile> profiles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "regions")
-    private List<MarketPost> marketPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "regions")
     private List<OpinionPost> opinionPosts = new ArrayList<>();

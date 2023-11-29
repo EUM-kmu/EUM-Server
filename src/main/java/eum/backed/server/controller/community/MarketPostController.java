@@ -4,8 +4,12 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.ErrorResponse;
 import eum.backed.server.controller.community.dto.request.PostRequestDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
+import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
+import eum.backed.server.domain.community.comment.CommentType;
 import eum.backed.server.domain.community.marketpost.Status;
+import eum.backed.server.service.community.CommentService;
+import eum.backed.server.service.community.CommentServiceImpl;
 import eum.backed.server.service.community.MarketPostService;
 import eum.backed.server.service.community.ScrapService;
 import io.swagger.annotations.Api;
@@ -33,6 +37,7 @@ import java.util.List;
 public class MarketPostController {
     private final MarketPostService marketPostService;
     private final ScrapService scrapService;
+    private final CommentService commentService;
 
 
     @ApiOperation(value = "게시글 작성", notes = "도움요청, 받기 게시글 작성")
@@ -90,7 +95,8 @@ public class MarketPostController {
     })
     @GetMapping("{postId}")
     public  ResponseEntity<APIResponse<PostResponseDTO.TransactionPostWithComment>> findById(@PathVariable Long postId,@AuthenticationPrincipal String email){
-        return ResponseEntity.ok(marketPostService.getTransactionPostWithComment(postId,email));
+        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, email, CommentType.TRANSACTION);
+        return ResponseEntity.ok(marketPostService.getTransactionPostWithComment(postId,email,commentResponses));
     }
     @ApiOperation(value = "필터 조회", notes = "필터 별 게시글 리스트 조회")
     @ApiResponses(value = {
