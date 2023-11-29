@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,16 @@ import java.io.IOException;
 public class UsersController {
     private final UsersService usersService;
     private final KakaoService kakaoService;
+    @ApiOperation(value = "토큰 검증", notes = "유저 타입 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
+            @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
+    })
+    @GetMapping("/token")
+    public ResponseEntity<APIResponse> validateToken(@AuthenticationPrincipal String email) {
+        return new ResponseEntity<>(usersService.validateToken(email), HttpStatus.OK);
+    }
     @ApiOperation(value = "자체 회원가입", notes = "자체 회원가입")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "성공"),

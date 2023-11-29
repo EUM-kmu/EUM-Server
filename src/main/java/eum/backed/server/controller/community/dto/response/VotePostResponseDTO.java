@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -60,7 +59,7 @@ public class VotePostResponseDTO {
         return VotePostWithComment.builder()
                 .writerId(votePost.getUser().getUserId())
                 .writerNickName(votePost.getUser().getProfile().getNickname())
-                .writerAddress(votePost.getUser().getProfile().getTownship().getName())
+                .writerAddress(votePost.getUser().getProfile().getRegions().getName())
                 .agreeCounts(votePost.getAgreeCount())
                 .disagreeCount(votePost.getDisagreeCount())
                 .postTitle(votePost.getTitle())

@@ -17,8 +17,8 @@ public class ProfileRequestDTO {
         @NotEmpty(message = "닉네임을 입력하세요")
         private String nickname;
         private String introduction;
-        @Positive(message = "동id 입력해주세요")
-        private Long townShip;
+        @Positive(message = "지역id 입력해주세요")
+        private Long regionId;
         @NotEmpty(message = "비밀번호는 필수 입력값입니다.")
         @Pattern(regexp = "\\d{4}", message = "비밀번호는 4자리 숫자여야 합니다.")
         private String accountPassword;
@@ -32,8 +32,8 @@ public class ProfileRequestDTO {
         @NotEmpty(message = "닉네임을 입력하세요")
         private String nickname;
         private String introduction;
-        @Positive(message = "동id 입력해주세요")
-        private Long townShip;
+        @Positive(message = "지역id 입력해주세요")
+        private Long regionId;
         @NotEmpty(message = "비밀번호는 필수 입력값입니다.")
         @Pattern(regexp = "\\d{4}", message = "비밀번호는 4자리 숫자여야 합니다.")
         private String accountPassword;

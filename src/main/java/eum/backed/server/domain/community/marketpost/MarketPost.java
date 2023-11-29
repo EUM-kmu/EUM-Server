@@ -5,7 +5,7 @@ import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.category.MarketCategory;
 import eum.backed.server.domain.community.comment.MarketComment;
-import eum.backed.server.domain.community.region.DONG.Township;
+import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.user.Users;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -62,8 +62,8 @@ public class MarketPost extends BaseTimeEntity {
     private List<Apply> applies = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "township_id")
-    private Township township;
+    @JoinColumn(name = "region_id")
+    private Regions regions;
 
     @OneToMany(mappedBy = "marketPost")
     private List<MarketComment> marketComments = new ArrayList<>();
@@ -85,6 +85,6 @@ public class MarketPost extends BaseTimeEntity {
     public void updateStartDate(Date startDate) {this.startDate = startDate;}
     public void updateSlot(Slot slot) {this.slot = slot;}
     public  void updateLocation(String location) {this.location = location;}
-    public  void updateDong(Township townShip){this.township = townShip;}
+    public  void updateDong(Regions regions){this.regions = regions;}
 
 }

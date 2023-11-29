@@ -20,8 +20,7 @@ public class CommentResponseDTO {
     public static class CommentResponse {
         private Long postId;
         private Long commentId;
-        private String commentNickName;
-        private String commentUserAddress;
+        private ProfileResponseDTO.UserInfo writerInfo;
         private String commentContent;
         private Boolean isPostWriter;
         private String createdTime;

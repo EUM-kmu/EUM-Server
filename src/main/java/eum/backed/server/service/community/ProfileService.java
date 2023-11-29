@@ -4,12 +4,11 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
-import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.community.avatar.*;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
-import eum.backed.server.domain.community.region.DONG.Township;
-import eum.backed.server.domain.community.region.DONG.TownshipRepository;
+import eum.backed.server.domain.community.region.Regions;
+import eum.backed.server.domain.community.region.RegionsRepository;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
@@ -22,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class ProfileService {
     private final ProfileRepository profileRepository;
     private final UsersRepository userRepository;
-    private final TownshipRepository townShipRepository;
+    private final RegionsRepository regionsRepository;
     private final AvatarRepository avatarRepository;
     private final BankAccountService bankAccountService;
     private final StandardRepository standardRepository;
@@ -30,12 +29,12 @@ public class ProfileService {
     public APIResponse<ProfileResponseDTO.AllProfile> create(ProfileRequestDTO.CreateProfile createProfile, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
-        Township getTownship = townShipRepository.findById(createProfile.getTownShip()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
+        Regions getRegions = regionsRepository.findById(createProfile.getRegionId()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
         Standard initialLevel = standardRepository.findById(1L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         Avatar getAvatar = avatarRepository.findByAvatarNameAndStandard(createProfile.getAvatarName(),initialLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());
 
-        Profile profile = Profile.t0Entity(createProfile, getTownship, getAvatar,getUser);
+        Profile profile = Profile.toEntity(createProfile, getRegions, getAvatar,getUser);
         Profile savedProfile = profileRepository.save(profile);
 
         getUser.updateRole(Role.ROLE_USER);
@@ -61,14 +60,14 @@ public class ProfileService {
     public APIResponse updateMyProfile(ProfileRequestDTO.UpdateProfile updateProfile,String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
-        Township getTownship = townShipRepository.findById(updateProfile.getTownShip()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
+        Regions getRegions = regionsRepository.findById(updateProfile.getRegionId()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
 
         Standard currentLevel = getProfile.getAvatar().getStandard();
         Avatar getAvatar = avatarRepository.findByAvatarNameAndStandard(updateProfile.getAvatarName(),currentLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
 
         validateNickname(updateProfile.getNickname());
         getProfile.updateNickName(updateProfile.getNickname());
-        getProfile.updateTownship(getTownship);
+        getProfile.updateRegions(getRegions);
         getProfile.upDateAvatar(getAvatar);
         getProfile.updateInstroduction(updateProfile.getIntroduction());
         profileRepository.save(getProfile);

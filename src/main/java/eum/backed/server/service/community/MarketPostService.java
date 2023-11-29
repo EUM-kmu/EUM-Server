@@ -7,6 +7,7 @@ import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.controller.community.dto.request.enums.ServiceType;
 import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
+import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.apply.ApplyRepository;
 import eum.backed.server.domain.community.category.MarketCategory;
@@ -17,8 +18,7 @@ import eum.backed.server.domain.community.comment.MarketCommentRepository;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.MarketPostRepository;
 import eum.backed.server.domain.community.marketpost.Status;
-import eum.backed.server.domain.community.region.DONG.Township;
-import eum.backed.server.domain.community.region.DONG.TownshipRepository;
+import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.scrap.ScrapRepository;
 import eum.backed.server.domain.community.user.Users;
@@ -45,7 +45,6 @@ public class MarketPostService {
     private final ScrapRepository scrapRepository;
     private final PostResponseDTO postResponseDTO;
     private final UsersRepository usersRepository;
-    private final TownshipRepository townShipRepository;
     private final MarketCommentRepository marketCommentRepository;
 
     private final ApplyRepository applyRepository;
@@ -53,7 +52,7 @@ public class MarketPostService {
 
     public APIResponse<PostResponseDTO.MarketPostResponse> create(PostRequestDTO.MarketCreate marketCreate, String email) throws Exception {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Township townShip = user.getProfile().getTownship();
+        Regions regions = user.getProfile().getRegions();
         MarketCategory getMarketCategory = marketCategoryRepository.findByContents(marketCreate.getCategory()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.KOREAN);
         Long pay = Long.valueOf(marketCreate.getVolunteerTime());
@@ -64,7 +63,7 @@ public class MarketPostService {
                 .startDate(simpleDateFormat.parse(marketCreate.getStartTime()))
                 .slot(marketCreate.getSlot())
                 .pay(pay)
-                .township(townShip)
+                .regions(regions)
                 .location(marketCreate.getLocation())
                 .volunteerTime(marketCreate.getVolunteerTime())
                 .marketType(marketCreate.getMarketType())
@@ -89,7 +88,7 @@ public class MarketPostService {
 
     public  APIResponse update(Long postId,PostRequestDTO.MarketUpdate marketUpdate, String email) throws ParseException {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Township townShip = user.getProfile().getTownship();
+        Regions regions = user.getProfile().getRegions();
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
@@ -98,7 +97,7 @@ public class MarketPostService {
         getMarketPost.updateSlot(marketUpdate.getSlot());
         getMarketPost.updateStartDate(simpleDateFormat.parse(marketUpdate.getStartDate()));
         getMarketPost.updateLocation(marketUpdate.getLocation());
-        getMarketPost.updateDong(townShip);
+        getMarketPost.updateDong(regions);
         marketPostRepository.save(getMarketPost);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"게시글 정보 변경");
 
@@ -127,8 +126,7 @@ public class MarketPostService {
             CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
                     .postId(postId)
                     .commentId(transactionComment.getMarketCommentId())
-                    .commentNickName(transactionComment.getUser().getProfile().getNickname())
-                    .commentUserAddress(transactionComment.getUser().getProfile().getTownship().getName())
+                    .writerInfo(ProfileResponseDTO.toUserInfo(transactionComment.getUser()))
                     .isPostWriter(getMarketPost.getUser() == transactionComment.getUser())
                     .createdTime(formattedDateTime)
                     .commentContent(transactionComment.getContent()).build();
@@ -140,13 +138,13 @@ public class MarketPostService {
     }
     public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Township townShip = user.getProfile().getTownship();
+        Regions regions = user.getProfile().getRegions();
         if (!(keyword == null || keyword.isBlank())) {
-            return findByKeyWord(keyword, townShip);
+            return findByKeyWord(keyword, regions);
         } else if (!(category == null || category.isBlank())) {
 
             MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
-            List<MarketPost> marketPosts = getMarketPosts(marketCategory, townShip, marketType, status);
+            List<MarketPost> marketPosts = getMarketPosts(marketCategory, regions, marketType, status);
             List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
 
             return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
@@ -157,24 +155,24 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
      }
 
-    private List<MarketPost> getMarketPosts(MarketCategory marketCategory, Township townShip, MarketType marketType, Status status) {
+    private List<MarketPost> getMarketPosts(MarketCategory marketCategory, Regions regions, MarketType marketType, Status status) {
         if (marketType == MarketType.PROVIDE_HELP) {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndTownshipAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, townShip, MarketType.PROVIDE_HELP, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndRegionsAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, regions, MarketType.PROVIDE_HELP, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryAndTownshipAndMarketTypeOrderByCreateDateDesc(marketCategory, townShip, MarketType.PROVIDE_HELP).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndRegionsAndMarketTypeOrderByCreateDateDesc(marketCategory, regions, MarketType.PROVIDE_HELP).orElse(Collections.emptyList());
             }
         } else if (marketType == MarketType.REQUEST_HELP) {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndTownshipAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, townShip, MarketType.REQUEST_HELP, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndRegionsAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, regions, MarketType.REQUEST_HELP, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryAndTownshipAndMarketTypeOrderByCreateDateDesc(marketCategory, townShip, MarketType.REQUEST_HELP).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndRegionsAndMarketTypeOrderByCreateDateDesc(marketCategory, regions, MarketType.REQUEST_HELP).orElse(Collections.emptyList());
             }
         } else {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndTownshipAndStatusOrderByCreateDateDesc(marketCategory, townShip, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndRegionsAndStatusOrderByCreateDateDesc(marketCategory, regions, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryAndTownshipOrderByCreateDateDesc(marketCategory, townShip).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndRegionsOrderByCreateDateDesc(marketCategory, regions).orElse(Collections.emptyList());
             }
         }
     }
@@ -207,9 +205,9 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
 
-    private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord, Township getTownship) {
+    private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord, Regions getRegions) {
 //        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<MarketPost> marketPosts = marketPostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(getTownship, keyWord).orElse(Collections.emptyList());
+        List<MarketPost> marketPosts = marketPostRepository.findByRegionsAndTitleContainingOrderByCreateDateDesc(getRegions, keyWord).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
