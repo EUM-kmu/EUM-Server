@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+
 @Component
 @RequiredArgsConstructor
 public class ApplyResponseDTO {
@@ -43,7 +43,7 @@ public class ApplyResponseDTO {
                 .applyId(apply.getApplyId())
                 .applicantId(applicant.getUserId())
                 .applicantNickName(profile.getNickname())
-                .applicantAddress(profile.getTownship().getName())
+                .applicantAddress(profile.getRegions().getName())
                 .createdTime(formattedDateTime)
                 .introduction(apply.getContent())
                 .postId(marketPost.getMarketPostId())

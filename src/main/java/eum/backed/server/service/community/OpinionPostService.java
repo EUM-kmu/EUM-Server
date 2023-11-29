@@ -5,11 +5,12 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.dto.request.OpinionPostRequestDTO;
 import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.OpinionResponseDTO;
+import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.domain.community.comment.OpinionComment;
 import eum.backed.server.domain.community.comment.OpinionCommentRepository;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.opinionpost.OpinionPostRepository;
-import eum.backed.server.domain.community.region.DONG.Township;
+import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
@@ -38,8 +39,8 @@ public class OpinionPostService {
     public APIResponse create(OpinionPostRequestDTO.Create create, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (getUser.getRole() == Role.ROLE_TEMPORARY_USER ) throw new IllegalArgumentException("프로필이 없느 유저");
-        Township getTownship =getUser.getProfile().getTownship();
-        OpinionPost opinionPost = OpinionPost.toEntity(create.getTitle(), create.getContent(), getUser, getTownship);
+        Regions getRegions =getUser.getProfile().getRegions();
+        OpinionPost opinionPost = OpinionPost.toEntity(create.getTitle(), create.getContent(), getUser, getRegions);
         opinionPostRepository.save(opinionPost);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS);
     }
@@ -62,9 +63,9 @@ public class OpinionPostService {
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
 
-    private APIResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getAllOpinionPosts(Township township) {
+    private APIResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getAllOpinionPosts(Regions regions) {
 //        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-        List<OpinionPost> opinionPosts = opinionPostRepository.findByTownshipOrderByCreateDateDesc(township).orElse(Collections.emptyList());
+        List<OpinionPost> opinionPosts = opinionPostRepository.findByRegionsOrderByCreateDateDesc(regions).orElse(Collections.emptyList());
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, allOpinionPostsResponses);
     }
@@ -82,8 +83,7 @@ public class OpinionPostService {
             CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
                     .postId(opinionPostId)
                     .commentId(opinionComment.getOpinionCommentId())
-                    .commentNickName(opinionComment.getUser().getProfile().getNickname())
-                    .commentUserAddress(opinionComment.getUser().getProfile().getTownship().getName())
+                    .writerInfo(ProfileResponseDTO.toUserInfo(opinionComment.getUser()))
                     .isPostWriter(getOpinionPost.getUser() == opinionComment.getUser())
                     .createdTime(formattedDateTime)
                     .commentContent(opinionComment.getComment()).build();
@@ -102,10 +102,10 @@ public class OpinionPostService {
     }
 
 
-    private APIResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(Township township) {
-//        Users getUser = userRepository.findByEmail(township).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-//        Township getTownship = getUser.getProfile().getTownship();
-//        int majorityCounts = township.getProfiles().size()/2;
+    private APIResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> getHottestPosts(Regions regions) {
+//        Users getUser = userRepository.findByEmail(regions).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+//        Regions getRegions = getUser.getProfile().getRegions();
+//        int majorityCounts = regions.getProfiles().size()/2;
         List<OpinionPost> opinionPosts = opinionPostRepository.findByLikeCountGreaterThanOrderByLikeCountDesc(10).orElse(Collections.emptyList());
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, allOpinionPostsResponses);
@@ -118,22 +118,22 @@ public class OpinionPostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, allOpinionPostsResponses);
     }
 
-    private APIResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByKeyWord(String keyWord, Township township) {
-//        Users getUser = userRepository.findByEmail(township).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-        List<OpinionPost> opinionPosts = opinionPostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(township, keyWord).orElse(Collections.emptyList());
+    private APIResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByKeyWord(String keyWord, Regions regions) {
+//        Users getUser = userRepository.findByEmail(regions).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        List<OpinionPost> opinionPosts = opinionPostRepository.findByRegionsAndTitleContainingOrderByCreateDateDesc(regions, keyWord).orElse(Collections.emptyList());
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, allOpinionPostsResponses);
     }
 
     public APIResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>> findByFilter(String keyword, String isShow, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-        Township getTownship = getUser.getProfile().getTownship();
+        Regions getRegions = getUser.getProfile().getRegions();
         if(!(keyword == null || keyword.isBlank())) {
-            return findByKeyWord(keyword, getTownship);
+            return findByKeyWord(keyword, getRegions);
         }else if (isShow!=null &&isShow.equals("true") ){
             log.info(">>>>>."+isShow);
-            return getHottestPosts(getTownship);
+            return getHottestPosts(getRegions);
         }
-        return getAllOpinionPosts(getTownship);
+        return getAllOpinionPosts(getRegions);
     }
 }

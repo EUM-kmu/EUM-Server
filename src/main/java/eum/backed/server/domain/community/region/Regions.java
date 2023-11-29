@@ -1,10 +1,8 @@
-package eum.backed.server.domain.community.region.DONG;
+package eum.backed.server.domain.community.region;
 
-import eum.backed.server.common.BaseTimeEntity;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.profile.Profile;
-import eum.backed.server.domain.community.region.GU.Town;
-import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.votepost.VotePost;
 import lombok.*;
 
@@ -18,28 +16,35 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Township  {
+public class Regions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long townshipId;
+    private Long regionId;
 
     @Column
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name="town_id")
-    private Town town;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private RegionType regionType;
 
-    @OneToMany(mappedBy = "township")
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private eum.backed.server.domain.community.region.Regions parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<Regions> children = new ArrayList<>();
+
+    @OneToMany(mappedBy = "regions")
     private List<Profile> profiles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "township")
+    @OneToMany(mappedBy = "regions")
     private List<MarketPost> marketPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "township")
+    @OneToMany(mappedBy = "regions")
     private List<OpinionPost> opinionPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "township")
+    @OneToMany(mappedBy = "regions")
     private List<VotePost> votePosts = new ArrayList<>();
 
 }

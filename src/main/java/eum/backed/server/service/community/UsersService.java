@@ -135,4 +135,9 @@ public class UsersService {
                 .set("RT:" +email, tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, tokenInfo);
     }
+
+    public APIResponse<UsersResponseDTO.UserRole> validateToken(String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid email"));
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, UsersResponseDTO.UserRole.builder().role(getUser.getRole()).build());
+    }
 }

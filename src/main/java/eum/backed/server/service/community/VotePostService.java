@@ -4,10 +4,11 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.dto.request.VotePostRequestDTO;
 import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
+import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.controller.community.dto.response.VotePostResponseDTO;
 import eum.backed.server.domain.community.VoteCommentRepository;
 import eum.backed.server.domain.community.comment.VoteComment;
-import eum.backed.server.domain.community.region.DONG.Township;
+import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
@@ -68,8 +69,8 @@ public class VotePostService {
         votePostRepository.delete(getVotePost);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
-    private APIResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(Township township) {
-        List<VotePost> votePosts = votePostRepository.findByTownshipOrderByCreateDateDesc(township).orElse(Collections.emptyList());
+    private APIResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(Regions regions) {
+        List<VotePost> votePosts = votePostRepository.findByRegionsOrderByCreateDateDesc(regions).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, votePostResponses);
     }
@@ -106,8 +107,7 @@ public class VotePostService {
             CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
                     .postId(postId)
                     .commentId(voteComment.getVoteCommentId())
-                    .commentNickName(voteComment.getUser().getProfile().getNickname())
-                    .commentUserAddress(voteComment.getUser().getProfile().getTownship().getName())
+                    .writerInfo(ProfileResponseDTO.toUserInfo(voteComment.getUser()))
                     .isPostWriter(getVotePost.getUser() == voteComment.getUser())
                     .createdTime(formattedDateTime)
                     .commentContent(voteComment.getContent()).build();
@@ -133,18 +133,18 @@ public class VotePostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, votePostResponses);
     }
 
-    private APIResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(String keyWord, Township township) {
-        List<VotePost> votePosts = votePostRepository.findByTownshipAndTitleContainingOrderByCreateDateDesc(township, keyWord).orElse(Collections.emptyList());
+    private APIResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(String keyWord, Regions regions) {
+        List<VotePost> votePosts = votePostRepository.findByRegionsAndTitleContainingOrderByCreateDateDesc(regions, keyWord).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,votePostResponses);
     }
 
     public APIResponse<List<VotePostResponseDTO.VotePostResponses>> findByFilter(String keyword, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Township getTownship = getUser.getProfile().getTownship();
+        Regions getRegions = getUser.getProfile().getRegions();
         if(!(keyword == null || keyword.isBlank())) {
-            return findByKeyWord(keyword, getTownship);
+            return findByKeyWord(keyword, getRegions);
         }
-        return getAllVotePosts(getTownship);
+        return getAllVotePosts(getRegions);
     }
 }

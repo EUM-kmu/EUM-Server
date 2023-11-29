@@ -26,8 +26,7 @@ public class UsersResponseDTO {
     @Builder
     @Getter
     @AllArgsConstructor
-    public static class Users{
-        private String user;
+    public static class UserRole {
+        private Role role;
     }
-
 }
