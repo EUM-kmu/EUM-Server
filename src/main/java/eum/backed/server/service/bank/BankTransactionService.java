@@ -35,23 +35,24 @@ public class BankTransactionService {
         bankAccountTransactionRepository.save(bankAccountTransaction);
 
     }
-    public APIResponse<List<BankAccountResponseDTO.GetAllHistory>> getAllHistory(String email, TrasnactionType trasnactionType) {
+    public APIResponse<List<BankAccountResponseDTO.HistoryWithInfo>> getAllHistory(String email, TrasnactionType trasnactionType) {
         Users geUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount bankAccount = userBankAccountRepository.findByUser(geUser).orElseThrow(() -> new NullPointerException("Invalid user"));
-        if (trasnactionType == TrasnactionType.DEPOSIT || trasnactionType == TrasnactionType.WITHDRAW){
+        if (!(trasnactionType==null)){
             List<BankAccountTransaction> bankAccountTransactions = bankAccountTransactionRepository.findByMyBankAccountAndTrasnactionTypeOrderByCreateDateDesc(bankAccount,trasnactionType).orElse(Collections.emptyList());
-            List<BankAccountResponseDTO.GetAllHistory> getAllHistories = getAllHistories(bankAccountTransactions);
+            List<BankAccountResponseDTO.History> getAllHistories = getAllHistories(bankAccountTransactions);
             return APIResponse.of(SuccessCode.SELECT_SUCCESS, getAllHistories);
         }
         List<BankAccountTransaction> bankAccountTransactions = bankAccountTransactionRepository.findByMyBankAccountOrderByCreateDateDesc(bankAccount).orElse(Collections.emptyList());
-        List<BankAccountResponseDTO.GetAllHistory> getAllHistories = getAllHistories(bankAccountTransactions);
-        return APIResponse.of(SuccessCode.SELECT_SUCCESS, getAllHistories);
+        List<BankAccountResponseDTO.History> getAllHistories = getAllHistories(bankAccountTransactions);
+        BankAccountResponseDTO.HistoryWithInfo historyWithInfo = BankAccountResponseDTO.HistoryWithInfo.builder().cardName(bankAccount.getAccountName()).balance(bankAccount.getBalance()).histories(getAllHistories).build();
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, historyWithInfo);
     }
-    private List<BankAccountResponseDTO.GetAllHistory> getAllHistories(List<BankAccountTransaction> bankAccountTransactions){
-        List<BankAccountResponseDTO.GetAllHistory> allHistories = new ArrayList<>();
+    private List<BankAccountResponseDTO.History> getAllHistories(List<BankAccountTransaction> bankAccountTransactions){
+        List<BankAccountResponseDTO.History> allHistories = new ArrayList<>();
         for(BankAccountTransaction bankAccountTransaction: bankAccountTransactions){
-            BankAccountResponseDTO.GetAllHistory getAllHistory = bankAccountResponseDTO.newGetAllHistory(bankAccountTransaction);
-            allHistories.add(getAllHistory);
+            BankAccountResponseDTO.History history = bankAccountResponseDTO.newHistory(bankAccountTransaction);
+            allHistories.add(history);
         }
         return allHistories;
     }

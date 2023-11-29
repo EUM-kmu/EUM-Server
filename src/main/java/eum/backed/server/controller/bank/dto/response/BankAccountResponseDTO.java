@@ -5,7 +5,14 @@ import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,25 +22,53 @@ public class BankAccountResponseDTO {
     @Getter
     @Setter
     @Builder
-    public static class GetAllHistory {
-        private TrasnactionType trasnactionType;
-        private Long receiverId;
-        private String receiverNickName;
-        private Long senderId;
-        private String senderNickName;
-        private Long myCurrentBalance;
-        private Long transactionAmount;
+    private static class OpponentInfo{
+        private String nickName;
+        private String cardName;
     }
 
-    public GetAllHistory newGetAllHistory(BankAccountTransaction bankAccountTransaction){
-        return GetAllHistory.builder()
-                .trasnactionType(bankAccountTransaction.getTrasnactionType())
-                .receiverId(bankAccountTransaction.getReceiverBankAccount().getUserBankAccountId())
-                .receiverNickName(bankAccountTransaction.getReceiverBankAccount().getUser().getProfile().getNickname())
-                .senderId(bankAccountTransaction.getSenderBankAccount().getUserBankAccountId())
-                .senderNickName(bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getNickname())
-                .myCurrentBalance(bankAccountTransaction.getMyCurrentBalance())
-                .transactionAmount(bankAccountTransaction.getAmount()).build();
+
+    @Getter
+    public static class History {
+        private TrasnactionType trasnactionType;
+        private OpponentInfo opponentInfo;
+        private Long myCurrentBalance;
+        private Long amount;
+        private String createdTime;
+
+
+        public History(TrasnactionType trasnactionType, OpponentInfo opponentInfo, Long myCurrentBalance, Long amount, String createdTime) {
+            this.trasnactionType = trasnactionType;
+            this.opponentInfo = opponentInfo;
+            this.myCurrentBalance = myCurrentBalance;
+            this.amount = amount;
+            this.createdTime = createdTime;
+        }
+    }
+    @Builder
+    @Getter
+    @Setter
+    public static class HistoryWithInfo{
+        private String cardName;
+        private Long balance;
+        private List<History> histories;
+    }
+    public History newHistory(BankAccountTransaction bankAccountTransaction){
+        LocalDateTime utcDateTime = LocalDateTime.parse(bankAccountTransaction.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
+        ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
+        // 한국 시간대로 포맷팅
+        String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        if(bankAccountTransaction.getTrasnactionType() == TrasnactionType.WITHDRAW){
+            String receiverNickName = bankAccountTransaction.getReceiverBankAccount().getUser().getProfile().getNickname();
+            String cardName = bankAccountTransaction.getReceiverBankAccount().getAccountName();
+            OpponentInfo receiverInfo = OpponentInfo.builder().nickName(receiverNickName).cardName(cardName).build();
+            return new History(TrasnactionType.WITHDRAW, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
+        }
+        String senderNickName = (bankAccountTransaction.getSenderBankAccount() == null) ?  bankAccountTransaction.getBranchBankAccount().getAccountName():bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getNickname();
+        String cardName = (bankAccountTransaction.getSenderBankAccount() == null) ?  "":bankAccountTransaction.getSenderBankAccount().getAccountName();
+
+        OpponentInfo receiverInfo = OpponentInfo.builder().nickName(senderNickName).cardName(cardName).build();
+        return new History(TrasnactionType.DEPOSIT, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
 
     }
 

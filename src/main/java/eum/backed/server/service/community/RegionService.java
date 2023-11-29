@@ -19,7 +19,7 @@ import java.util.Map;
 public class RegionService {
     private final RegionsRepository regionsRepository;
 
-    public APIResponse<RegionResponseDTO.Region> getRegionByType(RegionType regionType) {
+    public APIResponse<List<RegionResponseDTO.Region>> getRegionByType(RegionType regionType) {
         if(!(regionType == null)){
             List<Regions> regions = regionsRepository.findByRegionType(regionType).orElse(Collections.emptyList());
             return getRegions(regions);
@@ -28,7 +28,7 @@ public class RegionService {
         return getRegions(regions);
     }
 
-    public APIResponse<RegionResponseDTO.Region> getRegionByParent(Long regionId) {
+    public APIResponse<List<RegionResponseDTO.Region>> getRegionByParent(Long regionId) {
         Regions parentRegion = regionsRepository.findById(regionId).orElseThrow(() -> new IllegalArgumentException("Invalid regionId"));
         List<Regions> regions = regionsRepository.findByParent(parentRegion).orElse(Collections.emptyList());
         return getRegions(regions);
@@ -36,15 +36,9 @@ public class RegionService {
     }
 
 
-    private APIResponse<RegionResponseDTO.Region> getRegions(List<Regions> regions){
-        List<Map<Long, String>> nameList = regions.stream()
-                .map(region -> {
-                    Map < Long, String > map = new HashMap<>();
-                    map.put(region.getRegionId(), region.getName());
-                    return map;}
-                ).toList();
-        RegionResponseDTO.Region region = RegionResponseDTO.Region.builder().region(nameList).build();
-        return APIResponse.of(SuccessCode.SELECT_SUCCESS,region);
+    private APIResponse<List<RegionResponseDTO.Region>> getRegions(List<Regions> regions){
+        List<RegionResponseDTO.Region> regionList = regions.stream().map(RegionResponseDTO.Region::new).toList();
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,regionList);
     }
 
 }

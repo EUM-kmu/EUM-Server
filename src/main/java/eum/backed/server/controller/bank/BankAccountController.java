@@ -36,9 +36,9 @@ public class BankAccountController {
     public ResponseEntity<APIResponse> remittance(@RequestBody @Validated  BankAccountRequestDTO.Remittance remittance, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(bankAccountService.remittance(remittance, email));
     }
-    @GetMapping("/{transactionType}")
+    @GetMapping("/pay")
     @ApiOperation(value = "거래 내역 조회",notes = "transactionType 별 전체 입출금 필터")
-    public ResponseEntity<APIResponse<List<BankAccountResponseDTO.GetAllHistory>>> getAllHistory(@PathVariable TrasnactionType transactionType,@AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse<List<BankAccountResponseDTO.HistoryWithInfo>>> getAllHistory(@RequestParam(name = "type",required = false) TrasnactionType transactionType, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(bankTransactionService.getAllHistory(email,transactionType));
     }
 }

@@ -7,13 +7,11 @@ import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.controller.community.dto.request.enums.ServiceType;
 import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
-import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.apply.ApplyRepository;
 import eum.backed.server.domain.community.category.MarketCategory;
 import eum.backed.server.domain.community.category.MarketCategoryRepository;
 import eum.backed.server.domain.community.chat.ChatRoomRepository;
-import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.comment.MarketCommentRepository;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.MarketPostRepository;
@@ -28,15 +26,11 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class MarketPostService {
@@ -52,7 +46,6 @@ public class MarketPostService {
 
     public APIResponse<PostResponseDTO.MarketPostResponse> create(PostRequestDTO.MarketCreate marketCreate, String email) throws Exception {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Regions regions = user.getProfile().getRegions();
         MarketCategory getMarketCategory = marketCategoryRepository.findByContents(marketCreate.getCategory()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.KOREAN);
         Long pay = Long.valueOf(marketCreate.getVolunteerTime());
@@ -63,7 +56,6 @@ public class MarketPostService {
                 .startDate(simpleDateFormat.parse(marketCreate.getStartTime()))
                 .slot(marketCreate.getSlot())
                 .pay(pay)
-                .regions(regions)
                 .location(marketCreate.getLocation())
                 .volunteerTime(marketCreate.getVolunteerTime())
                 .marketType(marketCreate.getMarketType())
@@ -88,7 +80,6 @@ public class MarketPostService {
 
     public  APIResponse update(Long postId,PostRequestDTO.MarketUpdate marketUpdate, String email) throws ParseException {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Regions regions = user.getProfile().getRegions();
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
@@ -97,7 +88,6 @@ public class MarketPostService {
         getMarketPost.updateSlot(marketUpdate.getSlot());
         getMarketPost.updateStartDate(simpleDateFormat.parse(marketUpdate.getStartDate()));
         getMarketPost.updateLocation(marketUpdate.getLocation());
-        getMarketPost.updateDong(regions);
         marketPostRepository.save(getMarketPost);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"게시글 정보 변경");
 
@@ -111,40 +101,21 @@ public class MarketPostService {
         marketPostRepository.save(getMarketPost);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"게시글 상태 변경");
     }
-    public  APIResponse<PostResponseDTO.TransactionPostWithComment> getTransactionPostWithComment(Long postId,String email) {
+    public  APIResponse<PostResponseDTO.TransactionPostWithComment> getTransactionPostWithComment(Long postId,String email,List<CommentResponseDTO.CommentResponse> commentResponses) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
-        List<MarketComment> marketComments = marketCommentRepository.findByMarketPostOrderByCreateDateDesc(getMarketPost).orElse(Collections.emptyList());
-        List<CommentResponseDTO.CommentResponse> commentResponses = marketComments.stream().map(transactionComment -> {
-            LocalDateTime utcDateTime = LocalDateTime.parse(transactionComment.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
-
-            // UTC 시간을 한국 시간대로 변환
-            ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
-
-            // 한국 시간대로 포맷팅
-            String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
-            CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
-                    .postId(postId)
-                    .commentId(transactionComment.getMarketCommentId())
-                    .writerInfo(ProfileResponseDTO.toUserInfo(transactionComment.getUser()))
-                    .isPostWriter(getMarketPost.getUser() == transactionComment.getUser())
-                    .createdTime(formattedDateTime)
-                    .commentContent(transactionComment.getContent()).build();
-            return commentResponse;
-        }).collect(Collectors.toList());
         PostResponseDTO.TransactionPostWithComment singlePostResponse = postResponseDTO.newTransactionPostWithComment(user,getMarketPost,commentResponses);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,singlePostResponse);
 
     }
     public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        Regions regions = user.getProfile().getRegions();
         if (!(keyword == null || keyword.isBlank())) {
-            return findByKeyWord(keyword, regions);
+            return findByKeyWord(keyword);
         } else if (!(category == null || category.isBlank())) {
 
             MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
-            List<MarketPost> marketPosts = getMarketPosts(marketCategory, regions, marketType, status);
+            List<MarketPost> marketPosts = getMarketPosts(marketCategory, marketType, status);
             List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
 
             return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
@@ -155,24 +126,24 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
      }
 
-    private List<MarketPost> getMarketPosts(MarketCategory marketCategory, Regions regions, MarketType marketType, Status status) {
+    private List<MarketPost> getMarketPosts(MarketCategory marketCategory, MarketType marketType, Status status) {
         if (marketType == MarketType.PROVIDE_HELP) {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndRegionsAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, regions, MarketType.PROVIDE_HELP, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, MarketType.PROVIDE_HELP, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryAndRegionsAndMarketTypeOrderByCreateDateDesc(marketCategory, regions, MarketType.PROVIDE_HELP).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndMarketTypeOrderByCreateDateDesc(marketCategory, MarketType.PROVIDE_HELP).orElse(Collections.emptyList());
             }
         } else if (marketType == MarketType.REQUEST_HELP) {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndRegionsAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, regions, MarketType.REQUEST_HELP, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, MarketType.REQUEST_HELP, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryAndRegionsAndMarketTypeOrderByCreateDateDesc(marketCategory, regions, MarketType.REQUEST_HELP).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndMarketTypeOrderByCreateDateDesc(marketCategory, MarketType.REQUEST_HELP).orElse(Collections.emptyList());
             }
         } else {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndRegionsAndStatusOrderByCreateDateDesc(marketCategory, regions, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndStatusOrderByCreateDateDesc(marketCategory, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryAndRegionsOrderByCreateDateDesc(marketCategory, regions).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryOrderByCreateDateDesc(marketCategory).orElse(Collections.emptyList());
             }
         }
     }
@@ -205,9 +176,9 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
 
-    private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord, Regions getRegions) {
+    private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord) {
 //        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<MarketPost> marketPosts = marketPostRepository.findByRegionsAndTitleContainingOrderByCreateDateDesc(getRegions, keyWord).orElse(Collections.emptyList());
+        List<MarketPost> marketPosts = marketPostRepository.findByTitleContainingOrderByCreateDateDesc( keyWord).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }

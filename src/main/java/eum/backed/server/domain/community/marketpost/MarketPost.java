@@ -61,9 +61,7 @@ public class MarketPost extends BaseTimeEntity {
     @OneToMany(mappedBy = "marketPost", orphanRemoval = true)
     private List<Apply> applies = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "region_id")
-    private Regions regions;
+
 
     @OneToMany(mappedBy = "marketPost")
     private List<MarketComment> marketComments = new ArrayList<>();
@@ -85,6 +83,5 @@ public class MarketPost extends BaseTimeEntity {
     public void updateStartDate(Date startDate) {this.startDate = startDate;}
     public void updateSlot(Slot slot) {this.slot = slot;}
     public  void updateLocation(String location) {this.location = location;}
-    public  void updateDong(Regions regions){this.regions = regions;}
 
 }

@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/regions")
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class RegionController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("")
-    public ResponseEntity<APIResponse<RegionResponseDTO.Region>> getRegionByType(@RequestParam(name = "type",required = false) RegionType regionType){
+    public ResponseEntity<APIResponse<List<RegionResponseDTO.Region>>> getRegionByType(@RequestParam(name = "type",required = false) RegionType regionType){
         return ResponseEntity.ok(regionService.getRegionByType(regionType));
     }
     @ApiOperation(value = "지역 정보 조회")
@@ -37,7 +39,7 @@ public class RegionController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/{regionId}/subregions")
-    public ResponseEntity<APIResponse<RegionResponseDTO.Region>> getRegionByParent(@PathVariable Long regionId){
+    public ResponseEntity<APIResponse<List<RegionResponseDTO.Region>>> getRegionByParent(@PathVariable Long regionId){
         return ResponseEntity.ok(regionService.getRegionByParent(regionId));
     }
 }

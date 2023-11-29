@@ -3,6 +3,7 @@ package eum.backed.server.controller.community;
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
+import eum.backed.server.service.community.LevelService;
 import eum.backed.server.service.community.ProfileService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +28,7 @@ import javax.validation.Valid;
 @Api(tags = "profile")
 public class ProfileController {
     private final ProfileService profileService;
+    private final LevelService levelService;
 
 
     @PostMapping("")
@@ -50,7 +52,8 @@ public class ProfileController {
     })
     @ApiOperation(value = "내 프로필 조회")
     public ResponseEntity<APIResponse<ProfileResponseDTO.AllProfile>> getMyProfile(@AuthenticationPrincipal String email){
-        return ResponseEntity.ok(profileService.getMyProfile(email));
+        int nextStandard = levelService.getNextLevel(email);
+        return ResponseEntity.ok(profileService.getMyProfile(email,nextStandard));
     }
     @PutMapping("")
     @ApiResponses(value = {
@@ -61,6 +64,7 @@ public class ProfileController {
     })
     @ApiOperation(value = "프로필 수정")
     public ResponseEntity<APIResponse> updateMyProfile(@RequestBody @Validated ProfileRequestDTO.UpdateProfile updateProfile, @AuthenticationPrincipal String email){
+
         return ResponseEntity.ok(profileService.updateMyProfile(updateProfile,email));
     }
 

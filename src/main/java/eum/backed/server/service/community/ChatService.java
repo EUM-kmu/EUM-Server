@@ -67,6 +67,12 @@ public class ChatService {
         List<ChatRoomResponseDTO> chatRoomResponseDTOS = getChatRoomResponses(chatRooms, getUser,false);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,chatRoomResponseDTOS);
     }
+    private APIResponse<List<ChatRoomResponseDTO>> getAllChatList(String email){
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
+        List<ChatRoom> chatRooms = chatRoomRepository.findByPostWriterOrApplicant(getUser,getUser).orElse(Collections.emptyList());
+        List<ChatRoomResponseDTO> chatRoomResponseDTOS = getAllChatRoomResponses(chatRooms, getUser);
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,chatRoomResponseDTOS);
+    }
     private List<ChatRoomResponseDTO> getChatRoomResponses(List<ChatRoom> chatRooms,Users mine,Boolean amIWriter){
         List<ChatRoomResponseDTO> chatRoomResponseDTOS = new ArrayList<>();
         for (ChatRoom chatRoom : chatRooms) {
@@ -74,9 +80,20 @@ public class ChatService {
             if(amIWriter){
                 ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(transactionUser,mine,chatRoom.getApplicant(),chatRoom);
                 chatRoomResponseDTOS.add(chatRoomResponseDTO);
+            }else {
+                ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(transactionUser,mine, chatRoom.getPostWriter(), chatRoom);
+                chatRoomResponseDTOS.add(chatRoomResponseDTO);
             }
-            ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(transactionUser,mine, chatRoom.getPostWriter(), chatRoom);
+        }
+        return chatRoomResponseDTOS;
+    }
+    private List<ChatRoomResponseDTO> getAllChatRoomResponses(List<ChatRoom> chatRooms,Users mine){
+        List<ChatRoomResponseDTO> chatRoomResponseDTOS = new ArrayList<>();
+        for (ChatRoom chatRoom : chatRooms) {
+            BankTransactionDTO.TransactionUser transactionUser = checkSender(chatRoom);
+            ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(transactionUser,mine,chatRoom.getApplicant(),chatRoom);
             chatRoomResponseDTOS.add(chatRoomResponseDTO);
+
         }
         return chatRoomResponseDTOS;
     }
@@ -84,8 +101,10 @@ public class ChatService {
     public APIResponse<List<ChatRoomResponseDTO>> getChatListFilter(ChatType chatType, String email) {
         if(chatType == ChatType.mine){
             return getChatListInMyPost(email);
+        } else if (chatType ==ChatType.others) {
+            return getChatListInOtherPost(email);
         }
-        return getChatListInOtherPost(email);
+        return getAllChatList(email);
     }
     private BankTransactionDTO.TransactionUser checkSender(ChatRoom chatRoom){
 //        true인경우 도움 요청, 작성자가 송금

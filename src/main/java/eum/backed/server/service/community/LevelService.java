@@ -6,6 +6,8 @@ import eum.backed.server.domain.community.avatar.Standard;
 import eum.backed.server.domain.community.avatar.StandardRepository;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
+import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ public class LevelService {
     private final StandardRepository standardRepository;
     private final ProfileRepository profileRepository;
     private final AvatarRepository avatarRepository;
+    private final UsersRepository usersRepository;
     public void levelUp(Profile profile){
         Standard checkLevel = checkLevel(profile.getTotalSunrisePay());
         if(profile.getAvatar().getStandard() != checkLevel ){
@@ -34,12 +37,21 @@ public class LevelService {
         Standard sun = standardRepository.findById(3L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         Standard organization = standardRepository.findById(4L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         log.info(String.valueOf(totalSunrise));
-        if(totalSunrise <=cloud.getStandard() && totalSunrise > 0){
+        if(totalSunrise <=babySun.getStandard() && totalSunrise > 0){
             return cloud;
-        } else if ( cloud.getStandard() < totalSunrise && totalSunrise<=babySun.getStandard()  ) {
+        } else if ( cloud.getStandard() < totalSunrise && totalSunrise<=sun.getStandard()  ) {
             return babySun;
-        } else if (babySun.getStandard()< totalSunrise ) {
+        } else if (sun.getStandard()< totalSunrise ) {
             return sun;
         }return organization;
+    }
+    public int getNextLevel(String email){
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        Long currentStandardId = getUser.getProfile().getAvatar().getStandard().getStandardId();
+        if(currentStandardId == 3L){
+            return -1;
+        }
+        int nextLevel = standardRepository.findById(currentStandardId+1L).orElseThrow(()-> new IllegalArgumentException("초기 데이터 입력오류")).getStandard();
+        return nextLevel;
     }
 }
