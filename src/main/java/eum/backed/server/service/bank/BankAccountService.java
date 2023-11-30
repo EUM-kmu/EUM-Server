@@ -3,6 +3,7 @@ package eum.backed.server.service.bank;
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
+import eum.backed.server.controller.bank.dto.response.BankAccountResponseDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.bank.bankacounttransaction.Code;
 import eum.backed.server.domain.bank.bankacounttransaction.Status;
@@ -128,4 +129,15 @@ public class BankAccountService {
         return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
     }
 
+    public APIResponse<BankAccountResponseDTO.CheckNickName> checkNickName(BankAccountRequestDTO.CheckNickName checkNickName, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        if(getUser.getProfile().getNickname().equals(checkNickName.getReceiverNickname())) throw new IllegalArgumentException("본인 닉네임입니다");
+        Profile receiverProfile = profileRepository.findByNickname(checkNickName.getReceiverNickname()).orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다"));
+        String receiverNickName = receiverProfile.getNickname();
+        String receiverCardName = receiverProfile.getUser().getUserBankAccount().getAccountName();
+        Long myBalance = getUser.getUserBankAccount().getBalance();
+        BankAccountResponseDTO.CheckNickName response = BankAccountResponseDTO.CheckNickName.builder().receiverNickName(receiverNickName).receiverCardName(receiverCardName).myBalance(myBalance).build();
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, response);
+
+    }
 }

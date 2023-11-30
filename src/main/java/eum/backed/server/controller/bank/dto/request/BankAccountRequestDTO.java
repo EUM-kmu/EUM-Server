@@ -10,6 +10,12 @@ import javax.validation.constraints.Positive;
 public class BankAccountRequestDTO {
     @Getter
     @Setter
+    public static class CheckNickName{
+        @NotEmpty(message = "송금할 사람의 닉네임을 입력하세요")
+        private String receiverNickname;
+    }
+    @Getter
+    @Setter
     public static class Remittance{
         @NotEmpty(message = "송금할 사람의 닉네임을 입력하세요")
         private String receiverNickname;

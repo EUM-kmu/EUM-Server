@@ -1,5 +1,6 @@
 package eum.backed.server.controller.bank.dto.response;
 
+import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
 import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransaction;
 import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
 import lombok.Builder;
@@ -18,6 +19,15 @@ import java.util.List;
 @Setter
 @Component
 public class BankAccountResponseDTO {
+    @Getter
+    @Setter
+    @Builder
+    public static class CheckNickName{
+        private String receiverNickName;
+        private String receiverCardName;
+        private Long myBalance;
+
+    }
 
     @Getter
     @Setter
@@ -71,5 +81,6 @@ public class BankAccountResponseDTO {
         return new History(TrasnactionType.DEPOSIT, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
 
     }
+
 
 }
