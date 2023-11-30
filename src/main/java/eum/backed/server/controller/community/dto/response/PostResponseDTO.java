@@ -66,6 +66,7 @@ public class PostResponseDTO {
     public static class TransactionPostWithComment {
         private ProfileResponseDTO.UserInfo writerInfo;
         private Boolean isWriter;
+        private Boolean isApplicant;
         private MarketType marketType;
         private Long postId;
         private String title;
@@ -133,7 +134,7 @@ public class PostResponseDTO {
                 .commentCount(marketPost.getMarketComments().size())
                 .build();
     }
-    public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses){
+    public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses,Boolean isApply){
         LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
         Instant instant = marketPost.getStartDate().toInstant();
         LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -150,6 +151,7 @@ public class PostResponseDTO {
                 .writerInfo(ProfileResponseDTO.toUserInfo(marketPost.getUser()))
                 .postId(marketPost.getMarketPostId())
                 .isWriter(user == marketPost.getUser())
+                .isApplicant(isApply)
                 .title(marketPost.getTitle())
                 .content(marketPost.getContents())
                 .startDate(formattedCreateTime)
