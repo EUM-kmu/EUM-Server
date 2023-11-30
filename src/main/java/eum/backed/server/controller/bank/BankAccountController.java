@@ -41,4 +41,10 @@ public class BankAccountController {
     public ResponseEntity<APIResponse<List<BankAccountResponseDTO.HistoryWithInfo>>> getAllHistory(@RequestParam(name = "type",required = false) TrasnactionType transactionType, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(bankTransactionService.getAllHistory(email,transactionType));
     }
+    @PostMapping("/check")
+    @ApiOperation(value = "닉네임 확인 및 잔액 확인",notes = "송금 시 잔액 확인")
+    public ResponseEntity<APIResponse<BankAccountResponseDTO.CheckNickName>> checkNickName(@RequestBody @Validated BankAccountRequestDTO.CheckNickName checkNickName,@AuthenticationPrincipal String email ){
+        return ResponseEntity.ok(bankAccountService.checkNickName(checkNickName, email));
+    }
+
 }

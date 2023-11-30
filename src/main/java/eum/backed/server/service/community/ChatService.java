@@ -91,7 +91,8 @@ public class ChatService {
         List<ChatRoomResponseDTO> chatRoomResponseDTOS = new ArrayList<>();
         for (ChatRoom chatRoom : chatRooms) {
             BankTransactionDTO.TransactionUser transactionUser = checkSender(chatRoom);
-            ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(transactionUser,mine,chatRoom.getApplicant(),chatRoom);
+            Users opponentUser = (mine != chatRoom.getApplicant()) ? chatRoom.getApplicant() : chatRoom.getPostWriter();
+            ChatRoomResponseDTO chatRoomResponseDTO = ChatRoomResponseDTO.newChatRoomResponse(transactionUser,mine,opponentUser,chatRoom);
             chatRoomResponseDTOS.add(chatRoomResponseDTO);
 
         }
