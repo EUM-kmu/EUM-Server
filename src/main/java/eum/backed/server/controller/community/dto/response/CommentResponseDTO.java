@@ -35,7 +35,7 @@ public class CommentResponseDTO {
         LocalDateTime utcDateTime = LocalDateTime.parse(createdTime.toString(), DateTimeFormatter.ISO_DATE_TIME);
         ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
         // 한국 시간대로 포맷팅
-        String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z"));
+        String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         return CommentResponse.builder()
                 .postId(postId)
                 .commentId(commentId)
