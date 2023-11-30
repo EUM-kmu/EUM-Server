@@ -20,6 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -106,8 +108,9 @@ public class MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("")
-    public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword,@RequestParam(name = "category",required = false) String category, @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,email));
+    public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category, @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,  Pageable pageable, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,email,pageable
+        ));
     }
 
     @GetMapping("/{postId}/scrap")

@@ -28,6 +28,7 @@ import java.io.IOException;
 @RequestMapping()
 @RestController
 @Api(tags = "user")
+@CrossOrigin("*")
 public class UsersController {
     private final UsersService usersService;
     private final KakaoService kakaoService;

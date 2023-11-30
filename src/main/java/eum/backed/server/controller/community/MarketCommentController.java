@@ -23,6 +23,7 @@ import java.util.List;
 @RequestMapping("/market/post")
 @RequiredArgsConstructor
 @Api(tags = "market")
+@CrossOrigin("*")
 public class MarketCommentController {
     private final CommentServiceImpl commentServiceImpl;
     @ApiOperation(value = "댓글 삭제", notes = "댓글 삭제")

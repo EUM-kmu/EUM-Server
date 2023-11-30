@@ -18,6 +18,7 @@ import java.util.List;
 @RequestMapping("/post/opinion")
 @RequiredArgsConstructor
 @Api(tags = "opinion")
+@CrossOrigin("*")
 public class OpinionPostController {
     private final OpinionPostService opinionPostService;
     private final LikeOpinionPostService likeOpinionPostService;

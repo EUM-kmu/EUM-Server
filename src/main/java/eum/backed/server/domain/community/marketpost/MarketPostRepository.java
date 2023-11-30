@@ -3,6 +3,7 @@ package eum.backed.server.domain.community.marketpost;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.community.category.MarketCategory;
 import eum.backed.server.domain.community.user.Users;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -21,5 +22,5 @@ public interface MarketPostRepository extends JpaRepository<MarketPost,Long> {
 
     Optional<List<MarketPost>> findByTitleContainingOrderByCreateDateDesc(String title);
 
-    List<MarketPost> findAllByOrderByCreateDateDesc();
+    List<MarketPost> findAllByOrderByCreateDateDesc(Pageable pageable);
 }

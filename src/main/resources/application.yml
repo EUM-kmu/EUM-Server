@@ -3,9 +3,9 @@ spring:
     time-zone: Asia/Seoul
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/eum?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
-    username: root
-    password: root
+    url: jdbc:mysql://db-jt925-kr.vpc-pub-cdb.ntruss.com:3306/eum?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
+    username: user
+    password: k-eum2023!
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -18,7 +18,7 @@ spring:
     hibernate:
       format-sql: true
       highlight-sql: true
-      ddl-auto: update
+      ddl-auto: create
 
       dialect: org.hibernate.dialect.MySQL5Dialect # 수정된 부분
     properties:
@@ -28,6 +28,7 @@ spring:
   sql:
     init:
       mode: always
+
 jwt:
   header: Authorization
   secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHN

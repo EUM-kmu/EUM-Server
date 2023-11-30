@@ -26,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/chat")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class ChatController {
     private final ChatService chatService;
     private final BankAccountService bankAccountService;

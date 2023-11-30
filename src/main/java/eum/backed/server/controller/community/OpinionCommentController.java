@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Api(tags = "opinion comment")
+@CrossOrigin("*")
 public class OpinionCommentController {
     private final CommentServiceImpl commentService;
     @PostMapping("/{postId}/comment")

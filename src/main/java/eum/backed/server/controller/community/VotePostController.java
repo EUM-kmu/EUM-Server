@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/post/vote")
 @RequiredArgsConstructor
 @Api(tags = "vote")
+@CrossOrigin("*")
 public class VotePostController {
     private final VotePostService votePostService;
     @PostMapping
