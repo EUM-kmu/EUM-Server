@@ -22,6 +22,7 @@ import java.util.List;
 @RequestMapping("/market/post")
 @RequiredArgsConstructor
 @Api(tags = "market")
+@CrossOrigin("*")
 public class ApplyController {
     private final ApplyService applyService;
     @PostMapping("/{postId}/apply")

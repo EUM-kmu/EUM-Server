@@ -22,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Api(tags = "bank account ")
 @Slf4j
+@CrossOrigin("*")
 public class BankAccountController {
     private final BankAccountService bankAccountService;
     private final BankTransactionService bankTransactionService;

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/post/vote")
 @RequiredArgsConstructor
 @Api(tags = "vote comment")
+@CrossOrigin("*")
 public class VoteCommentController {
     private final CommentServiceImpl commentService;
     @ApiOperation(value = "투표 댓글 작성", notes = "댓글 작성")

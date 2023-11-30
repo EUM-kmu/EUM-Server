@@ -16,10 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
@@ -27,6 +24,7 @@ import java.util.List;
 @RequestMapping("your-activity")
 @RequiredArgsConstructor
 @Api(tags = "your activity")
+@CrossOrigin("*")
 public class YourActivityController {
     private final MarketPostService marketPostService;
     private final OpinionPostService opinionPostService;

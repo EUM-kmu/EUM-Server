@@ -26,6 +26,7 @@ import javax.validation.Valid;
 @RequestMapping("profile")
 @RequiredArgsConstructor
 @Api(tags = "profile")
+@CrossOrigin("*")
 public class ProfileController {
     private final ProfileService profileService;
     private final LevelService levelService;

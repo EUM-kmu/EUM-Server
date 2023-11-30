@@ -22,6 +22,7 @@ import eum.backed.server.domain.community.scrap.ScrapRepository;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -108,7 +109,7 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,singlePostResponse);
 
     }
-    public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email) {
+    public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email, Pageable pageable) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         if (!(keyword == null || keyword.isBlank())) {
             return findByKeyWord(keyword);
@@ -120,7 +121,7 @@ public class MarketPostService {
 
             return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
         }
-        List<MarketPost> marketPosts = marketPostRepository.findAllByOrderByCreateDateDesc();
+        List<MarketPost> marketPosts = marketPostRepository.findAllByOrderByCreateDateDesc(pageable);
         List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
 
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);

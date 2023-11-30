@@ -18,6 +18,7 @@ import java.util.List;
 @RequestMapping("/regions")
 @RequiredArgsConstructor
 @Api(tags = "region")
+@CrossOrigin("*")
 public class RegionController {
     private final RegionService regionService;
     @ApiOperation(value = "지역 정보 조회")
