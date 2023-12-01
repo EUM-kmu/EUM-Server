@@ -29,9 +29,14 @@ public class BankAccountController {
     private final BankTransactionService bankTransactionService;
 
     @GetMapping
-    @ApiOperation("계좌 정보 조회")
-    public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> getAccountInfro(@AuthenticationPrincipal String email){
+    @ApiOperation("내 계좌 정보 조회")
+    public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> getAccountInfo(@AuthenticationPrincipal String email){
         return ResponseEntity.ok(bankAccountService.getAccountInfo(email));
+    }
+    @PostMapping("/other")
+    @ApiOperation(value = "닉네임 별 조회")
+    public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> getOtherAccountInfo(@RequestBody @Validated BankAccountRequestDTO.CheckNickName checkNickName ){
+        return ResponseEntity.ok(bankAccountService.getOtherAccountInfo(checkNickName));
     }
     @PutMapping
     @ApiOperation("계좌 이름 추가")
@@ -60,10 +65,6 @@ public class BankAccountController {
     public ResponseEntity<APIResponse<List<BankAccountResponseDTO.HistoryWithInfo>>> getAllHistory(@RequestParam(name = "type",required = false) TrasnactionType transactionType, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(bankTransactionService.getAllHistory(email,transactionType));
     }
-    @PostMapping("/check")
-    @ApiOperation(value = "닉네임 확인 및 잔액 확인",notes = "송금 시 잔액 확인")
-    public ResponseEntity<APIResponse<BankAccountResponseDTO.CheckNickName>> checkNickName(@RequestBody @Validated BankAccountRequestDTO.CheckNickName checkNickName,@AuthenticationPrincipal String email ){
-        return ResponseEntity.ok(bankAccountService.checkNickName(checkNickName, email));
-    }
+
 
 }

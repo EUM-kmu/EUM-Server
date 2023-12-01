@@ -5,7 +5,6 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
 import eum.backed.server.controller.bank.dto.response.BankAccountResponseDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
-import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.domain.bank.bankacounttransaction.Code;
 import eum.backed.server.domain.bank.bankacounttransaction.Status;
 import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
@@ -21,7 +20,6 @@ import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.service.bank.DTO.BankTransactionDTO;
-import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -132,15 +130,10 @@ public class BankAccountService {
         return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
     }
 
-    public APIResponse<BankAccountResponseDTO.CheckNickName> checkNickName(BankAccountRequestDTO.CheckNickName checkNickName, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
-        if(getUser.getProfile().getNickname().equals(checkNickName.getReceiverNickname())) throw new IllegalArgumentException("본인 닉네임입니다");
+    public APIResponse<BankAccountResponseDTO.AccountInfo> getOtherAccountInfo(BankAccountRequestDTO.CheckNickName checkNickName) {
         Profile receiverProfile = profileRepository.findByNickname(checkNickName.getReceiverNickname()).orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다"));
-        String receiverNickName = receiverProfile.getNickname();
         String receiverCardName = receiverProfile.getUser().getUserBankAccount().getAccountName();
-        Long myBalance = getUser.getUserBankAccount().getBalance();
-        BankAccountResponseDTO.CheckNickName response = BankAccountResponseDTO.CheckNickName.builder().receiverNickName(receiverNickName).receiverCardName(receiverCardName).myBalance(myBalance).build();
-        return APIResponse.of(SuccessCode.SELECT_SUCCESS, response);
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(null).cardName(receiverCardName).build());
 
     }
 

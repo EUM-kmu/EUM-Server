@@ -85,4 +85,13 @@ public class ApplyService {
         });
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS, "선정성공, 채팅방 개설 완료");
     }
+
+    public APIResponse unApply(Long postId, Long applyId, String email) {
+        Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
+        Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
+        if(getApply.getUser() != getUser) throw new IllegalArgumentException("신청 취소할 권한이 없습니다");
+        applyRepository.delete(getApply);
+        return APIResponse.of(SuccessCode.DELETE_SUCCESS);
+
+    }
 }

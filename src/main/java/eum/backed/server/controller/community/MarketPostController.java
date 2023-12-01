@@ -4,6 +4,7 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.ErrorResponse;
 import eum.backed.server.controller.community.dto.request.PostRequestDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
+import eum.backed.server.controller.community.dto.request.enums.ServiceType;
 import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
 import eum.backed.server.domain.community.comment.CommentType;
@@ -127,6 +128,17 @@ public class MarketPostController {
     @ApiOperation(value = "거래 게시글 관심설정", notes = "관심 설정")
     public  ResponseEntity<APIResponse> doScrap(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         return scrapService.scrap(postId, email);
+    }
+    @ApiOperation(value = "거래 게시글 관려 내서비스 조회", notes = "내 관심 거래글(scrap), 내가 작성한 거래 게시글(postlist) , 지원한 게시글(apply)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
+            @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
+            @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
+            @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
+    })
+    @GetMapping("/user-activity/{serviceType}")
+    public ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByServiceType(@PathVariable ServiceType serviceType, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(marketPostService.findByServiceType(serviceType,email));
     }
 
 

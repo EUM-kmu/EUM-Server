@@ -37,6 +37,18 @@ public class ApplyController {
     public ResponseEntity<APIResponse> apply(@PathVariable Long postId,@RequestBody ApplyRequestDTO.Apply apply, @AuthenticationPrincipal String email){
         return new ResponseEntity<>(applyService.doApply(postId,apply, email), HttpStatus.CREATED);
     }
+    @DeleteMapping("/{postId}/apply/{applyId}")
+    @ApiOperation(value = "지원하기", notes = "도움 게시글에 지원")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "성공",content = @Content(schema = @Schema(implementation = APIResponse.class))),
+            @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
+            @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
+            @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
+            @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
+    })
+    public ResponseEntity<APIResponse> unapply(@PathVariable Long postId,@PathVariable Long applyId, @AuthenticationPrincipal String email){
+        return new ResponseEntity<>(applyService.unApply(postId,applyId, email), HttpStatus.CREATED);
+    }
     @GetMapping("/{postId}/apply")
     @ApiOperation(value ="지원리스트 조회", notes = "게시글 당 지원리스트 조회")
     @ApiResponses(value = {
