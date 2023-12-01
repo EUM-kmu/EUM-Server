@@ -36,8 +36,8 @@ public class BankAccountService {
     private final UsersRepository usersRepository;
     private final ChatRoomRepository chatRoomRepository;
     //일반 유저 계정 생성
-    public UserBankAccount createUserBankAccount(String nickname, String password,Users user){
-        UserBankAccount userBankAccount = UserBankAccount.toEntity(nickname,passwordEncoder.encode(password),user);
+    private UserBankAccount createUserBankAccount(String cardName, String password,Users user){
+        UserBankAccount userBankAccount = UserBankAccount.toEntity(cardName,passwordEncoder.encode(password),user);
         UserBankAccount savedUserBankAccount =  userBankAccountRepository.save(userBankAccount);
         BranchBankAccount initialBankAccount = branchBankAccountRepository.findById(1L).get(); //초기 300 포인트 제공 계좌
 
@@ -139,5 +139,12 @@ public class BankAccountService {
         BankAccountResponseDTO.CheckNickName response = BankAccountResponseDTO.CheckNickName.builder().receiverNickName(receiverNickName).receiverCardName(receiverCardName).myBalance(myBalance).build();
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, response);
 
+    }
+
+    public APIResponse<BankAccountResponseDTO.AccountInfo> createPassword(BankAccountRequestDTO.Password password, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        UserBankAccount userBankAccount = createUserBankAccount("", password.getPassword(),getUser);
+        userBankAccountRepository.save(userBankAccount);
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(userBankAccount.getBalance()).cardName(userBankAccount.getAccountName()).build());
     }
 }

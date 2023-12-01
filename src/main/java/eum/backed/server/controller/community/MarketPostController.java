@@ -84,9 +84,9 @@ public class MarketPostController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    @PutMapping("/{postId}/{status}")
-    public  ResponseEntity<APIResponse> updateState(@PathVariable Long postId,@PathVariable Status status, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(marketPostService.updateState(postId,status, email));
+    @PutMapping("/{postId}/status")
+    public  ResponseEntity<APIResponse> updateState(@PathVariable Long postId,@RequestBody PostRequestDTO.UpdateStatus status, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(marketPostService.updateState(postId,status.getStatus(), email));
     }
     @ApiOperation(value = "단일 게시글 조회", notes = "게시글 정보 + 댓글  조회")
     @ApiResponses(value = {
@@ -96,8 +96,8 @@ public class MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("{postId}")
-    public  ResponseEntity<APIResponse<PostResponseDTO.TransactionPostWithComment>> findById(@PathVariable Long postId,@AuthenticationPrincipal String email){
-        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, email, CommentType.TRANSACTION);
+    public  ResponseEntity<APIResponse<PostResponseDTO.TransactionPostWithComment>> findById(@PathVariable Long postId,@AuthenticationPrincipal String email, Pageable pageable){
+        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, email, CommentType.TRANSACTION,pageable);
         return ResponseEntity.ok(marketPostService.getTransactionPostWithComment(postId,email,commentResponses));
     }
     @ApiOperation(value = "필터 조회", notes = "필터 별 게시글 리스트 조회")
@@ -108,7 +108,9 @@ public class MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("")
-    public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category, @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,  Pageable pageable, @AuthenticationPrincipal String email){
+    public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category,
+                                                                                         @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,
+                                                                                         @PageableDefault Pageable pageable, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,email,pageable
         ));
     }

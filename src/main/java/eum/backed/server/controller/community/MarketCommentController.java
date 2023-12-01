@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +28,7 @@ import java.util.List;
 @CrossOrigin("*")
 public class MarketCommentController {
     private final CommentServiceImpl commentServiceImpl;
-    @ApiOperation(value = "댓글 삭제", notes = "댓글 삭제")
+    @ApiOperation(value = "댓글 삭제", notes = "댓글 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -35,8 +37,8 @@ public class MarketCommentController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/{postId}/comment")
-    ResponseEntity<APIResponse<List<CommentResponseDTO.CommentResponse>>> getComments(@PathVariable Long postId, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS,commentServiceImpl.getComments(postId, email,CommentType.TRANSACTION)));
+    ResponseEntity<APIResponse<List<CommentResponseDTO.CommentResponse>>> getComments(@PathVariable Long postId,  Pageable pageable, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS,commentServiceImpl.getComments(postId, email,CommentType.TRANSACTION,pageable)));
     }
     @ApiOperation(value = "거래 댓글 작성", notes = "댓글 작성")
     @ApiResponses(value = {
