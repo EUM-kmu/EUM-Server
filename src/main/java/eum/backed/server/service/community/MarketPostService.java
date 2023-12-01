@@ -16,7 +16,6 @@ import eum.backed.server.domain.community.comment.MarketCommentRepository;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.MarketPostRepository;
 import eum.backed.server.domain.community.marketpost.Status;
-import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.scrap.ScrapRepository;
 import eum.backed.server.domain.community.user.Users;
@@ -189,7 +188,7 @@ public class MarketPostService {
     public APIResponse<List<PostResponseDTO.PostResponse>> findByServiceType(ServiceType serviceType, String email) {
         if(serviceType == ServiceType.scrap){
             return findByScrap(email);
-        } else if (serviceType == ServiceType.market) {
+        } else if (serviceType == ServiceType.postlist) {
             return getMyPosts(email);
         }else if(serviceType == ServiceType.apply){
             return getMyApplyList(email);
