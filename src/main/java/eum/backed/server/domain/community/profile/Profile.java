@@ -68,7 +68,7 @@ public class Profile extends BaseTimeEntity {
         return Profile.builder()
                 .nickname(createProfile.getNickname())
                 .regions(regions)
-                .introduction(createProfile.getIntroduction())
+                .introduction("")
                 .totalSunrisePay(0)
                 .avatar(avatar)
                 .user(user)

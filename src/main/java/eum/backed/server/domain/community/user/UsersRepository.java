@@ -1,6 +1,5 @@
 package eum.backed.server.domain.community.user;
 
-import eum.backed.server.enums.Authority;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

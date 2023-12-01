@@ -121,12 +121,12 @@ public class UsersService {
                 role = Role.ROLE_USER;
                 tokenInfo = jwtTokenProvider.generateToken(email,role);
 //                return new DataResponse<>(tokenInfo).success(tokenInfo, "로그인 성공");
-            } else if (usersRepository.existsByEmailAndRole(email,Role.ROLE_TEMPORARY_USER)) {
-                role = Role.ROLE_TEMPORARY_USER;
+            } else if (usersRepository.existsByEmailAndRole(email,Role.ROLE_UNPROFILE_USER) ||usersRepository.existsByEmailAndRole(email,Role.ROLE_UNPASSWORD_USER )) {
+                role = Role.ROLE_UNPROFILE_USER;
                 tokenInfo = jwtTokenProvider.generateToken(email,role);
             }
         }else{
-            role = Role.ROLE_TEMPORARY_USER;
+            role = Role.ROLE_UNPROFILE_USER;
             Users temporaryUser = Users.builder().email(email).role(role).build();
             usersRepository.save(temporaryUser);
             tokenInfo = jwtTokenProvider.generateToken(email,role);

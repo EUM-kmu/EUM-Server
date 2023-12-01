@@ -5,6 +5,7 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
 import eum.backed.server.controller.bank.dto.response.BankAccountResponseDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
+import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.domain.bank.bankacounttransaction.Code;
 import eum.backed.server.domain.bank.bankacounttransaction.Status;
 import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
@@ -16,9 +17,11 @@ import eum.backed.server.domain.community.chat.ChatRoom;
 import eum.backed.server.domain.community.chat.ChatRoomRepository;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
+import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.service.bank.DTO.BankTransactionDTO;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -145,6 +148,23 @@ public class BankAccountService {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount userBankAccount = createUserBankAccount("", password.getPassword(),getUser);
         userBankAccountRepository.save(userBankAccount);
+        getUser.updateRole(Role.ROLE_USER);
+        usersRepository.save(getUser);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(userBankAccount.getBalance()).cardName(userBankAccount.getAccountName()).build());
+    }
+
+    public APIResponse<BankAccountResponseDTO.AccountInfo> getAccountInfo(String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        UserBankAccount userBankAccount = userBankAccountRepository.findByUser(getUser).orElseThrow(() -> new IllegalArgumentException("아직 비밀번호 설정이 안되있습니다"));
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(userBankAccount.getBalance()).cardName(userBankAccount.getAccountName()).build());
+    }
+
+    public APIResponse<BankAccountResponseDTO.AccountInfo> updateCardName(String cardName, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        UserBankAccount userBankAccount = getUser.getUserBankAccount();
+        userBankAccount.updateCardName(cardName);
+        userBankAccountRepository.save(userBankAccount);
+        return APIResponse.of(SuccessCode.UPDATE_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(userBankAccount.getBalance()).cardName(userBankAccount.getAccountName()).build());
+
     }
 }

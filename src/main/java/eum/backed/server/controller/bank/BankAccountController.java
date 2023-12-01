@@ -8,7 +8,6 @@ import eum.backed.server.service.bank.BankAccountService;
 import eum.backed.server.service.bank.BankTransactionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,9 +28,20 @@ public class BankAccountController {
     private final BankAccountService bankAccountService;
     private final BankTransactionService bankTransactionService;
 
+    @GetMapping
+    @ApiOperation("계좌 정보 조회")
+    public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> getAccountInfro(@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(bankAccountService.getAccountInfo(email));
+    }
+    @PutMapping
+    @ApiOperation("계좌 이름 추가")
+    public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> updateCardname(@RequestBody  BankAccountRequestDTO.CardName cardName,@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(bankAccountService.updateCardName(cardName.getCardName(), email));
+    }
+
     @PostMapping("/password")
     @ApiOperation(value = "카드 비밀번호 생성")
-    public ResponseEntity<APIResponse> createPassword(@RequestBody @Validated BankAccountRequestDTO.Password password,@AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> createPassword(@RequestBody @Validated BankAccountRequestDTO.Password password,@AuthenticationPrincipal String email){
         return new ResponseEntity<>(bankAccountService.createPassword(password,email), HttpStatus.CREATED);
     }
 

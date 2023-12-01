@@ -44,7 +44,7 @@ public class VotePostService {
 
     public APIResponse create(VotePostRequestDTO.Create create, String email) throws ParseException {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        if(getUser.getRole() == Role.ROLE_TEMPORARY_USER) throw new IllegalArgumentException("프로필이 없는 유저");
+        if(getUser.getRole() == Role.ROLE_UNPROFILE_USER) throw new IllegalArgumentException("프로필이 없는 유저");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.KOREAN);
         VotePost votePost = VotePost.toEntity(create.getTitle(), create.getContent(), simpleDateFormat.parse(create.getEndDate()), getUser);
         votePostRepository.save(votePost);

@@ -38,7 +38,7 @@ public class OpinionPostService {
 
     public APIResponse create(OpinionPostRequestDTO.Create create, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
-        if (getUser.getRole() == Role.ROLE_TEMPORARY_USER ) throw new IllegalArgumentException("프로필이 없느 유저");
+        if (getUser.getRole() == Role.ROLE_UNPROFILE_USER) throw new IllegalArgumentException("프로필이 없느 유저");
         Regions getRegions =getUser.getProfile().getRegions();
         OpinionPost opinionPost = OpinionPost.toEntity(create.getTitle(), create.getContent(), getUser, getRegions);
         opinionPostRepository.save(opinionPost);

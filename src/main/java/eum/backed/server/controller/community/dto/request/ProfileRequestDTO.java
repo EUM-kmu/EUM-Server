@@ -16,7 +16,6 @@ public class ProfileRequestDTO {
     public static class CreateProfile{
         @NotEmpty(message = "닉네임을 입력하세요")
         private String nickname;
-        private String introduction;
         @Positive(message = "지역id 입력해주세요")
         private Long regionId;
 
