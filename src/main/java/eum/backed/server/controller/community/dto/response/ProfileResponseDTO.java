@@ -1,8 +1,8 @@
 package eum.backed.server.controller.community.dto.response;
 
-import eum.backed.server.controller.community.dto.request.ProfileRequestDTO;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.region.RegionType;
+import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,15 +22,15 @@ public class ProfileResponseDTO {
         private String nickname;
         private String address;
         private String avatarPhotoURL;
-        private Long balance;
         private String characterName;
         private String levelName;
         private int totalSunrisePay;
         private int nextStandard;
+        private Role role;
 
     }
 
-    public static AllProfile toNewProfileResponseDTO(Long balance,Users user, Profile profile,int nextStandard){
+    public static AllProfile toProfileResponse(Users user, Profile profile, int nextStandard){
         if(profile.getRegions().getRegionType()!= RegionType.DONG) throw new IllegalArgumentException("행정동이 들어가야합니다");
         String si = profile.getRegions().getParent().getParent().getName();
         String gu = profile.getRegions().getParent().getName();
@@ -41,9 +41,9 @@ public class ProfileResponseDTO {
                 .userId(user.getUserId())
                 .profileId(profile.getProfileId())
                 .nickname(profile.getNickname())
-                .balance(balance)
                 .introduction(profile.getIntroduction())
                 .address(fullAddress)
+                .role(user.getRole())
                 .totalSunrisePay(profile.getTotalSunrisePay())
                 .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
                 .characterName(profile.getAvatar().getAvatarName().toString())
@@ -51,43 +51,43 @@ public class ProfileResponseDTO {
                 .levelName(profile.getAvatar().getStandard().getName())
                 .build();
     }
-    @Getter
-    @Setter
-    @Builder
-    public static class CreateProfile{
-        private Long userId;
-        private Long profileId;
-        private String introduction;
-        private String nickname;
-        private String address;
-        private String avatarPhotoURL;
-        private String characterName;
-        private String levelName;
-        private int totalSunrisePay;
-        private int nextStandard;
-
-    }
-
-    public static CreateProfile toNewProfileResponseDTO(Users user, Profile profile, int nextStandard){
-        if(profile.getRegions().getRegionType()!= RegionType.DONG) throw new IllegalArgumentException("행정동이 들어가야합니다");
-        String si = profile.getRegions().getParent().getParent().getName();
-        String gu = profile.getRegions().getParent().getName();
-        String dong = profile.getRegions().getName();
-        String fullAddress = si + " " + gu + " " + dong;
-
-        return CreateProfile.builder()
-                .userId(user.getUserId())
-                .profileId(profile.getProfileId())
-                .nickname(profile.getNickname())
-                .introduction(profile.getIntroduction())
-                .address(fullAddress)
-                .totalSunrisePay(profile.getTotalSunrisePay())
-                .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
-                .characterName(profile.getAvatar().getAvatarName().toString())
-                .nextStandard(nextStandard)
-                .levelName(profile.getAvatar().getStandard().getName())
-                .build();
-    }
+//    @Getter
+//    @Setter
+//    @Builder
+//    public static class CreateProfile{
+//        private Long userId;
+//        private Long profileId;
+//        private String introduction;
+//        private String nickname;
+//        private String address;
+//        private String avatarPhotoURL;
+//        private String characterName;
+//        private String levelName;
+//        private int totalSunrisePay;
+//        private int nextStandard;
+//
+//    }
+//
+//    public static CreateProfile toProfileResponse(Users user, Profile profile, int nextStandard){
+//        if(profile.getRegions().getRegionType()!= RegionType.DONG) throw new IllegalArgumentException("행정동이 들어가야합니다");
+//        String si = profile.getRegions().getParent().getParent().getName();
+//        String gu = profile.getRegions().getParent().getName();
+//        String dong = profile.getRegions().getName();
+//        String fullAddress = si + " " + gu + " " + dong;
+//
+//        return CreateProfile.builder()
+//                .userId(user.getUserId())
+//                .profileId(profile.getProfileId())
+//                .nickname(profile.getNickname())
+//                .introduction(profile.getIntroduction())
+//                .address(fullAddress)
+//                .totalSunrisePay(profile.getTotalSunrisePay())
+//                .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
+//                .characterName(profile.getAvatar().getAvatarName().toString())
+//                .nextStandard(nextStandard)
+//                .levelName(profile.getAvatar().getStandard().getName())
+//                .build();
+//    }
     @Getter
     @Setter
     @Builder

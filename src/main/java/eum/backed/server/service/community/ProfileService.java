@@ -12,7 +12,6 @@ import eum.backed.server.domain.community.region.RegionsRepository;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
-import eum.backed.server.service.bank.BankAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,13 +35,13 @@ public class ProfileService {
         Profile profile = Profile.toEntity(createProfile, getRegions, getAvatar,getUser);
         Profile savedProfile = profileRepository.save(profile);
 
-        getUser.updateRole(Role.ROLE_USER);
+        getUser.updateRole(Role.ROLE_UNPASSWORD_USER);
         Users updatedUser= userRepository.save(getUser);
 
 
         int getNextStandard = standardRepository.findById(2L).orElseThrow(() -> new IllegalArgumentException("초기데이터 설정오류")).getStandard();
 
-        ProfileResponseDTO.CreateProfile createProfileResponse = ProfileResponseDTO.toNewProfileResponseDTO(updatedUser, savedProfile,getNextStandard);
+        ProfileResponseDTO.AllProfile createProfileResponse = ProfileResponseDTO.toProfileResponse(updatedUser, savedProfile,getNextStandard);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,createProfileResponse);
 
     }
@@ -50,7 +49,7 @@ public class ProfileService {
     public APIResponse<ProfileResponseDTO.AllProfile> getMyProfile(String email, int nextStandard) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (!profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("프로필이 없는 유저");
-        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(getUser.getUserBankAccount().getBalance(),getUser, getUser.getProfile(),nextStandard);
+        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toProfileResponse(getUser, getUser.getProfile(),nextStandard);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);
     }
     private void validateNickname(String nickname){

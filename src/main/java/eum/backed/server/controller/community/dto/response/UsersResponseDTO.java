@@ -28,5 +28,6 @@ public class UsersResponseDTO {
     @AllArgsConstructor
     public static class UserRole {
         private Role role;
+        private Boolean isPassword;
     }
 }

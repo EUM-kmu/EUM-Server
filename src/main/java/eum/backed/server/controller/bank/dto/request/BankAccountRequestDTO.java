@@ -42,5 +42,9 @@ public class BankAccountRequestDTO {
         @Pattern(regexp = "\\d{4}", message = "비밀번호는 4자리 숫자여야 합니다.")
         private String password;
     }
-
+    @Getter
+    @Setter
+    public static class CardName {
+        private String cardName;
+    }
 }

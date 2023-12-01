@@ -39,7 +39,7 @@ public class UsersController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/token")
-    public ResponseEntity<APIResponse> validateToken(@AuthenticationPrincipal String email) {
+    public ResponseEntity<APIResponse<UsersResponseDTO.UserRole>> validateToken(@AuthenticationPrincipal String email) {
         return new ResponseEntity<>(usersService.validateToken(email), HttpStatus.OK);
     }
     @ApiOperation(value = "자체 회원가입", notes = "자체 회원가입")

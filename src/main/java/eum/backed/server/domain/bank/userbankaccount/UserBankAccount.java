@@ -46,6 +46,10 @@ public class UserBankAccount extends BaseTimeEntity {
         this.balance += balance;
     }
 
+    public void updateCardName(String accountName) {
+        this.accountName = accountName;
+    }
+
     public void updatePassword(String password) {
         this.password = password;
     }
