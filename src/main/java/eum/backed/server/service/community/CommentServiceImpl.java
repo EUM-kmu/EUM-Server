@@ -15,6 +15,7 @@ import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.domain.community.votepost.VotePost;
 import eum.backed.server.domain.community.votepost.VotePostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,12 +36,12 @@ public class CommentServiceImpl implements CommentService {
     private final VotePostRepository votePostRepository;
     private final UsersRepository userRepository;
     @Override
-    public List<CommentResponseDTO.CommentResponse> getComments(Long postId, String email, CommentType commentType) {
+    public List<CommentResponseDTO.CommentResponse> getComments(Long postId, String email, CommentType commentType, Pageable pageable) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         List<CommentResponseDTO.CommentResponse> commentResponses = new ArrayList<>();
         if(commentType == CommentType.TRANSACTION){
             MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
-            List<MarketComment> marketComments = marketCommentRepository.findByMarketPostOrderByCreateDateDesc(getMarketPost).orElse(Collections.emptyList());
+            List<MarketComment> marketComments = marketCommentRepository.findByMarketPostOrderByCreateDateDesc(getMarketPost,pageable).orElse(Collections.emptyList());
             commentResponses = marketComments.stream()
                     .map(marketComment -> newCommentResponse(
                             marketComment.getMarketPost().getMarketPostId(),

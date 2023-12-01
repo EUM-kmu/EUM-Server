@@ -23,7 +23,6 @@ public class ProfileService {
     private final UsersRepository userRepository;
     private final RegionsRepository regionsRepository;
     private final AvatarRepository avatarRepository;
-    private final BankAccountService bankAccountService;
     private final StandardRepository standardRepository;
     private final LevelService levelService;
     public APIResponse<ProfileResponseDTO.AllProfile> create(ProfileRequestDTO.CreateProfile createProfile, String email) {
@@ -39,12 +38,12 @@ public class ProfileService {
 
         getUser.updateRole(Role.ROLE_USER);
         Users updatedUser= userRepository.save(getUser);
-        bankAccountService.createUserBankAccount(createProfile.getNickname(), createProfile.getAccountPassword(),getUser);
+
 
         int getNextStandard = standardRepository.findById(2L).orElseThrow(() -> new IllegalArgumentException("초기데이터 설정오류")).getStandard();
 
-        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toNewProfileResponseDTO(300L,updatedUser, savedProfile,getNextStandard);
-        return APIResponse.of(SuccessCode.INSERT_SUCCESS,profileResponseDTO);
+        ProfileResponseDTO.CreateProfile createProfileResponse = ProfileResponseDTO.toNewProfileResponseDTO(updatedUser, savedProfile,getNextStandard);
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS,createProfileResponse);
 
     }
 

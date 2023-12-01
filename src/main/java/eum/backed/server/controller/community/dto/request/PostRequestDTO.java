@@ -54,4 +54,9 @@ public class PostRequestDTO {
         private int maxNumOfPeople;
 
     }
+    @Getter
+    @Setter
+    public static class UpdateStatus{
+        private Status status;
+    }
 }

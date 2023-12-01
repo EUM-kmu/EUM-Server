@@ -19,9 +19,7 @@ public class ProfileRequestDTO {
         private String introduction;
         @Positive(message = "지역id 입력해주세요")
         private Long regionId;
-        @NotEmpty(message = "비밀번호는 필수 입력값입니다.")
-        @Pattern(regexp = "\\d{4}", message = "비밀번호는 4자리 숫자여야 합니다.")
-        private String accountPassword;
+
         @NotNull(message = "캐릭터를 선택하세요")
         private AvatarName avatarName;
 

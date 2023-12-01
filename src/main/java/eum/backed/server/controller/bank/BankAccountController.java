@@ -8,8 +8,10 @@ import eum.backed.server.service.bank.BankAccountService;
 import eum.backed.server.service.bank.BankTransactionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +28,12 @@ import java.util.List;
 public class BankAccountController {
     private final BankAccountService bankAccountService;
     private final BankTransactionService bankTransactionService;
+
+    @PostMapping("/password")
+    @ApiOperation(value = "카드 비밀번호 생성")
+    public ResponseEntity<APIResponse> createPassword(@RequestBody @Validated BankAccountRequestDTO.Password password,@AuthenticationPrincipal String email){
+        return new ResponseEntity<>(bankAccountService.createPassword(password,email), HttpStatus.CREATED);
+    }
 
     @PutMapping("/password")
     @ApiOperation(value = "카드 비밀 번호 바꾸기")

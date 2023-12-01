@@ -81,6 +81,11 @@ public class BankAccountResponseDTO {
         return new History(TrasnactionType.DEPOSIT, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
 
     }
-
-
+    @Builder
+    @Getter
+    @Setter
+    public static class AccountInfo {
+        private String cardName;
+        private Long balance;
+    }
 }
