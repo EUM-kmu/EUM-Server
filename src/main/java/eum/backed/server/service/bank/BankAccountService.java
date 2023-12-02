@@ -63,7 +63,7 @@ public class BankAccountService {
     public APIResponse remittance(BankAccountRequestDTO.Remittance remittance, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
 
-        Profile getProfile = profileRepository.findByNickname(remittance.getReceiverNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
+        Profile getProfile = profileRepository.findByNickname(remittance.getNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
         Users receiver = getProfile.getUser();
         if(!passwordEncoder.matches(remittance.getPassword(),getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
@@ -131,7 +131,7 @@ public class BankAccountService {
     }
 
     public APIResponse<BankAccountResponseDTO.AccountInfo> getOtherAccountInfo(BankAccountRequestDTO.CheckNickName checkNickName) {
-        Profile receiverProfile = profileRepository.findByNickname(checkNickName.getReceiverNickname()).orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다"));
+        Profile receiverProfile = profileRepository.findByNickname(checkNickName.getNickname()).orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다"));
         String receiverCardName = receiverProfile.getUser().getUserBankAccount().getAccountName();
         return APIResponse.of(SuccessCode.INSERT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(null).cardName(receiverCardName).build());
 

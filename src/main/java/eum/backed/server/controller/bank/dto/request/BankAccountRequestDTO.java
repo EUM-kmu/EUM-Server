@@ -12,13 +12,13 @@ public class BankAccountRequestDTO {
     @Setter
     public static class CheckNickName{
         @NotEmpty(message = "송금할 사람의 닉네임을 입력하세요")
-        private String receiverNickname;
+        private String nickname;
     }
     @Getter
     @Setter
     public static class Remittance{
         @NotEmpty(message = "송금할 사람의 닉네임을 입력하세요")
-        private String receiverNickname;
+        private String nickname;
         @Positive(message = "금액은 양수여야 합니다")
         private Long amount;
         @NotEmpty(message = "비밀번호는 필수 입력값입니다.")
