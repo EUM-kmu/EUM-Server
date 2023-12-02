@@ -41,7 +41,8 @@ public class BankTransactionService {
         if (!(trasnactionType==null)){
             List<BankAccountTransaction> bankAccountTransactions = bankAccountTransactionRepository.findByMyBankAccountAndTrasnactionTypeOrderByCreateDateDesc(bankAccount,trasnactionType).orElse(Collections.emptyList());
             List<BankAccountResponseDTO.History> getAllHistories = getAllHistories(bankAccountTransactions);
-            return APIResponse.of(SuccessCode.SELECT_SUCCESS, getAllHistories);
+            BankAccountResponseDTO.HistoryWithInfo historyWithInfo = BankAccountResponseDTO.HistoryWithInfo.builder().cardName(bankAccount.getAccountName()).balance(bankAccount.getBalance()).histories(getAllHistories).build();
+            return APIResponse.of(SuccessCode.SELECT_SUCCESS, historyWithInfo);
         }
         List<BankAccountTransaction> bankAccountTransactions = bankAccountTransactionRepository.findByMyBankAccountOrderByCreateDateDesc(bankAccount).orElse(Collections.emptyList());
         List<BankAccountResponseDTO.History> getAllHistories = getAllHistories(bankAccountTransactions);
