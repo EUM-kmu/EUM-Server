@@ -40,7 +40,7 @@ public class BankAccountResponseDTO {
 
     @Getter
     public static class History {
-        private TrasnactionType trasnactionType;
+        private TrasnactionType transactionType;
         private OpponentInfo opponentInfo;
         private Long myCurrentBalance;
         private Long amount;
@@ -48,7 +48,7 @@ public class BankAccountResponseDTO {
 
 
         public History(TrasnactionType trasnactionType, OpponentInfo opponentInfo, Long myCurrentBalance, Long amount, String createdTime) {
-            this.trasnactionType = trasnactionType;
+            this.transactionType = trasnactionType;
             this.opponentInfo = opponentInfo;
             this.myCurrentBalance = myCurrentBalance;
             this.amount = amount;
