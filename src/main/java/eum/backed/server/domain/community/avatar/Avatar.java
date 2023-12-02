@@ -21,6 +21,7 @@ public class Avatar {
 
     @Column
     private String avatarPhotoUrl;
+    private String simpleAvatarPhotoUrl;
 
     @Column
     @Enumerated(EnumType.STRING)
