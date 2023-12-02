@@ -7,6 +7,7 @@ import eum.backed.server.controller.community.dto.response.ProfileResponseDTO;
 import eum.backed.server.domain.community.avatar.*;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
+import eum.backed.server.domain.community.region.RegionType;
 import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.region.RegionsRepository;
 import eum.backed.server.domain.community.user.Role;
@@ -28,6 +29,7 @@ public class ProfileService {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
         Regions getRegions = regionsRepository.findById(createProfile.getRegionId()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
+        if(getRegions.getRegionType() != RegionType.DONG) throw new IllegalArgumentException("행정동으로만 설정가능");
         Standard initialLevel = standardRepository.findById(1L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         Avatar getAvatar = avatarRepository.findByAvatarNameAndStandard(createProfile.getAvatarName(),initialLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());
