@@ -101,7 +101,7 @@ public class ProfileResponseDTO {
         return UserInfo.builder()
                 .userId(user.getUserId())
                 .nickName(user.getProfile().getNickname())
-                .avatarPhotoUrl(user.getProfile().getAvatar().getAvatarPhotoUrl())
+                .avatarPhotoUrl(user.getProfile().getAvatar().getSimpleAvatarPhotoUrl())
                 .address(user.getProfile().getRegions().getName()).build();
     }
 
