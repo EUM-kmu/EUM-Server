@@ -31,7 +31,7 @@ public class ProfileResponseDTO {
     }
 
     public static AllProfile toProfileResponse(Users user, Profile profile, int nextStandard){
-        if(profile.getRegions().getRegionType()!= RegionType.DONG) throw new IllegalArgumentException("행정동이 들어가야합니다");
+        if(profile.getRegions().getRegionType()!= RegionType.DONG) throw new IllegalArgumentException("주소는 행정동만 들어갈수있습니다");
         String si = profile.getRegions().getParent().getParent().getName();
         String gu = profile.getRegions().getParent().getName();
         String dong = profile.getRegions().getName();
