@@ -35,6 +35,7 @@ public class BankAccountResponseDTO {
     private static class OpponentInfo{
         private String nickName;
         private String cardName;
+        private String avatarPhotoUrl;
     }
 
 
@@ -70,14 +71,15 @@ public class BankAccountResponseDTO {
         String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         if(bankAccountTransaction.getTrasnactionType() == TrasnactionType.WITHDRAW){
             String receiverNickName = bankAccountTransaction.getReceiverBankAccount().getUser().getProfile().getNickname();
+            String avatarPhotoUrl =  bankAccountTransaction.getReceiverBankAccount().getUser().getProfile().getAvatar().getAvatarPhotoUrl();
             String cardName = bankAccountTransaction.getReceiverBankAccount().getAccountName();
-            OpponentInfo receiverInfo = OpponentInfo.builder().nickName(receiverNickName).cardName(cardName).build();
+            OpponentInfo receiverInfo = OpponentInfo.builder().nickName(receiverNickName).avatarPhotoUrl(avatarPhotoUrl).cardName(cardName).build();
             return new History(TrasnactionType.WITHDRAW, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
         }
         String senderNickName = (bankAccountTransaction.getSenderBankAccount() == null) ?  bankAccountTransaction.getBranchBankAccount().getAccountName():bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getNickname();
         String cardName = (bankAccountTransaction.getSenderBankAccount() == null) ?  "":bankAccountTransaction.getSenderBankAccount().getAccountName();
-
-        OpponentInfo receiverInfo = OpponentInfo.builder().nickName(senderNickName).cardName(cardName).build();
+        String avatarPhotoUrl = (bankAccountTransaction.getSenderBankAccount() == null) ? "" : bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getAvatar().getAvatarPhotoUrl();
+        OpponentInfo receiverInfo = OpponentInfo.builder().nickName(senderNickName).cardName(cardName).avatarPhotoUrl(avatarPhotoUrl).build();
         return new History(TrasnactionType.DEPOSIT, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
 
     }
