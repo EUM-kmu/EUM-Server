@@ -62,7 +62,9 @@ public class PostResponseDTO {
     @ApiModel(value = "id 별 게시글 + 댓글 ")
     public static class TransactionPostWithComment {
         private ProfileResponseDTO.UserInfo writerInfo;
-        private UserCurrentStatus userCurrentStatus;
+        private Boolean isWriter;
+        private Boolean isApplicant;
+        private Boolean isScrap;
         private MarketType marketType;
         private Long postId;
         private String title;
@@ -140,9 +142,7 @@ public class PostResponseDTO {
                 .build();
     }
     public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses, Boolean isApply, Boolean isScrap){
-        UserCurrentStatus userCurrentStatus = UserCurrentStatus.builder().isScrap(isScrap)
-                .isWriter(user == marketPost.getUser())
-                .isApplicant(isApply).build();
+
         LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
         Instant instant = marketPost.getStartDate().toInstant();
         LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -157,7 +157,9 @@ public class PostResponseDTO {
         String formattedStartTime = koreaZonedStartTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         return TransactionPostWithComment.builder()
                 .writerInfo(ProfileResponseDTO.toUserInfo(marketPost.getUser()))
-                .userCurrentStatus(userCurrentStatus)
+                .isScrap(isScrap)
+                .isWriter(user == marketPost.getUser())
+                .isApplicant(isApply)
                 .postId(marketPost.getMarketPostId())
                 .title(marketPost.getTitle())
                 .content(marketPost.getContents())
