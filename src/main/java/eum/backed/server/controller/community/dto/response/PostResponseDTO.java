@@ -1,6 +1,5 @@
 package eum.backed.server.controller.community.dto.response;
 
-import eum.backed.server.common.DTO.Time;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.community.marketpost.Slot;
 import eum.backed.server.domain.community.marketpost.MarketPost;
@@ -10,13 +9,11 @@ import io.swagger.annotations.ApiModel;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -65,8 +62,7 @@ public class PostResponseDTO {
     @ApiModel(value = "id 별 게시글 + 댓글 ")
     public static class TransactionPostWithComment {
         private ProfileResponseDTO.UserInfo writerInfo;
-        private Boolean isWriter;
-        private Boolean isApplicant;
+        private UserCurrentStatus userCurrentStatus;
         private MarketType marketType;
         private Long postId;
         private String title;
@@ -83,6 +79,14 @@ public class PostResponseDTO {
         private String createdDate;
         private int commentCount;
         private List<CommentResponseDTO.CommentResponse> commentResponses;
+    }
+    @Builder
+    @Getter
+    @Setter
+    private static class UserCurrentStatus{
+        private Boolean isWriter;
+        private Boolean isApplicant;
+        private Boolean isScrap;
     }
     public static PostResponseDTO.MarketPostResponse singleMarketPost(MarketPost marketPost){
         LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
@@ -111,6 +115,7 @@ public class PostResponseDTO {
                 .category(marketPost.getMarketCategory().getContents())
                 .status(marketPost.getStatus())
                 .commentCount(0)
+                .maxNumOfPeople(marketPost.getMaxNumOfPeople())
                 .build();
     }
     public static PostResponseDTO.PostResponse newPostResponse(MarketPost marketPost){
@@ -134,7 +139,10 @@ public class PostResponseDTO {
                 .commentCount(marketPost.getMarketComments().size())
                 .build();
     }
-    public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses,Boolean isApply){
+    public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses, Boolean isApply, Boolean isScrap){
+        UserCurrentStatus userCurrentStatus = UserCurrentStatus.builder().isScrap(isScrap)
+                .isWriter(user == marketPost.getUser())
+                .isApplicant(isApply).build();
         LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
         Instant instant = marketPost.getStartDate().toInstant();
         LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -149,9 +157,8 @@ public class PostResponseDTO {
         String formattedStartTime = koreaZonedStartTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         return TransactionPostWithComment.builder()
                 .writerInfo(ProfileResponseDTO.toUserInfo(marketPost.getUser()))
+                .userCurrentStatus(userCurrentStatus)
                 .postId(marketPost.getMarketPostId())
-                .isWriter(user == marketPost.getUser())
-                .isApplicant(isApply)
                 .title(marketPost.getTitle())
                 .content(marketPost.getContents())
                 .startDate(formattedCreateTime)

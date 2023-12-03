@@ -24,6 +24,7 @@ public class ScrapService {
     public ResponseEntity<APIResponse> scrap(Long postId, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(()->new IllegalArgumentException("Invalid postId"));
+        if(getMarketPost.getUser() == getUser) throw new IllegalArgumentException("자기 게시글 스크랩 불가");
         if(scrapRepository.existsByMarketPostAndUser(getMarketPost,getUser)) {
             Scrap getScrap = scrapRepository.findByMarketPostAndUser(getMarketPost, getUser);
             scrapRepository.delete(getScrap);

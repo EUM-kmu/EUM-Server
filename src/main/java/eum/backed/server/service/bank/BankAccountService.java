@@ -14,6 +14,8 @@ import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccountRepository;
 import eum.backed.server.domain.community.chat.ChatRoom;
 import eum.backed.server.domain.community.chat.ChatRoomRepository;
+import eum.backed.server.domain.community.marketpost.MarketPost;
+import eum.backed.server.domain.community.marketpost.MarketPostRepository;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.user.Role;
@@ -36,6 +38,7 @@ public class BankAccountService {
     private final ProfileRepository profileRepository;
     private final UsersRepository usersRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final MarketPostRepository marketPostRepository;
     //일반 유저 계정 생성
     private UserBankAccount createUserBankAccount(String cardName, String password,Users user){
         UserBankAccount userBankAccount = UserBankAccount.toEntity(cardName,passwordEncoder.encode(password),user);
@@ -100,8 +103,8 @@ public class BankAccountService {
 
         if(!passwordEncoder.matches(password,getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
 
-
-        Long amount = getChatRoom.getMarketPost().getPay();
+        MarketPost marketPost = getChatRoom.getMarketPost();
+        Long amount = marketPost.getPay();
 //        송금 결과 각 계좌 반영
         remittance(myBankAccount, receiverAccount, amount);
 //        각 거래 로그 작성
@@ -109,6 +112,8 @@ public class BankAccountService {
         BankTransactionDTO.Transaction opponentTransaction = BankTransactionDTO.toUserTransactionDTO(Code.SUCCESS, Status.TRADING,TrasnactionType.DEPOSIT, amount, receiverAccount,myBankAccount,null);
         bankTransactionService.createTransactionWithUserBankAccount(myTransaction);
         bankTransactionService.createTransactionWithUserBankAccount(opponentTransaction);
+        marketPost.updateStatus(eum.backed.server.domain.community.marketpost.Status.TRANSACTION_COMPLETED);
+        marketPostRepository.save(marketPost);
         return BankTransactionDTO.UpdateTotalSunrise.builder().me(getUser).receiver(receiverAccount.getUser()).amount(amount).build();
 
 
