@@ -19,6 +19,7 @@ import java.util.List;
 @Setter
 @Component
 public class BankAccountResponseDTO {
+    private static String SYSTEM_PHOTO_URL="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/system.png";
     @Getter
     @Setter
     @Builder
@@ -78,7 +79,7 @@ public class BankAccountResponseDTO {
         }
         String senderNickName = (bankAccountTransaction.getSenderBankAccount() == null) ?  bankAccountTransaction.getBranchBankAccount().getAccountName():bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getNickname();
         String cardName = (bankAccountTransaction.getSenderBankAccount() == null) ?  "":bankAccountTransaction.getSenderBankAccount().getAccountName();
-        String avatarPhotoUrl = (bankAccountTransaction.getSenderBankAccount() == null) ? "" : bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getAvatar().getSimpleAvatarPhotoUrl();
+        String avatarPhotoUrl = (bankAccountTransaction.getSenderBankAccount() == null) ? SYSTEM_PHOTO_URL : bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getAvatar().getSimpleAvatarPhotoUrl();
         OpponentInfo receiverInfo = OpponentInfo.builder().nickName(senderNickName).cardName(cardName).avatarPhotoUrl(avatarPhotoUrl).build();
         return new History(TrasnactionType.DEPOSIT, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
 

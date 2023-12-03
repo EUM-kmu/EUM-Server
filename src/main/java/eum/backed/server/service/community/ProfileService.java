@@ -37,7 +37,8 @@ public class ProfileService {
         Profile profile = Profile.toEntity(createProfile, getRegions, getAvatar,getUser);
         Profile savedProfile = profileRepository.save(profile);
 
-        getUser.updateRole(Role.ROLE_UNPASSWORD_USER);
+        Role role = (getUser.getRole() == Role.ROLE_ORGANIZATION) ? Role.ROLE_ORGANIZATION : Role.ROLE_UNPASSWORD_USER;
+        getUser.updateRole(role);
         Users updatedUser= userRepository.save(getUser);
 
 
@@ -63,8 +64,11 @@ public class ProfileService {
         Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
         Regions getRegions = regionsRepository.findById(updateProfile.getRegionId()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
 
+
         Standard currentLevel = getProfile.getAvatar().getStandard();
-        Avatar getAvatar = avatarRepository.findByAvatarNameAndStandard(updateProfile.getAvatarName(),currentLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
+        Avatar getAvatar = (getUser.getRole() == Role.ROLE_ORGANIZATION)
+                ? avatarRepository.findByAvatarName(AvatarName.ORGANIZATION).orElseThrow(()->new IllegalArgumentException("초기데이터 미세팅"))
+                :avatarRepository.findByAvatarNameAndStandard(updateProfile.getAvatarName(),currentLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
 
         validateNickname(updateProfile.getNickname());
         getProfile.updateNickName(updateProfile.getNickname());
