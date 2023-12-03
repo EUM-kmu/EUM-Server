@@ -21,6 +21,8 @@ import eum.backed.server.domain.community.scrap.ScrapRepository;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,7 @@ import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MarketPostService {
     private final MarketPostRepository marketPostRepository;
     private final MarketCategoryRepository marketCategoryRepository;
@@ -49,7 +52,7 @@ public class MarketPostService {
         MarketCategory getMarketCategory = marketCategoryRepository.findByContents(marketCreate.getCategory()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.KOREAN);
         Long pay = Long.valueOf(marketCreate.getVolunteerTime());
-        if(marketCreate.getMarketType()==MarketType.REQUEST_HELP && user.getUserBankAccount().getBalance() < pay) throw new IllegalArgumentException("잔액보다 크게 돈 설정 불가");
+        if(marketCreate.getMarketType()==MarketType.REQUEST_HELP && user.getUserBankAccount().getBalance() < pay * marketCreate.getMaxNumOfPeople()) throw new IllegalArgumentException("잔액보다 크게 돈 설정 불가");
         MarketPost marketPost = MarketPost.builder()
                 .title(marketCreate.getTitle())
                 .contents(marketCreate.getContent())
@@ -78,18 +81,25 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
 
-    public  APIResponse update(Long postId,PostRequestDTO.MarketUpdate marketUpdate, String email) throws ParseException {
+    public  APIResponse<PostResponseDTO.MarketPostResponse> update(Long postId,PostRequestDTO.MarketUpdate marketUpdate, String email) throws ParseException {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.KOREAN);
         getMarketPost.updateTitle(marketUpdate.getTitle());
         getMarketPost.updateContents(marketUpdate.getContent());
         getMarketPost.updateSlot(marketUpdate.getSlot());
         getMarketPost.updateStartDate(simpleDateFormat.parse(marketUpdate.getStartDate()));
         getMarketPost.updateLocation(marketUpdate.getLocation());
-        marketPostRepository.save(getMarketPost);
-        return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"게시글 정보 변경");
+        Long pay = Long.valueOf(marketUpdate.getVolunteerTime());
+        if(getMarketPost.getMarketType()==MarketType.REQUEST_HELP && (user.getUserBankAccount().getBalance() < (pay * marketUpdate.getMaxNumOfPeople()))) throw new IllegalArgumentException("잔액보다 크게 돈 설정 불가");
+        log.info(String.valueOf(pay * marketUpdate.getMaxNumOfPeople()));
+        getMarketPost.updateVolunteerTime(marketUpdate.getVolunteerTime());
+        getMarketPost.updateMaxNumOfPeople(marketUpdate.getMaxNumOfPeople());
+        getMarketPost.updatePay(pay);
+        MarketPost updatedMarketPost = marketPostRepository.save(getMarketPost);
+        PostResponseDTO.MarketPostResponse marketPostResponse = PostResponseDTO.singleMarketPost(updatedMarketPost);
+        return APIResponse.of(SuccessCode.UPDATE_SUCCESS,marketPostResponse);
 
     }
 
@@ -104,8 +114,9 @@ public class MarketPostService {
     public  APIResponse<PostResponseDTO.TransactionPostWithComment> getTransactionPostWithComment(Long postId,String email,List<CommentResponseDTO.CommentResponse> commentResponses) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+        Boolean isScrap = scrapRepository.existsByMarketPostAndUser(getMarketPost,user);
         Boolean isApply = applyRepository.existsByUserAndMarketPost(user, getMarketPost);
-        PostResponseDTO.TransactionPostWithComment singlePostResponse = postResponseDTO.newTransactionPostWithComment(user,getMarketPost,commentResponses,isApply);
+        PostResponseDTO.TransactionPostWithComment singlePostResponse = postResponseDTO.newTransactionPostWithComment(user,getMarketPost,commentResponses,isApply,isScrap);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,singlePostResponse);
 
     }

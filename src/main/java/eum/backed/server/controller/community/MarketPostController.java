@@ -75,7 +75,7 @@ public class MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PutMapping("/{postId}")
-    public  ResponseEntity<APIResponse> update(@PathVariable Long postId, @RequestBody @Validated PostRequestDTO.MarketUpdate marketUpdate, @AuthenticationPrincipal String email) throws ParseException {
+    public  ResponseEntity<APIResponse<PostResponseDTO.MarketPostResponse>> update(@PathVariable Long postId, @RequestBody @Validated PostRequestDTO.MarketUpdate marketUpdate, @AuthenticationPrincipal String email) throws ParseException {
         return ResponseEntity.ok(marketPostService.update(postId,marketUpdate,email));
     }
     @ApiOperation(value = "게시글 상태 수정", notes = "게시글 아이디받고 거래 상태 상태 수정")

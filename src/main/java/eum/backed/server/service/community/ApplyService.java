@@ -9,6 +9,7 @@ import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.apply.ApplyRepository;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.MarketPostRepository;
+import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.user.Users;
@@ -72,8 +73,13 @@ public class ApplyService {
             Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
             if (getApply.getMarketPost().getUser() != getUser) throw new IllegalArgumentException("해당 게시글에 대한 권한이 없다");
             if(getApply.getIsAccepted() == true) throw new IllegalArgumentException("이미 선정한 사람입니다");
+            MarketPost marketPost = getApply.getMarketPost();
             getApply.updateAccepted(true);
-            getApply.getMarketPost().addCurrentAcceptedPeople();
+            marketPost.addCurrentAcceptedPeople();
+            if(marketPost.getCurrentAcceptedPeople() == marketPost.getMaxNumOfPeople()) {
+                marketPost.updateStatus(Status.RECRUITMENT_COMPLETED);
+            }
+            marketPostRepository.save(marketPost);
             applyRepository.save(getApply);
             try {
                 chatService.createChatRoomWithFireStore(applyId);

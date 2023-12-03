@@ -53,6 +53,9 @@ public class PostRequestDTO {
         @Max(value = 50, message = "최대값은 50이어야 합니다.")
         private int maxNumOfPeople;
 
+        @Positive(message = "참여시간은 양수여야함")
+        private int volunteerTime;
+
     }
     @Getter
     @Setter
