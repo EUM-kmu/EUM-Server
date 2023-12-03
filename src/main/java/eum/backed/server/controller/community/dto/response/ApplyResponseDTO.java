@@ -33,20 +33,21 @@ public class ApplyResponseDTO {
         private Boolean isAccepted;
     }
     public ApplyListResponse newApplyListResponse(MarketPost marketPost, Users applicant, Profile profile, Apply apply){
-        LocalDateTime utcDateTime = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
 
         // UTC 시간을 한국 시간대로 변환
-        ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
+        LocalDateTime createUTC = LocalDateTime.parse(apply.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
+//        ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
 
         // 한국 시간대로 포맷팅
-        String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z"));
+        ZonedDateTime koreaZonedCreateime = createUTC.atZone(ZoneId.of("Asia/Seoul"));
+        String formattedCreateTime = koreaZonedCreateime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         return ApplyListResponse.builder()
                 .applyId(apply.getApplyId())
                 .applicantId(applicant.getUserId())
                 .avatarPhotoUrl(profile.getAvatar().getSimpleAvatarPhotoUrl())
                 .applicantNickName(profile.getNickname())
                 .applicantAddress(profile.getRegions().getName())
-                .createdTime(formattedDateTime)
+                .createdTime(formattedCreateTime)
                 .introduction(apply.getContent())
                 .postId(marketPost.getMarketPostId())
                 .isAccepted(apply.getIsAccepted()).build();
