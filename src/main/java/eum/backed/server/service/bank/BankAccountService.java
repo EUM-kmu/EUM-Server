@@ -56,7 +56,7 @@ public class BankAccountService {
     public APIResponse updatePassword(BankAccountRequestDTO.UpdatePassword updatePassword, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
-        if(!passwordEncoder.matches(updatePassword.getCurrentPassword(),getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
+        if(!passwordEncoder.matches(updatePassword.getCurrentPassword(),getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         myBankAccount.updatePassword(passwordEncoder.encode(updatePassword.getNewPassword()));
         userBankAccountRepository.save(myBankAccount);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS, "비밀번호 업데이트");
@@ -68,7 +68,7 @@ public class BankAccountService {
 
         Profile getProfile = profileRepository.findByNickname(remittance.getNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
         Users receiver = getProfile.getUser();
-        if(!passwordEncoder.matches(remittance.getPassword(),getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
+        if(!passwordEncoder.matches(remittance.getPassword(),getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
         UserBankAccount receiverBankAccount = userBankAccountRepository.findByUser(receiver).orElseThrow(() -> new NullPointerException("InValid receiver"));
         //각 계좌에 송금 결과 반영
@@ -101,7 +101,7 @@ public class BankAccountService {
         UserBankAccount myBankAccount = transactionUser.getSender().getUserBankAccount();
         UserBankAccount receiverAccount = transactionUser.getReceiver().getUserBankAccount();
 
-        if(!passwordEncoder.matches(password,getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
+        if(!passwordEncoder.matches(password,getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
 
         MarketPost marketPost = getChatRoom.getMarketPost();
         Long amount = marketPost.getPay();
