@@ -22,6 +22,7 @@ insert into user_bank_account(user_bank_account_id,account_name,balance,password
 
 insert into bank_account_transaction(bank_account_transaction_id  , amount ,code ,my_current_balance ,status ,branch_bank_account_id ,my_bank_account ,create_date,trasnaction_type)values (1,300,"SUCCESS",300,"INITIAL",1,1,now(),"DEPOSIT");
 insert into bank_account_transaction(bank_account_transaction_id  , amount ,code ,my_current_balance ,status ,branch_bank_account_id ,my_bank_account ,create_date,trasnaction_type)values (2,300,"SUCCESS",300,"INITIAL",1,2,now(),"DEPOSIT");
+insert into bank_account_transaction(bank_account_transaction_id  , amount ,code ,my_current_balance ,status ,branch_bank_account_id ,my_bank_account ,create_date,trasnaction_type)values (3,100000,"SUCCESS",100000,"INITIAL",1,3,now(),"DEPOSIT");
 
 insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id,  user_id, status,create_date)values (1, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "바퀴벌레 잡아주세요", "30", 4, 1, "RECRUITING",now());
 insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id,  user_id, status,create_date)values (2, "과외 구함", 0, "국민 빌라", "PROVIDE_HELP", 4, 30, "ALL", "2024-08-13 00:00:00", "과외구함", "30", 4, 2, "RECRUITING",now());

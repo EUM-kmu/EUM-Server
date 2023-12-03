@@ -44,11 +44,11 @@ public class BankAccountService {
         UserBankAccount userBankAccount = UserBankAccount.toEntity(cardName,passwordEncoder.encode(password),user);
         UserBankAccount savedUserBankAccount =  userBankAccountRepository.save(userBankAccount);
         BranchBankAccount initialBankAccount = branchBankAccountRepository.findById(1L).get(); //초기 300 포인트 제공 계좌
-
-        userBankAccount.deposit(300L);
+        Long amount = (user.getRole() != Role.ROLE_ORGANIZATION) ? 300L : 100000L;
+        userBankAccount.deposit(amount);
         UserBankAccount UpdatedBankAccount= userBankAccountRepository.save(userBankAccount);
 
-        BankTransactionDTO.Transaction transaction = BankTransactionDTO.toInitialDTO(Code.SUCCESS, Status.INITIAL, 300L, savedUserBankAccount, initialBankAccount);
+        BankTransactionDTO.Transaction transaction = BankTransactionDTO.toInitialDTO(Code.SUCCESS, Status.INITIAL, amount, savedUserBankAccount, initialBankAccount);
         bankTransactionService.createTransactionWithBranchBank(transaction);
         return UpdatedBankAccount;
 
@@ -146,7 +146,8 @@ public class BankAccountService {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount userBankAccount = createUserBankAccount("", password.getPassword(),getUser);
         userBankAccountRepository.save(userBankAccount);
-        getUser.updateRole(Role.ROLE_USER);
+        Role role = (getUser.getRole() == Role.ROLE_ORGANIZATION) ? Role.ROLE_ORGANIZATION : Role.ROLE_USER;
+        getUser.updateRole(role);
         usersRepository.save(getUser);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(userBankAccount.getBalance()).cardName(userBankAccount.getAccountName()).build());
     }

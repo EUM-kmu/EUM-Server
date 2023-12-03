@@ -6,6 +6,7 @@ import eum.backed.server.domain.community.avatar.Standard;
 import eum.backed.server.domain.community.avatar.StandardRepository;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
+import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,7 @@ public class LevelService {
     public int getNextLevel(String email){
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         Long currentStandardId = getUser.getProfile().getAvatar().getStandard().getStandardId();
-        if(currentStandardId == 3L){
+        if(currentStandardId == 3L || getUser.getRole() == Role.ROLE_ORGANIZATION){
             return -1;
         }
         int nextLevel = standardRepository.findById(currentStandardId+1L).orElseThrow(()-> new IllegalArgumentException("초기 데이터 입력오류")).getStandard();
