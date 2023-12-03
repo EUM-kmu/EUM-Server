@@ -25,6 +25,7 @@ public class ApplyResponseDTO {
         private Long applyId;
         private Long applicantId;
         private String createdTime;
+        private String avatarPhotoUrl;
         private String applicantNickName;
         private String applicantAddress;
         private String introduction;
@@ -42,6 +43,7 @@ public class ApplyResponseDTO {
         return ApplyListResponse.builder()
                 .applyId(apply.getApplyId())
                 .applicantId(applicant.getUserId())
+                .avatarPhotoUrl(profile.getAvatar().getSimpleAvatarPhotoUrl())
                 .applicantNickName(profile.getNickname())
                 .applicantAddress(profile.getRegions().getName())
                 .createdTime(formattedDateTime)
