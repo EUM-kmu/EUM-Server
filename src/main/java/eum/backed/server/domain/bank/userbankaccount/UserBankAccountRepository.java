@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface UserBankAccountRepository extends JpaRepository<UserBankAccount, Long> {
     Optional<UserBankAccount> findByUser(Users users);
+    Boolean existsByUser(Users users);
 
 }
