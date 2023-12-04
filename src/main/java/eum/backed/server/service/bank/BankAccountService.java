@@ -144,6 +144,7 @@ public class BankAccountService {
 
     public APIResponse<BankAccountResponseDTO.AccountInfo> createPassword(BankAccountRequestDTO.Password password, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        if(userBankAccountRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 비밀번호를 생성했습니다");
         UserBankAccount userBankAccount = createUserBankAccount("", password.getPassword(),getUser);
         userBankAccountRepository.save(userBankAccount);
         Role role = (getUser.getRole() == Role.ROLE_ORGANIZATION) ? Role.ROLE_ORGANIZATION : Role.ROLE_USER;
