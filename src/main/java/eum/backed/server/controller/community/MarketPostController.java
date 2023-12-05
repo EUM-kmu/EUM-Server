@@ -37,7 +37,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Api(tags = "market")
-public class MarketPostController {
+public class  MarketPostController {
     private final MarketPostService marketPostService;
     private final ScrapService scrapService;
     private final CommentService commentService;

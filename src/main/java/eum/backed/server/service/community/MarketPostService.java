@@ -77,6 +77,8 @@ public class MarketPostService {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+        if(!(getMarketPost.getChatRooms().isEmpty()&&getMarketPost.getChatRooms().size() ==0))
+            throw new IllegalArgumentException("채팅방이 생성된 게시물은 삭제가 안됩니다");
         marketPostRepository.delete(getMarketPost);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }

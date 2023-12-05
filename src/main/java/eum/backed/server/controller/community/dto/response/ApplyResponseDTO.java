@@ -2,6 +2,7 @@ package eum.backed.server.controller.community.dto.response;
 
 import eum.backed.server.common.DTO.Time;
 import eum.backed.server.domain.community.apply.Apply;
+import eum.backed.server.domain.community.apply.Status;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.Users;
@@ -23,8 +24,9 @@ public class ApplyResponseDTO {
     @Builder
     public static class ApplyListResponse {
         private Long applyId;
-        private Long applicantId;
         private String createdTime;
+        private Status status;
+        private Long applicantId;
         private String avatarPhotoUrl;
         private String applicantNickName;
         private String applicantAddress;

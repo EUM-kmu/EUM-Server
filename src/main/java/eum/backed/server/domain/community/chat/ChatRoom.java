@@ -27,9 +27,6 @@ public class ChatRoom extends BaseTimeEntity {
     @JoinColumn(name = "market_post_id")
     private MarketPost marketPost;
 
-    @ManyToOne
-    @JoinColumn(name="apply_id")
-    private Apply apply;
 
     @ManyToOne
     @JoinColumn(name="post_writer_id")
@@ -45,7 +42,6 @@ public class ChatRoom extends BaseTimeEntity {
         return ChatRoom.builder()
                 .chatRoomKeyFB(chatRoomKeyFB)
                 .marketPost(marketPost)
-                .apply(apply)
                 .isDeleted(false)
                 .postWriter(marketPost.getUser())
                 .applicant(apply.getUser())

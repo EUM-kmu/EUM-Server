@@ -22,6 +22,9 @@ public class Apply extends BaseTimeEntity {
     private Boolean isAccepted;
     private String content;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Status status;
     @ManyToOne
     @JoinColumn(name="applicant_id")
     private Users user;

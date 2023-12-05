@@ -4,6 +4,7 @@ import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.category.MarketCategory;
+import eum.backed.server.domain.community.chat.ChatRoom;
 import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.scrap.Scrap;
@@ -68,6 +69,9 @@ public class MarketPost extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "marketPost",orphanRemoval = true)
     private List<MarketComment> marketComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "marketPost")
+    private List<ChatRoom> chatRooms  = new ArrayList<>();
 
     public void updateTitle(String title) {
         this.title = title;
