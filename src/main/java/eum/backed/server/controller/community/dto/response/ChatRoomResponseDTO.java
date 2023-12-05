@@ -16,7 +16,7 @@ public class ChatRoomResponseDTO {
     private ProfileResponseDTO.UserInfo opponentInfo;
     private PostResponseDTO.PostResponse postInfo;
     private String chatRoomKeyFB;
-    private Long applyId;
+    private Long chatRoomId;
 
 //    송금 버튼 활성화 여부 ,
     private Boolean isRemittanceButton;
@@ -24,11 +24,11 @@ public class ChatRoomResponseDTO {
 
     public static ChatRoomResponseDTO newChatRoomResponse(BankTransactionDTO.TransactionUser transactionUser,Users mine, Users opponent, ChatRoom chatRoom){
         return ChatRoomResponseDTO.builder()
+                .chatRoomId(chatRoom.getChatRoomId())
                 .myInfo(ProfileResponseDTO.toUserInfo(mine))
                 .opponentInfo(ProfileResponseDTO.toUserInfo(opponent))
                 .chatRoomKeyFB(chatRoom.getChatRoomKeyFB())
                 .postInfo(PostResponseDTO.newPostResponse(chatRoom.getMarketPost()))
-                .applyId(chatRoom.getApply().getApplyId())
                 .isRemittanceButton(mine == transactionUser.getSender())
                 .build();
     }

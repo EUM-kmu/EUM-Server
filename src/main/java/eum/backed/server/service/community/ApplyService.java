@@ -96,6 +96,7 @@ public class ApplyService {
         Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
         Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
         if(getApply.getUser() != getUser) throw new IllegalArgumentException("신청 취소할 권한이 없습니다");
+        if(getApply.getIsAccepted() == true) throw new IllegalArgumentException("이미 선정되서 취소할 수 없습니다");
         applyRepository.delete(getApply);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
 

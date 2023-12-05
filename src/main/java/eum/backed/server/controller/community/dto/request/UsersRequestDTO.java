@@ -69,12 +69,6 @@ public class UsersRequestDTO {
     @Setter
     public static class Withdrawal {
 
-        @NotEmpty(message = "잘못된 요청입니다.")
-        private String accessToken;
-
-        @NotEmpty(message = "잘못된 요청입니다.")
-        private String refreshToken;
-
         private String reason;
 
     }

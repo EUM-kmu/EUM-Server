@@ -118,5 +118,7 @@ public class UsersController {
         }
         return null;
     }
+//    @PostMapping("/withdrawal")
+//    public ResponseEntity<APIResponse> withdrawa(@RequestBody UsersRequestDTO.Withdrawal withdrawal){}
 
 }
