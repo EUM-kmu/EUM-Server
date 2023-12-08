@@ -5,16 +5,24 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.config.jwt.JwtTokenProvider;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
+import eum.backed.server.domain.community.sleeperuser.SleeperUser;
 import eum.backed.server.domain.community.user.Role;
+import eum.backed.server.domain.community.user.SocialType;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategory;
+import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategoryRepository;
+import eum.backed.server.domain.community.withdrawaluser.WithdrawalUser;
+import eum.backed.server.domain.community.withdrawaluser.WithdrawalUserRepository;
 import eum.backed.server.enums.Authority;
 import eum.backed.server.exception.TokenException;
 import lombok.RequiredArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -28,9 +36,11 @@ import java.util.concurrent.TimeUnit;
 public class UsersService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final WithdrawalCategoryRepository withdrawalCategoryRepository;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
+    private final WithdrawalUserRepository withdrawalUserRepository;
 
 
     public APIResponse signUp(UsersRequestDTO.SignUp signUp){
@@ -40,7 +50,7 @@ public class UsersService {
         Users users = Users.builder()
                 .email(signUp.getEmail())
                 .password(passwordEncoder.encode(signUp.getPassword()))
-                .banned(false)
+                .isBanned(false)
                 .role(Role.ROLE_UNPROFILE_USER)
                 .authorities(Collections.singletonList(Authority.ROLE_USER.name())).build();
         usersRepository.save(users);
@@ -112,10 +122,10 @@ public class UsersService {
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"로그아웃 되었습니다.");
     }
 
-    public APIResponse<UsersResponseDTO.TokenInfo> getToken(String email){
+    public APIResponse<UsersResponseDTO.TokenInfo> getToken(String email, String uid, SocialType socialType){
         UsersResponseDTO.TokenInfo tokenInfo = null;
         if(email.isBlank()) throw new IllegalArgumentException("email is empty");
-        Role role = null;
+        Role role;
         if(usersRepository.existsByEmail(email)){
             if(usersRepository.existsByEmailAndRole(email,Role.ROLE_USER)){
                 role = Role.ROLE_USER;
@@ -127,7 +137,8 @@ public class UsersService {
             }
         }else{
             role = Role.ROLE_UNPROFILE_USER;
-            Users temporaryUser = Users.builder().email(email).role(role).build();
+            Users temporaryUser = Users.builder().email(email).role(role).uid(uid).isDeleted(false).isBanned(false
+            ).socialType(socialType).build();
             usersRepository.save(temporaryUser);
             tokenInfo = jwtTokenProvider.generateToken(email,role);
         }
@@ -139,5 +150,18 @@ public class UsersService {
     public APIResponse<UsersResponseDTO.UserRole> validateToken(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid email"));
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, UsersResponseDTO.UserRole.builder().role(getUser.getRole()).build());
+    }
+
+    public void withdrawal(UsersRequestDTO.Withdrawal withdrawal, Users user) {
+        WithdrawalCategory withdrawalCategory = withdrawalCategoryRepository.findById(withdrawal.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("초기 카테고리 데이터 미설정"));
+        WithdrawalUser withdrawalUser = WithdrawalUser.toEntity(user,withdrawal.getReason(),withdrawalCategory);
+        withdrawalUserRepository.save(withdrawalUser);
+        user.removeEmail();
+        user.setIsDeleted(true);
+        usersRepository.save(user);
+    }
+    public Users findByEmail(String email){
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid email"));
+        return getUser;
     }
 }

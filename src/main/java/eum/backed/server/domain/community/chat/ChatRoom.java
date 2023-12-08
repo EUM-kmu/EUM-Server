@@ -21,7 +21,13 @@ public class ChatRoom extends BaseTimeEntity {
 
     @Column
     private String chatRoomKeyFB;
-    private Boolean isDeleted;
+
+    public void updateBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
+    private boolean isDeleted;
+    private boolean isBlocked;
 
     @ManyToOne
     @JoinColumn(name = "market_post_id")
@@ -43,6 +49,7 @@ public class ChatRoom extends BaseTimeEntity {
                 .chatRoomKeyFB(chatRoomKeyFB)
                 .marketPost(marketPost)
                 .isDeleted(false)
+                .isBlocked(false)
                 .postWriter(marketPost.getUser())
                 .applicant(apply.getUser())
                 .build();
@@ -50,4 +57,7 @@ public class ChatRoom extends BaseTimeEntity {
     }
 
 
+    public void upDateBlocked(Boolean blocked) {
+        isBlocked = blocked;
+    }
 }

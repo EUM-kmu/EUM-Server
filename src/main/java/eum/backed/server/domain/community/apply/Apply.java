@@ -41,7 +41,12 @@ public class Apply extends BaseTimeEntity {
         return Apply.builder()
                 .content(introduction)
                 .user(user)
+                .status(Status.WAITING)
                 .isAccepted(Boolean.FALSE)
                 .marketPost(marketPost).build();
+    }
+
+    public void updateStatus(Status status) {
+        this.status = status;
     }
 }

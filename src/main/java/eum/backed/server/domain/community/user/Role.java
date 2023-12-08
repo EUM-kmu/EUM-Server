@@ -8,6 +8,5 @@ public enum Role {
 
     ROLE_AUTH_USER,
     ROLE_ORGANIZATION,
-    ROLE_SLEEPER_USER,
     TEST,
 }

@@ -1,4 +1,4 @@
-package eum.backed.server.service.bank;
+package eum.backed.server.service.community.bank;
 
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
@@ -21,7 +21,7 @@ import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
-import eum.backed.server.service.bank.DTO.BankTransactionDTO;
+import eum.backed.server.service.community.bank.DTO.BankTransactionDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,11 +53,10 @@ public class BankAccountService {
         return UpdatedBankAccount;
 
     }
-    public APIResponse updatePassword(BankAccountRequestDTO.UpdatePassword updatePassword, String email) {
+    public APIResponse updatePassword(BankAccountRequestDTO.Password password, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
-        if(!passwordEncoder.matches(updatePassword.getCurrentPassword(),getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
-        myBankAccount.updatePassword(passwordEncoder.encode(updatePassword.getNewPassword()));
+        myBankAccount.updatePassword(passwordEncoder.encode(password.getPassword()));
         userBankAccountRepository.save(myBankAccount);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS, "비밀번호 업데이트");
     }
@@ -68,6 +67,7 @@ public class BankAccountService {
 
         Profile getProfile = profileRepository.findByNickname(remittance.getNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
         Users receiver = getProfile.getUser();
+        checkWithdrawal(receiver);
         if(!passwordEncoder.matches(remittance.getPassword(),getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
         UserBankAccount receiverBankAccount = userBankAccountRepository.findByUser(receiver).orElseThrow(() -> new NullPointerException("InValid receiver"));
@@ -125,18 +125,21 @@ public class BankAccountService {
         if(chatRoom.getMarketPost().getMarketType()==MarketType.REQUEST_HELP){
             Users sender = chatRoom.getPostWriter();
             Users receiver = chatRoom.getApplicant();
+            checkWithdrawal(receiver);
             if(user !=sender) throw new IllegalArgumentException("송금해야할 유저가 잘못되었습니다");
             log.info(String.valueOf((user !=sender)));
             return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
         }
         Users sender = chatRoom.getApplicant();
         Users receiver = chatRoom.getPostWriter();
+        checkWithdrawal(receiver);
         if(user !=sender) throw new IllegalArgumentException("송금해야할 유저가 잘못되었습니다");
         return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
     }
 
     public APIResponse<BankAccountResponseDTO.AccountInfo> getOtherAccountInfo(BankAccountRequestDTO.CheckNickName checkNickName) {
         Profile receiverProfile = profileRepository.findByNickname(checkNickName.getNickname()).orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다"));
+        checkWithdrawal(receiverProfile.getUser());
         String receiverCardName = receiverProfile.getUser().getUserBankAccount().getAccountName();
         return APIResponse.of(SuccessCode.INSERT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(null).cardName(receiverCardName).build());
 
@@ -167,4 +170,24 @@ public class BankAccountService {
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(userBankAccount.getBalance()).cardName(userBankAccount.getAccountName()).build());
 
     }
+
+    public APIResponse validatePassword(BankAccountRequestDTO.Password password, String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        if(!passwordEncoder.matches(password.getPassword(),getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, "validate password success");
+
+    }
+//    계좌 동결
+
+    public void freezeAccount(Users getUser) {
+        if(!userBankAccountRepository.existsByUser(getUser)){
+            return ;
+        }
+        UserBankAccount userBankAccount = getUser.getUserBankAccount();
+        userBankAccount.updateFreeze(true);
+    }
+    private void checkWithdrawal(Users user){
+        if(user.getIsDeleted()) throw new IllegalArgumentException("이미 탈토한 회원입니다");
+    }
+
 }

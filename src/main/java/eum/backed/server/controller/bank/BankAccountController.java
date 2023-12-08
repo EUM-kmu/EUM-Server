@@ -4,8 +4,8 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
 import eum.backed.server.controller.bank.dto.response.BankAccountResponseDTO;
 import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
-import eum.backed.server.service.bank.BankAccountService;
-import eum.backed.server.service.bank.BankTransactionService;
+import eum.backed.server.service.community.bank.BankAccountService;
+import eum.backed.server.service.community.bank.BankTransactionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -49,11 +49,16 @@ public class BankAccountController {
     public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> createPassword(@RequestBody @Validated BankAccountRequestDTO.Password password,@AuthenticationPrincipal String email){
         return new ResponseEntity<>(bankAccountService.createPassword(password,email), HttpStatus.CREATED);
     }
+    @PostMapping("/validate")
+    @ApiOperation(value = "카드 비밀번호 확인")
+    public ResponseEntity<APIResponse> validatePassword(@RequestBody @Validated BankAccountRequestDTO.Password password,@AuthenticationPrincipal String email){
+        return new ResponseEntity<>(bankAccountService.validatePassword(password, email), HttpStatus.OK);
+    }
 
     @PutMapping("/password")
     @ApiOperation(value = "카드 비밀 번호 바꾸기")
-    public ResponseEntity<APIResponse> updatePassword(@RequestBody @Validated BankAccountRequestDTO.UpdatePassword updatePassword, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(bankAccountService.updatePassword(updatePassword,email));
+    public ResponseEntity<APIResponse> updatePassword(@RequestBody @Validated BankAccountRequestDTO.Password password, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(bankAccountService.updatePassword(password,email));
     }
     @PostMapping("/remittance")
     @ApiOperation(value = "거래(송금하기)")

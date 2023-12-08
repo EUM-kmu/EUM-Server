@@ -69,7 +69,8 @@ public class ApplyController {
     })
     public ResponseEntity<APIResponse> accept(@PathVariable List<Long> applyIds,@AuthenticationPrincipal String email){
         return ResponseEntity.ok(applyService.accept(applyIds,email));
-    }@PostMapping("/{postId}/accept")
+    }
+    @PostMapping("/{postId}/accept")
     @ApiOperation(value = "선정하기", notes = "해당 신청자 선정") @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
             @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
@@ -78,6 +79,17 @@ public class ApplyController {
     })
     public ResponseEntity<APIResponse> acceptByPost(@RequestBody ApplyRequestDTO.AcceptList acceptList,@AuthenticationPrincipal String email){
         return ResponseEntity.ok(applyService.accept(acceptList.getApplyIds(),email));
+    }
+
+    @DeleteMapping("{postId}/cancel/{chatId}")
+    @ApiOperation(value = "활동파기", notes = "활동 파기") @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
+            @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
+            @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
+            @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
+    })
+    public ResponseEntity<APIResponse> cancelTrading(@PathVariable Long postId, @PathVariable Long chatId, @AuthenticationPrincipal String email){
+        return ResponseEntity.ok(applyService.cancel(postId,chatId,email));
     }
 
 }

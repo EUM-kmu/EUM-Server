@@ -2,12 +2,13 @@ package eum.backed.server.domain.community.sleeperuser;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategory;
 import lombok.*;
+import org.hibernate.mapping.ToOne;
 
 import javax.persistence.*;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,10 +18,9 @@ public class SleeperUser extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sleeperUserId;
 
-    @Column
-    private String reason;
-
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="user_id")
-    Users user;
+    private Users user;
+
+
 }

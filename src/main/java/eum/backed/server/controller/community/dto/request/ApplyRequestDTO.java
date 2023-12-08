@@ -20,7 +20,6 @@ public class ApplyRequestDTO {
     @Getter
     @Setter
     public static class AcceptList {
-        @NotEmpty
         private List<Long> applyIds;
     }
 }

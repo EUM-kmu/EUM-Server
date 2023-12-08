@@ -8,9 +8,10 @@ import eum.backed.server.controller.community.dto.response.ChatRoomResponseDTO;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.apply.ApplyRepository;
 import eum.backed.server.domain.community.chat.*;
+import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
-import eum.backed.server.service.bank.DTO.BankTransactionDTO;
+import eum.backed.server.service.community.bank.DTO.BankTransactionDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ public class ChatService {
     private final ApplyRepository applyRepository;
     private final UsersRepository usersRepository;
     private final ChatDAO chatDAO;
+    private final ProfileRepository profileRepository;
     public void createChatRoomWithFireStore(Long applyId) throws ExecutionException, InterruptedException {
         Apply apply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid Id"));
         if(apply.getIsAccepted() == false) throw new IllegalArgumentException("선정되지 않은 유저와는 채팅을 만들 수 없습니다");
@@ -117,5 +119,13 @@ public class ChatService {
         Users sender = chatRoom.getApplicant();
         Users receiver = chatRoom.getPostWriter();
         return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
+    }
+    public void blockedChat(Users user){
+        if(!profileRepository.existsByUser(user)) return;
+        List<ChatRoom> chatRooms = chatRoomRepository.findByPostWriterOrApplicant(user, user).orElse(Collections.emptyList());
+        for(ChatRoom chatRoom : chatRooms){
+            chatRoom.updateBlocked(true);
+            chatRoomRepository.save(chatRoom);
+        }
     }
 }

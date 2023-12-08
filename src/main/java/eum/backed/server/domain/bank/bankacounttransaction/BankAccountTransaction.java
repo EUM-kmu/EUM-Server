@@ -3,8 +3,6 @@ package eum.backed.server.domain.bank.bankacounttransaction;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
-import eum.backed.server.service.bank.BankAccountService;
-import eum.backed.server.service.bank.DTO.BankTransactionDTO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package eum.backed.server.service.bank.DTO;
+package eum.backed.server.service.community.bank.DTO;
 
 import eum.backed.server.domain.bank.bankacounttransaction.Code;
 import eum.backed.server.domain.bank.bankacounttransaction.Status;
