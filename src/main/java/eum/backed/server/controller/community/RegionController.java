@@ -1,7 +1,7 @@
 package eum.backed.server.controller.community;
 
 import eum.backed.server.common.DTO.APIResponse;
-import eum.backed.server.controller.community.dto.response.RegionResponseDTO;
+import eum.backed.server.controller.community.dto.response.InitialResponseDTO;
 import eum.backed.server.domain.community.region.RegionType;
 import eum.backed.server.service.community.RegionService;
 import io.swagger.annotations.Api;
@@ -29,7 +29,7 @@ public class RegionController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("")
-    public ResponseEntity<APIResponse<List<RegionResponseDTO.Region>>> getRegionByType(@RequestParam(name = "type",required = false) RegionType regionType){
+    public ResponseEntity<APIResponse<List<InitialResponseDTO.Region>>> getRegionByType(@RequestParam(name = "type",required = false) RegionType regionType){
         return ResponseEntity.ok(regionService.getRegionByType(regionType));
     }
     @ApiOperation(value = "지역 정보 조회")
@@ -40,7 +40,7 @@ public class RegionController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/{regionId}/subregions")
-    public ResponseEntity<APIResponse<List<RegionResponseDTO.Region>>> getRegionByParent(@PathVariable Long regionId){
+    public ResponseEntity<APIResponse<List<InitialResponseDTO.Region>>> getRegionByParent(@PathVariable Long regionId){
         return ResponseEntity.ok(regionService.getRegionByParent(regionId));
     }
 }
