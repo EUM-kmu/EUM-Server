@@ -1,4 +1,4 @@
-package eum.backed.server.service.bank;
+package eum.backed.server.service.community.bank;
 
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
@@ -10,7 +10,7 @@ import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccountRepository;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
-import eum.backed.server.service.bank.DTO.BankTransactionDTO;
+import eum.backed.server.service.community.bank.DTO.BankTransactionDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

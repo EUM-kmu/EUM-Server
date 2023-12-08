@@ -16,6 +16,7 @@ import eum.backed.server.domain.community.sleeperuser.SleeperUser;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.votepost.VotePost;
 import eum.backed.server.domain.community.voteresult.VoteResult;
+import eum.backed.server.domain.community.withdrawaluser.WithdrawalUser;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -40,15 +41,22 @@ public class Users extends BaseTimeEntity implements UserDetails {
     private Long userId;
 
     @Column
+    private String uid;
     private String email;
     private String password;
     private String phone;
-    private boolean banned;
+    private Boolean isBanned;
+    private Boolean isDeleted;
 
     @Column
     @Enumerated(EnumType.STRING)
     @ApiModelProperty(value = "role", allowableValues = "ROLE_USER, ROLE_TEMPORARY_USER, ROLE_AUTH_USER, ROLE_ORGANIZATION")
     private Role role;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    @ApiModelProperty(value = "social signIn type")
+    private SocialType socialType;
 
 
 
@@ -79,8 +87,11 @@ public class Users extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Apply> applies = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<SleeperUser> sleeperUsers = new ArrayList<>();
+    @OneToOne(mappedBy = "user", orphanRemoval = true)
+    private SleeperUser sleeperUser;
+
+    @OneToOne(mappedBy = "user", orphanRemoval = true)
+    private WithdrawalUser withdrawalUser;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Inquiry> inquiries = new ArrayList<>();
@@ -141,5 +152,9 @@ public class Users extends BaseTimeEntity implements UserDetails {
 
     public void updateRole(Role role) {
         this.role = role;
+    }
+
+    public void removeEmail() {
+        this.email = "";
     }
 }

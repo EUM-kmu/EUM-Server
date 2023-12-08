@@ -2,12 +2,20 @@ package eum.backed.server.controller.community;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
 import eum.backed.server.controller.community.dto.request.enums.SignInType;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
+import eum.backed.server.domain.community.chat.ChatRoom;
+import eum.backed.server.domain.community.user.SocialType;
+import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.service.community.ChatService;
+import eum.backed.server.service.community.DTO.KakaoDTO;
 import eum.backed.server.service.community.KakaoService;
 import eum.backed.server.service.community.UsersService;
+import eum.backed.server.service.community.bank.BankAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,6 +40,8 @@ import java.io.IOException;
 public class UsersController {
     private final UsersService usersService;
     private final KakaoService kakaoService;
+    private final BankAccountService bankAccountService;
+    private final ChatService chatService;
     @ApiOperation(value = "토큰 검증", notes = "유저 타입 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -39,7 +49,7 @@ public class UsersController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/token")
-    public ResponseEntity<APIResponse<UsersResponseDTO.UserRole>> validateToken(@AuthenticationPrincipal String email) {
+    public ResponseEntity<APIResponse<UsersResponseDTO.UserRole>>validateToken(@AuthenticationPrincipal String email) {
         return new ResponseEntity<>(usersService.validateToken(email), HttpStatus.OK);
     }
     @ApiOperation(value = "자체 회원가입", notes = "자체 회원가입")
@@ -102,13 +112,21 @@ public class UsersController {
     public ResponseEntity<APIResponse<UsersResponseDTO.TokenInfo>> getToken(@PathVariable SignInType type ,@RequestBody @Validated UsersRequestDTO.Token token) throws IOException, FirebaseAuthException {
 //        String access = kakaoService.getKakaoAccessT(code);
         String email = "";
+        String uid = "";
+        SocialType socialType = null;
         if(type == SignInType.kakao){
-            email = kakaoService.createKakaoUser(token.getToken());
+            KakaoDTO.KaKaoInfo kaKaoInfo= kakaoService.createKakaoUser(token.getToken());
+            email = kaKaoInfo.getEmail();
+            uid = kaKaoInfo.getUid();
+            socialType = SocialType.KAKAO;
         } else if (type == SignInType.firebase) {
-            email = FirebaseAuth.getInstance().verifyIdToken(token.getToken()).getEmail();
+            FirebaseToken firebaseToken = FirebaseAuth.getInstance().verifyIdToken(token.getToken());
+            email = firebaseToken.getEmail();
+            uid = firebaseToken.getUid();
+            socialType = SocialType.FIREBASE;
         }
 //        log.info(token.);
-        return ResponseEntity.ok(usersService.getToken(email));
+        return ResponseEntity.ok(usersService.getToken(email,uid,socialType));
     }
 
     // Helper method to extract Bearer token from Authorization header
@@ -118,7 +136,20 @@ public class UsersController {
         }
         return null;
     }
-//    @PostMapping("/withdrawal")
-//    public ResponseEntity<APIResponse> withdrawa(@RequestBody UsersRequestDTO.Withdrawal withdrawal){}
+    @PostMapping("/withdrawal")
+    public ResponseEntity<APIResponse> withdrawal(@RequestBody UsersRequestDTO.Withdrawal withdrawal,@AuthenticationPrincipal String email) throws FirebaseAuthException {
+        Users getUser = usersService.findByEmail(email);
+//        계좌동결
+        bankAccountService.freezeAccount(getUser);
+        chatService.blockedChat(getUser);
+//        탈퇴 사유 등록
+        if(getUser.getSocialType() == SocialType.KAKAO){
+            kakaoService.WithdralKakao(getUser.getUid());
+        } else if (getUser.getSocialType() == SocialType.FIREBASE) {
+            FirebaseAuth.getInstance().deleteUser(getUser.getUid());
+        }
+        usersService.withdrawal(withdrawal,getUser);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.DELETE_SUCCESS, "탈퇴성공"));
+    }
 
 }

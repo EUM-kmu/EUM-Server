@@ -64,6 +64,7 @@ public class PostResponseDTO {
         private ProfileResponseDTO.UserInfo writerInfo;
         private Boolean isWriter;
         private Boolean isApplicant;
+        private eum.backed.server.domain.community.apply.Status tradingStatus;
         private Boolean isScrap;
         private MarketType marketType;
         private Long postId;
@@ -141,7 +142,7 @@ public class PostResponseDTO {
                 .commentCount(marketPost.getMarketComments().size())
                 .build();
     }
-    public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses, Boolean isApply, Boolean isScrap){
+    public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses, Boolean isApply, Boolean isScrap, eum.backed.server.domain.community.apply.Status tradingStatus){
 
         LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
         Instant instant = marketPost.getStartDate().toInstant();
@@ -160,16 +161,17 @@ public class PostResponseDTO {
                 .isScrap(isScrap)
                 .isWriter(user == marketPost.getUser())
                 .isApplicant(isApply)
+                .tradingStatus(tradingStatus)
                 .postId(marketPost.getMarketPostId())
                 .title(marketPost.getTitle())
                 .content(marketPost.getContents())
-                .startDate(formattedCreateTime)
-                .createdDate(formattedStartTime)
+                .startDate(formattedStartTime)
+                .createdDate(formattedCreateTime)
                 .pay(marketPost.getPay())
                 .location(marketPost.getLocation())
                 .volunteerTime(marketPost.getVolunteerTime())
                 .marketType(marketPost.getMarketType())
-                .currentApplicant(marketPost.getCurrentAcceptedPeople())
+                .currentApplicant(marketPost.getApplies().size())
                 .maxNumOfPeople(marketPost.getMaxNumOfPeople())
                 .category(marketPost.getMarketCategory().getContents())
                 .status(marketPost.getStatus())

@@ -47,6 +47,7 @@ public class ApplyResponseDTO {
                 .applyId(apply.getApplyId())
                 .applicantId(applicant.getUserId())
                 .avatarPhotoUrl(profile.getAvatar().getSimpleAvatarPhotoUrl())
+                .status(apply.getStatus())
                 .applicantNickName(profile.getNickname())
                 .applicantAddress(profile.getRegions().getName())
                 .createdTime(formattedCreateTime)

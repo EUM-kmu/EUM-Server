@@ -6,7 +6,6 @@ import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.category.MarketCategory;
 import eum.backed.server.domain.community.chat.ChatRoom;
 import eum.backed.server.domain.community.comment.MarketComment;
-import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.user.Users;
 import io.swagger.annotations.ApiModelProperty;
@@ -38,6 +37,7 @@ public class MarketPost extends BaseTimeEntity {
     private int maxNumOfPeople;
     private int currentAcceptedPeople;
     private Date startDate;
+    private boolean isDeleted;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -83,6 +83,9 @@ public class MarketPost extends BaseTimeEntity {
     public void addCurrentAcceptedPeople(){
         this.currentAcceptedPeople += 1;
     }
+    public void subCurrentAcceptedPeople(){
+        this.currentAcceptedPeople -= 1;
+    }
 
     public void updateStatus(Status status) {
         this.status = status;
@@ -101,5 +104,9 @@ public class MarketPost extends BaseTimeEntity {
 
     public void updatePay(Long pay) {
         this.pay = pay;
+    }
+
+    public void updateDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

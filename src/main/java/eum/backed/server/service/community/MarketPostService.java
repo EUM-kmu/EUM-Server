@@ -21,7 +21,6 @@ import eum.backed.server.domain.community.scrap.ScrapRepository;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -59,6 +58,7 @@ public class MarketPostService {
                 .startDate(simpleDateFormat.parse(marketCreate.getStartTime()))
                 .slot(marketCreate.getSlot())
                 .pay(pay)
+                .isDeleted(false)
                 .location(marketCreate.getLocation())
                 .volunteerTime(marketCreate.getVolunteerTime())
                 .marketType(marketCreate.getMarketType())
@@ -77,9 +77,8 @@ public class MarketPostService {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-        if(!(getMarketPost.getChatRooms().isEmpty()&&getMarketPost.getChatRooms().size() ==0))
-            throw new IllegalArgumentException("채팅방이 생성된 게시물은 삭제가 안됩니다");
-        marketPostRepository.delete(getMarketPost);
+        getMarketPost.updateDeleted(true);
+        marketPostRepository.save(getMarketPost);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
 
@@ -118,12 +117,15 @@ public class MarketPostService {
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         Boolean isScrap = scrapRepository.existsByMarketPostAndUser(getMarketPost,user);
         Boolean isApply = applyRepository.existsByUserAndMarketPost(user, getMarketPost);
-        PostResponseDTO.TransactionPostWithComment singlePostResponse = postResponseDTO.newTransactionPostWithComment(user,getMarketPost,commentResponses,isApply,isScrap);
+        eum.backed.server.domain.community.apply.Status tradingStatus = eum.backed.server.domain.community.apply.Status.NONE;
+        if(isApply){
+            tradingStatus = applyRepository.findByUserAndMarketPost(user,getMarketPost).get().getStatus();
+        }
+        PostResponseDTO.TransactionPostWithComment singlePostResponse = postResponseDTO.newTransactionPostWithComment(user,getMarketPost,commentResponses,isApply,isScrap,tradingStatus);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,singlePostResponse);
 
     }
     public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email, Pageable pageable) {
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         if (!(keyword == null || keyword.isBlank())) {
             return findByKeyWord(keyword);
         } else if (!(category == null || category.isBlank())) {
@@ -134,7 +136,12 @@ public class MarketPostService {
 
             return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
         }
-        List<MarketPost> marketPosts = marketPostRepository.findAllByOrderByCreateDateDesc(pageable);
+        if(marketType != null || status != null){
+            List<MarketPost> marketPosts = marketPostRepository.findByStatusAndIsDeletedFalseOrderByCreateDateDesc(status).orElse(Collections.emptyList());
+            List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
+            return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
+        }
+        List<MarketPost> marketPosts = marketPostRepository.findAllByIsDeletedFalseOrderByCreateDateDesc(pageable).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
 
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
@@ -143,21 +150,21 @@ public class MarketPostService {
     private List<MarketPost> getMarketPosts(MarketCategory marketCategory, MarketType marketType, Status status) {
         if (marketType == MarketType.PROVIDE_HELP) {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, MarketType.PROVIDE_HELP, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndMarketTypeAndStatusAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, MarketType.PROVIDE_HELP, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryAndMarketTypeOrderByCreateDateDesc(marketCategory, MarketType.PROVIDE_HELP).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndMarketTypeAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, MarketType.PROVIDE_HELP).orElse(Collections.emptyList());
             }
         } else if (marketType == MarketType.REQUEST_HELP) {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndMarketTypeAndStatusOrderByCreateDateDesc(marketCategory, MarketType.REQUEST_HELP, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndMarketTypeAndStatusAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, MarketType.REQUEST_HELP, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryAndMarketTypeOrderByCreateDateDesc(marketCategory, MarketType.REQUEST_HELP).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndMarketTypeAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, MarketType.REQUEST_HELP).orElse(Collections.emptyList());
             }
         } else {
             if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndStatusOrderByCreateDateDesc(marketCategory, status).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndStatusAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, status).orElse(Collections.emptyList());
             } else {
-                return marketPostRepository.findByMarketCategoryOrderByCreateDateDesc(marketCategory).orElse(Collections.emptyList());
+                return marketPostRepository.findByMarketCategoryAndIsDeletedFalseOrderByCreateDateDesc(marketCategory).orElse(Collections.emptyList());
             }
         }
     }
@@ -185,14 +192,14 @@ public class MarketPostService {
 
     private APIResponse<List<PostResponseDTO.PostResponse>> getMyPosts(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<MarketPost> marketPosts = marketPostRepository.findByUserOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
+        List<MarketPost> marketPosts = marketPostRepository.findByUserAndIsDeletedFalseOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
 
     private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord) {
 //        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<MarketPost> marketPosts = marketPostRepository.findByTitleContainingOrderByCreateDateDesc( keyWord).orElse(Collections.emptyList());
+        List<MarketPost> marketPosts = marketPostRepository.findByTitleContainingAndIsDeletedFalseOrderByCreateDateDesc( keyWord).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }

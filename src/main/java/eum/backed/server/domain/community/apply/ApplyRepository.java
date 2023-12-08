@@ -11,6 +11,7 @@ public interface ApplyRepository extends JpaRepository<Apply,Long> {
     Optional<List<Apply>> findByMarketPostOrderByCreateDateDesc(MarketPost marketPost);
 
     Boolean existsByUserAndMarketPost(Users user, MarketPost marketPost);
+    Optional<Apply> findByUserAndMarketPost(Users user, MarketPost marketPost);
 
     Optional<List<Apply>> findByUser(Users user);
 

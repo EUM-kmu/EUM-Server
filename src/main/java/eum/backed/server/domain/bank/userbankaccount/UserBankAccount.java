@@ -27,6 +27,11 @@ public class UserBankAccount extends BaseTimeEntity {
     private String accountName;
     private String password;
     private Long balance;
+    private Boolean isFreeze;
+
+    public void updateFreeze(Boolean freeze) {
+        isFreeze = freeze;
+    }
 
     @Column
     @Enumerated(EnumType.STRING)

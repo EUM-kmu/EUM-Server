@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 import java.sql.Date;
 
 public class UsersRequestDTO {
@@ -68,7 +69,8 @@ public class UsersRequestDTO {
     @Getter
     @Setter
     public static class Withdrawal {
-
+        @Positive(message = "탈퇴 사유 카테고리 id는 양수입니다")
+        private Long categoryId;
         private String reason;
 
     }
