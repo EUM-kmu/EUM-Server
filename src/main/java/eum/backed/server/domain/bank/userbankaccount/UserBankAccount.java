@@ -63,6 +63,7 @@ public class UserBankAccount extends BaseTimeEntity {
         return UserBankAccount.builder()
                 .accountName(nickname)
                 .password(password)
+                .isFreeze(false)
                 .owner(Owner.USER)
                 .balance(0L)
                 .user(user)

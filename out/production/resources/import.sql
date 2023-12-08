@@ -17,8 +17,8 @@ INSERT INTO users(user_id,email,password,role,is_banned,is_deleted) values (3,"J
 insert into profile(profile_id,nickname,introduction,total_sunrise_pay,avatar_id,region_id,user_id)values (1,"세윤","저는 세윤 황씨죠",0,1,36,1),(2,"정환","저는 정환 박씨죠",0,4,36,2);
 insert into profile(profile_id,nickname,introduction,total_sunrise_pay,avatar_id,region_id,user_id)values (3,"[정릉3동]주민센터","정릉 3동 공식주민센터 계정",-1,13,36,3);
 
-insert into user_bank_account(user_bank_account_id,account_name,balance,password,user_id)values (1,"세윤황","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",1),(2,"정환박","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",2);
-insert into user_bank_account(user_bank_account_id,account_name,balance,password,user_id)values (3,"[정릉3동]주민센터","10000000","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.",3);
+insert into user_bank_account(user_bank_account_id,account_name,balance,password,owner,user_id,is_freeze)values (1,"세윤황","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","USER",1,0),(2,"정환박","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","USER",2,0);
+insert into user_bank_account(user_bank_account_id,account_name,balance,password,owner,user_id,is_freeze)values (3,"[정릉3동]주민센터","100000","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","USER",3,0);
 
 insert into bank_account_transaction(bank_account_transaction_id  , amount ,code ,my_current_balance ,status ,branch_bank_account_id ,my_bank_account ,create_date,trasnaction_type)values (1,300,"SUCCESS",300,"INITIAL",1,1,now(),"DEPOSIT");
 insert into bank_account_transaction(bank_account_transaction_id  , amount ,code ,my_current_balance ,status ,branch_bank_account_id ,my_bank_account ,create_date,trasnaction_type)values (2,300,"SUCCESS",300,"INITIAL",1,2,now(),"DEPOSIT");
@@ -33,15 +33,15 @@ insert into market_post(market_post_id, contents, current_accepted_people, locat
 insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id,  user_id, status,create_date,is_deleted)values (7, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "PM", "2024-08-13 00:00:00", "심부름", "30", 4, 1, "RECRUITING",now(),0);
 insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id,  user_id, status,create_date,is_deleted)values (8, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "PROVIDE_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "구걸", "30", 5, 2, "RECRUITING",now(),0);
 insert into market_post(market_post_id, contents, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id,  user_id, status,create_date,is_deleted)values (19, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "모기박멸", "30", 4, 2, "RECRUITING",now(),0);
-
-insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (1,now(),"얼죽아 회원 모집합니다.관심 있으신분",0,"얼죽아 회원",10,1);
-insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (2,now(),"집에 가고싶어요",0,"집",10,2);
-insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (3,now(),"피곤합니다",0,"커피 수혈해서 다닐까",10,2);
-insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (4,now(),"학교를 왜 와야하는 걸까요 휴강해주세요",0,"i'm 휴강 원해요",10,1);
-
-insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (1,now(),3,"학교에서 꼭 와야하는가",10,"2020-11-13 18:14:48","학교에 와야할까요",13,10,1);
-insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (2,now(),10,"당신은 지금 졸린가요",2,"2020-11-13 18:14:48","학교에 와야할까요",12,10,2);
-insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (3,now(),10,"학교에서 꼭 와야하는가",10,"2020-11-13 18:14:48","학교에 와야할까요",20,10,1);
+--
+-- insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (1,now(),"얼죽아 회원 모집합니다.관심 있으신분",0,"얼죽아 회원",10,1);
+-- insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (2,now(),"집에 가고싶어요",0,"집",10,2);
+-- insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (3,now(),"피곤합니다",0,"커피 수혈해서 다닐까",10,2);
+-- insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (4,now(),"학교를 왜 와야하는 걸까요 휴강해주세요",0,"i'm 휴강 원해요",10,1);
+--
+-- insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (1,now(),3,"학교에서 꼭 와야하는가",10,"2020-11-13 18:14:48","학교에 와야할까요",13,10,1);
+-- insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (2,now(),10,"당신은 지금 졸린가요",2,"2020-11-13 18:14:48","학교에 와야할까요",12,10,2);
+-- insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (3,now(),10,"학교에서 꼭 와야하는가",10,"2020-11-13 18:14:48","학교에 와야할까요",20,10,1);
 
 update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_young.png" where avatar_id = 1;
 update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_young.png" where avatar_id = 2;

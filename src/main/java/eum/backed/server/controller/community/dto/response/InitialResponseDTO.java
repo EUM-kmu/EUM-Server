@@ -2,14 +2,12 @@ package eum.backed.server.controller.community.dto.response;
 
 import eum.backed.server.domain.community.region.RegionType;
 import eum.backed.server.domain.community.region.Regions;
+import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategory;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
-
-public class RegionResponseDTO {
+public class InitialResponseDTO {
     @Getter
     @Setter
     public static class Region{
@@ -26,6 +24,18 @@ public class RegionResponseDTO {
             this.regionType = regions.getRegionType();
         }
     }
+    @Getter
+    @Setter
+    public static class WithdrawalCategoryResponse{
+        private Long categoryId;
+        private String content;
+
+        public WithdrawalCategoryResponse(WithdrawalCategory withdrawalCategory) {
+            this.categoryId = withdrawalCategory.getWithdrawalCategoryId();
+            this.content = withdrawalCategory.getContent();
+        }
+    }
+
 
 
 }
