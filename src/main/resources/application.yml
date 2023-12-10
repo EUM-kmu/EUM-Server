@@ -67,6 +67,13 @@ spring:
     init:
       mode: always
 
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: /api/docs/v1
+server:
+  port: 80
+
 jwt:
   header: Authorization
   secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHN

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/market/post")
+@RequestMapping("/api/v1/market/post")
 @RequiredArgsConstructor
 @Api(tags = "market")
 @CrossOrigin("*")

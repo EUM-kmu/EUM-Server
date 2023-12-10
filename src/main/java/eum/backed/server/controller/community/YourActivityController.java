@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
 @Slf4j
-@RequestMapping("your-activity")
+@RequestMapping("/api/v1/your-activity")
 @RequiredArgsConstructor
 @Api(tags = "your activity")
 @CrossOrigin("*")

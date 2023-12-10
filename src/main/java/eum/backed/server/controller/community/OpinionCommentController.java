@@ -11,7 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/post/opinion")
+@RequestMapping("/api/v1/post/opinion")
 @RestController
 @RequiredArgsConstructor
 @Api(tags = "opinion comment")

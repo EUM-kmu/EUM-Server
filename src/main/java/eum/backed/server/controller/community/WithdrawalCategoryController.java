@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @Api(tags = "user")
-@RequestMapping("/withdrawal")
+@RequestMapping("/api/v1/withdrawal")
 @RequiredArgsConstructor
 public class WithdrawalCategoryController {
     private final WithdrawalCategoryService withdrawalCategoryService;

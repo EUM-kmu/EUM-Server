@@ -32,7 +32,7 @@ import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping()
+@RequestMapping("/api/v1")
 @RestController
 @Api(tags = "user")
 @CrossOrigin("*")
