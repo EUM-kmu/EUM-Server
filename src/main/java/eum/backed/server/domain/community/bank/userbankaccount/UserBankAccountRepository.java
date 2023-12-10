@@ -1,4 +1,4 @@
-package eum.backed.server.domain.bank.userbankaccount;
+package eum.backed.server.domain.community.bank.userbankaccount;
 
 import eum.backed.server.domain.community.user.Users;
 import org.springframework.data.jpa.repository.JpaRepository;

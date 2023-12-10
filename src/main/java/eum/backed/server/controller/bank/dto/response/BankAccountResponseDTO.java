@@ -1,12 +1,10 @@
 package eum.backed.server.controller.bank.dto.response;
 
-import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
-import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransaction;
-import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
+import eum.backed.server.domain.community.bank.bankacounttransaction.BankAccountTransaction;
+import eum.backed.server.domain.community.bank.bankacounttransaction.TrasnactionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

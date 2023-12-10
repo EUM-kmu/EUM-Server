@@ -1,8 +1,8 @@
-package eum.backed.server.domain.bank.branchbankaccountlog;
+package eum.backed.server.domain.community.bank.branchbankaccountlog;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.admin.admin.Admin;
-import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
+import eum.backed.server.domain.community.bank.branchbankaccount.BranchBankAccount;
 import lombok.*;
 
 import javax.persistence.*;

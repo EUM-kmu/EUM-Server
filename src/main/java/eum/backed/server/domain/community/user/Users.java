@@ -2,8 +2,9 @@ package eum.backed.server.domain.community.user;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.admin.inquiry.Inquiry;
-import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
+import eum.backed.server.domain.community.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.community.apply.Apply;
+import eum.backed.server.domain.community.block.Block;
 import eum.backed.server.domain.community.comment.OpinionComment;
 import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.comment.VoteComment;
@@ -64,6 +65,12 @@ public class Users extends BaseTimeEntity implements UserDetails {
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> authorities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "blocker")
+    private List<Block> blockers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "blocked")
+    private List<Block> blockedUsers = new ArrayList<>();
 
     @OneToOne(mappedBy = "user")
     private Profile profile;

@@ -6,9 +6,7 @@ import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
-import java.sql.Date;
 
 public class UsersRequestDTO {
     @Getter
@@ -72,6 +70,13 @@ public class UsersRequestDTO {
         @Positive(message = "탈퇴 사유 카테고리 id는 양수입니다")
         private Long categoryId;
         private String reason;
+
+    }
+    @Getter
+    @Setter
+    public static class BlockedAction {
+        @Positive(message = "유저 아이디는 양수입니다")
+        private Long userId;
 
     }
 }

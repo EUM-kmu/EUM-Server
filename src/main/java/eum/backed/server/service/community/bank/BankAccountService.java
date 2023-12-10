@@ -5,13 +5,15 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
 import eum.backed.server.controller.bank.dto.response.BankAccountResponseDTO;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
-import eum.backed.server.domain.bank.bankacounttransaction.Code;
-import eum.backed.server.domain.bank.bankacounttransaction.Status;
-import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
-import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
-import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccountRepository;
-import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
-import eum.backed.server.domain.bank.userbankaccount.UserBankAccountRepository;
+import eum.backed.server.domain.community.bank.bankacounttransaction.Code;
+import eum.backed.server.domain.community.bank.bankacounttransaction.Status;
+import eum.backed.server.domain.community.bank.bankacounttransaction.TrasnactionType;
+import eum.backed.server.domain.community.bank.branchbankaccount.BranchBankAccount;
+import eum.backed.server.domain.community.bank.branchbankaccount.BranchBankAccountRepository;
+import eum.backed.server.domain.community.bank.userbankaccount.UserBankAccount;
+import eum.backed.server.domain.community.bank.userbankaccount.UserBankAccountRepository;
+import eum.backed.server.domain.community.block.Block;
+import eum.backed.server.domain.community.block.BlockRepository;
 import eum.backed.server.domain.community.chat.ChatRoom;
 import eum.backed.server.domain.community.chat.ChatRoomRepository;
 import eum.backed.server.domain.community.marketpost.MarketPost;
@@ -27,6 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -39,6 +44,7 @@ public class BankAccountService {
     private final UsersRepository usersRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MarketPostRepository marketPostRepository;
+    private final BlockRepository blockRepository;
     //일반 유저 계정 생성
     private UserBankAccount createUserBankAccount(String cardName, String password,Users user){
         UserBankAccount userBankAccount = UserBankAccount.toEntity(cardName,passwordEncoder.encode(password),user);
@@ -67,6 +73,8 @@ public class BankAccountService {
 
         Profile getProfile = profileRepository.findByNickname(remittance.getNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
         Users receiver = getProfile.getUser();
+
+        checkBlocked(getUser,receiver);
         checkWithdrawal(receiver);
         if(!passwordEncoder.matches(remittance.getPassword(),getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
@@ -125,6 +133,8 @@ public class BankAccountService {
         if(chatRoom.getMarketPost().getMarketType()==MarketType.REQUEST_HELP){
             Users sender = chatRoom.getPostWriter();
             Users receiver = chatRoom.getApplicant();
+
+            checkBlocked(sender,receiver);
             checkWithdrawal(receiver);
             if(user !=sender) throw new IllegalArgumentException("송금해야할 유저가 잘못되었습니다");
             log.info(String.valueOf((user !=sender)));
@@ -132,13 +142,17 @@ public class BankAccountService {
         }
         Users sender = chatRoom.getApplicant();
         Users receiver = chatRoom.getPostWriter();
+
+        checkBlocked(sender,receiver);
         checkWithdrawal(receiver);
         if(user !=sender) throw new IllegalArgumentException("송금해야할 유저가 잘못되었습니다");
         return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
     }
 
-    public APIResponse<BankAccountResponseDTO.AccountInfo> getOtherAccountInfo(BankAccountRequestDTO.CheckNickName checkNickName) {
+    public APIResponse<BankAccountResponseDTO.AccountInfo> getOtherAccountInfo(BankAccountRequestDTO.CheckNickName checkNickName,String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         Profile receiverProfile = profileRepository.findByNickname(checkNickName.getNickname()).orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다"));
+        checkBlocked(getUser,receiverProfile.getUser());
         checkWithdrawal(receiverProfile.getUser());
         String receiverCardName = receiverProfile.getUser().getUserBankAccount().getAccountName();
         return APIResponse.of(SuccessCode.INSERT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(null).cardName(receiverCardName).build());
@@ -189,5 +203,11 @@ public class BankAccountService {
     private void checkWithdrawal(Users user){
         if(user.getIsDeleted()) throw new IllegalArgumentException("이미 탈토한 회원입니다");
     }
+    private void checkBlocked(Users opponent ,Users user){
+        if(blockRepository.existsByBlockerAndBlocked(opponent,user) || blockRepository.existsByBlockerAndBlocked(user,opponent)){
+            throw new IllegalArgumentException("차단 했거나 차단 당한 유저입니다");
+        }
+    }
+
 
 }

@@ -8,13 +8,11 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.dto.request.UsersRequestDTO;
 import eum.backed.server.controller.community.dto.request.enums.SignInType;
 import eum.backed.server.controller.community.dto.response.UsersResponseDTO;
-import eum.backed.server.domain.community.chat.ChatRoom;
+import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.SocialType;
 import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.service.community.ChatService;
+import eum.backed.server.service.community.*;
 import eum.backed.server.service.community.DTO.KakaoDTO;
-import eum.backed.server.service.community.KakaoService;
-import eum.backed.server.service.community.UsersService;
 import eum.backed.server.service.community.bank.BankAccountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.error.Mark;
 
 import java.io.IOException;
 
@@ -42,6 +41,9 @@ public class UsersController {
     private final KakaoService kakaoService;
     private final BankAccountService bankAccountService;
     private final ChatService chatService;
+    private final BlockService blockService;
+    private final MarketPostService marketPostService;
+    private final ApplyService applyService;
     @ApiOperation(value = "토큰 검증", notes = "유저 타입 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -137,11 +139,13 @@ public class UsersController {
         return null;
     }
     @PostMapping("/withdrawal")
+    @ApiOperation(value = "탈퇴하기")
     public ResponseEntity<APIResponse> withdrawal(@RequestBody UsersRequestDTO.Withdrawal withdrawal,@AuthenticationPrincipal String email) throws FirebaseAuthException {
         Users getUser = usersService.findByEmail(email);
 //        계좌동결
         bankAccountService.freezeAccount(getUser);
         chatService.blockedChat(getUser);
+        applyService.withdrawalApply(getUser);
 //        탈퇴 사유 등록
         if(getUser.getSocialType() == SocialType.KAKAO){
             kakaoService.WithdralKakao(getUser.getUid());
@@ -151,5 +155,20 @@ public class UsersController {
         usersService.withdrawal(withdrawal,getUser);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.DELETE_SUCCESS, "탈퇴성공"));
     }
+   @PostMapping("/block")
+   @ApiOperation(value = "차단하기",notes = "동일한 메소드 한번더 보낼땐 차단해제, 클라이언트에는 현재 없는 기능이지만 테스트용으로 존재")
+    public ResponseEntity<APIResponse> blockedAction(@RequestBody UsersRequestDTO.BlockedAction blockedAction, @AuthenticationPrincipal String email){
+       Users blocker = usersService.findByEmail(email);
+       Users blocked = usersService.findById(blockedAction.getUserId());
+
+       Boolean isBlocked = blockService.blockedAction(blocker, blocked);
+       chatService.blockedAction(isBlocked,blocker, blocked);
+       applyService.blockedAction( blocker, blocked);
+
+       String msg = isBlocked ? "차단 성공" : "차단 해제";
+       return new ResponseEntity<>(APIResponse.of(SuccessCode.INSERT_SUCCESS,msg),HttpStatus.CREATED);
+
+
+   }
 
 }

@@ -128,4 +128,17 @@ public class ChatService {
             chatRoomRepository.save(chatRoom);
         }
     }
+
+    public void blockedAction(Boolean isBlocked,Users blocker, Users blocked) {
+        List<ChatRoom> allChatRooms = new ArrayList<>();
+        List<ChatRoom> chatRooms1 = chatRoomRepository.findByPostWriterAndApplicant(blocker, blocked).orElse(Collections.emptyList());
+        List<ChatRoom> chatRooms2 = chatRoomRepository.findByPostWriterAndApplicant(blocked, blocker).orElse(Collections.emptyList());
+        allChatRooms.addAll(chatRooms1);
+        allChatRooms.addAll(chatRooms2);
+        for(ChatRoom chatRoom : allChatRooms){
+            chatRoom.updateBlocked(isBlocked);
+            chatRoomRepository.save(chatRoom);
+        }
+
+    }
 }

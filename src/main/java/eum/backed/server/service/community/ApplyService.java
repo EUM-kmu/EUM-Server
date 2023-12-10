@@ -17,6 +17,7 @@ import eum.backed.server.domain.community.profile.ProfileRepository;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -118,14 +119,47 @@ public class ApplyService {
         if(!(getUser == chatRoom.getApplicant() || getUser == chatRoom.getPostWriter() )) throw new IllegalArgumentException("활동 파기할수있는 권한이 없습니다");
 //        블록 상태 처리
         chatRoom.upDateBlocked(true);
+        cancel(getApply);
+        return APIResponse.of(SuccessCode.DELETE_SUCCESS);
+
+    }
+
+    public void blockedAction(Users blocker, Users blocked) {
+        List<Apply> applies = new ArrayList<>();
+        List<MarketPost> myPosts = marketPostRepository.findByUserAndIsDeletedFalse(blocker).orElse(Collections.emptyList());
+        List<Apply> tradingList = applyRepository.findTradingAppliesByApplicantAndPostIn(blocked,myPosts).orElse(Collections.emptyList());
+        applies.addAll(tradingList);
+
+        List<MarketPost> opponentsPosts = marketPostRepository.findByUserAndIsDeletedFalse(blocked).orElse(Collections.emptyList());
+        List<Apply> tradedList = applyRepository.findTradingAppliesByApplicantAndPostIn(blocker,opponentsPosts).orElse(Collections.emptyList());
+        applies.addAll(tradedList);
+
+        for (Apply apply:applies){
+            if(apply.getStatus() == eum.backed.server.domain.community.apply.Status.WAITING){
+                applyRepository.delete(apply);
+            } else if (apply.getStatus() == eum.backed.server.domain.community.apply.Status.TRADING) {
+                cancel(apply);
+            }
+        }
+    }
+
+    public void withdrawalApply(Users getUser) {
+        List<Apply> applies = applyRepository.findByUser(getUser).orElse(Collections.emptyList());
+        for(Apply apply:applies){
+            if(apply.getStatus() == eum.backed.server.domain.community.apply.Status.WAITING){
+                applyRepository.delete(apply);
+            } else if (apply.getStatus() == eum.backed.server.domain.community.apply.Status.TRADING) {
+                cancel(apply);
+            }
+        }
+    }
+    private void cancel(Apply getApply){
         getApply.updateStatus(eum.backed.server.domain.community.apply.Status.TRADING_CANCEL);
         getApply.updateAccepted(false);
         applyRepository.save(getApply);
 
-        getMarketPost.subCurrentAcceptedPeople();
-        getMarketPost.updateStatus(Status.RECRUITING);
-        marketPostRepository.save(getMarketPost);
-        return APIResponse.of(SuccessCode.DELETE_SUCCESS);
-
+        getApply.getMarketPost().subCurrentAcceptedPeople();
+        getApply.getMarketPost().updateStatus(Status.RECRUITING);
+        marketPostRepository.save(getApply.getMarketPost());
     }
 }
