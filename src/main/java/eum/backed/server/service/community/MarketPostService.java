@@ -41,7 +41,6 @@ public class MarketPostService {
     private final ScrapRepository scrapRepository;
     private final PostResponseDTO postResponseDTO;
     private final UsersRepository usersRepository;
-    private final MarketCommentRepository marketCommentRepository;
 
     private final ApplyRepository applyRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -78,6 +77,8 @@ public class MarketPostService {
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         getMarketPost.updateDeleted(true);
+        List<Scrap> scraps = scrapRepository.findByMarketPost(getMarketPost).orElse(Collections.emptyList());
+        scrapRepository.deleteAll(scraps);
         marketPostRepository.save(getMarketPost);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
@@ -125,53 +126,27 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,singlePostResponse);
 
     }
-    public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email, Pageable pageable) {
+    public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email, Pageable pageable,List<Users> blockedUsers) {
         if (!(keyword == null || keyword.isBlank())) {
-            return findByKeyWord(keyword);
-        } else if (!(category == null || category.isBlank())) {
-
-            MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElseThrow(() -> new IllegalArgumentException("Invalid categoryId"));
-            List<MarketPost> marketPosts = getMarketPosts(marketCategory, marketType, status);
-            List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
-
-            return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
+            return findByKeyWord(keyword,blockedUsers);
         }
-        if(marketType != null || status != null){
-            List<MarketPost> marketPosts = marketPostRepository.findByStatusAndIsDeletedFalseOrderByCreateDateDesc(status).orElse(Collections.emptyList());
-            List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
-            return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
-        }
-        List<MarketPost> marketPosts = marketPostRepository.findAllByIsDeletedFalseOrderByCreateDateDesc(pageable).orElse(Collections.emptyList());
+            MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElse(null);
+
+        List<MarketPost> marketPosts = getMarketPosts(marketCategory, marketType, status,blockedUsers);
         List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
 
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
      }
 
-    private List<MarketPost> getMarketPosts(MarketCategory marketCategory, MarketType marketType, Status status) {
-        if (marketType == MarketType.PROVIDE_HELP) {
-            if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndMarketTypeAndStatusAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, MarketType.PROVIDE_HELP, status).orElse(Collections.emptyList());
-            } else {
-                return marketPostRepository.findByMarketCategoryAndMarketTypeAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, MarketType.PROVIDE_HELP).orElse(Collections.emptyList());
-            }
-        } else if (marketType == MarketType.REQUEST_HELP) {
-            if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndMarketTypeAndStatusAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, MarketType.REQUEST_HELP, status).orElse(Collections.emptyList());
-            } else {
-                return marketPostRepository.findByMarketCategoryAndMarketTypeAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, MarketType.REQUEST_HELP).orElse(Collections.emptyList());
-            }
-        } else {
-            if (status == Status.RECRUITING) {
-                return marketPostRepository.findByMarketCategoryAndStatusAndIsDeletedFalseOrderByCreateDateDesc(marketCategory, status).orElse(Collections.emptyList());
-            } else {
-                return marketPostRepository.findByMarketCategoryAndIsDeletedFalseOrderByCreateDateDesc(marketCategory).orElse(Collections.emptyList());
-            }
-        }
+
+//    }
+    private List<MarketPost> getMarketPosts(MarketCategory marketCategory, MarketType marketType, Status status,List<Users> blockedUsers) {
+        return marketPostRepository.findByFilters(marketCategory, marketType,status,blockedUsers).orElse(Collections.emptyList());
     }
 
-    private  APIResponse<List<PostResponseDTO.PostResponse>> findByScrap(String email) {
+    private  APIResponse<List<PostResponseDTO.PostResponse>> findByScrap(String email,List<Users> blockedUsers) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<Scrap> scraps = scrapRepository.findByUserOrderByCreateDateDesc(user).orElse(Collections.emptyList());
+        List<Scrap> scraps = scrapRepository.findScrapPostsForUser(user,blockedUsers).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
         for (Scrap scrap : scraps) {
             MarketPost marketPost = scrap.getMarketPost();
@@ -197,17 +172,17 @@ public class MarketPostService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
 
-    private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord) {
+    private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord, List<Users> blockedUsers) {
 //        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<MarketPost> marketPosts = marketPostRepository.findByTitleContainingAndIsDeletedFalseOrderByCreateDateDesc( keyWord).orElse(Collections.emptyList());
+        List<MarketPost> marketPosts = marketPostRepository.findByTitleContainingAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc( keyWord,blockedUsers).orElse(Collections.emptyList());
         List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
 
 
-    public APIResponse<List<PostResponseDTO.PostResponse>> findByServiceType(ServiceType serviceType, String email) {
+    public APIResponse<List<PostResponseDTO.PostResponse>> findByServiceType(ServiceType serviceType, String email,List<Users> blockedUsers) {
         if(serviceType == ServiceType.scrap){
-            return findByScrap(email);
+            return findByScrap(email,blockedUsers);
         } else if (serviceType == ServiceType.postlist) {
             return getMyPosts(email);
         }else if(serviceType == ServiceType.apply){
@@ -218,7 +193,7 @@ public class MarketPostService {
 
     private APIResponse<List<PostResponseDTO.PostResponse>> getMyApplyList(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<Apply> applies = applyRepository.findByUser(getUser).orElse(Collections.emptyList());
+        List<Apply> applies = applyRepository.findByUserIsDeletedFalse(getUser).orElse(Collections.emptyList());
         List<MarketPost> marketPosts = new ArrayList<>();
         for(Apply apply : applies){
             MarketPost marketPost = apply.getMarketPost();

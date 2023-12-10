@@ -1,8 +1,7 @@
-package eum.backed.server.domain.bank.branchbankaccount;
+package eum.backed.server.domain.community.bank.branchbankaccount;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.bank.branchbankaccountlog.BranchBankAccountLog;
-import eum.backed.server.domain.community.user.Role;
+import eum.backed.server.domain.community.bank.branchbankaccountlog.BranchBankAccountLog;
 import eum.backed.server.enums.Owner;
 import lombok.*;
 

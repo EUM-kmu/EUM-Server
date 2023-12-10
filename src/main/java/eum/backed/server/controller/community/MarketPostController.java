@@ -9,10 +9,8 @@ import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.PostResponseDTO;
 import eum.backed.server.domain.community.comment.CommentType;
 import eum.backed.server.domain.community.marketpost.Status;
-import eum.backed.server.service.community.CommentService;
-import eum.backed.server.service.community.CommentServiceImpl;
-import eum.backed.server.service.community.MarketPostService;
-import eum.backed.server.service.community.ScrapService;
+import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.service.community.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -41,6 +39,7 @@ public class  MarketPostController {
     private final MarketPostService marketPostService;
     private final ScrapService scrapService;
     private final CommentService commentService;
+    private final BlockService blockService;
 
 
     @ApiOperation(value = "게시글 작성", notes = "도움요청, 받기 게시글 작성")
@@ -110,9 +109,10 @@ public class  MarketPostController {
     })
     @GetMapping("")
     public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category,
-                                                                                         @RequestParam(name = "type",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,
+                                                                                         @RequestParam(name = "marketType",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,
                                                                                          @PageableDefault Pageable pageable, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,email,pageable
+        List<Users> blockedUsrs = blockService.getBlockedUser(email);
+        return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,email,pageable,blockedUsrs
         ));
     }
 
@@ -138,7 +138,8 @@ public class  MarketPostController {
     })
     @GetMapping("/user-activity/{serviceType}")
     public ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByServiceType(@PathVariable ServiceType serviceType, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(marketPostService.findByServiceType(serviceType,email));
+        List<Users> blockedUser = blockService.getBlockedUser(email);
+        return ResponseEntity.ok(marketPostService.findByServiceType(serviceType,email,blockedUser));
     }
 
 

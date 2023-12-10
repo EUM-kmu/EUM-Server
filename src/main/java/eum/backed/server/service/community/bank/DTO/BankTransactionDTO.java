@@ -1,10 +1,10 @@
 package eum.backed.server.service.community.bank.DTO;
 
-import eum.backed.server.domain.bank.bankacounttransaction.Code;
-import eum.backed.server.domain.bank.bankacounttransaction.Status;
-import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
-import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
-import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
+import eum.backed.server.domain.community.bank.bankacounttransaction.Code;
+import eum.backed.server.domain.community.bank.bankacounttransaction.Status;
+import eum.backed.server.domain.community.bank.bankacounttransaction.TrasnactionType;
+import eum.backed.server.domain.community.bank.branchbankaccount.BranchBankAccount;
+import eum.backed.server.domain.community.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.community.user.Users;
 import lombok.Builder;
 import lombok.Getter;

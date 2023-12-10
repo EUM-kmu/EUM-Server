@@ -1,7 +1,7 @@
-package eum.backed.server.domain.bank.userbankaccount;
+package eum.backed.server.domain.community.bank.userbankaccount;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransaction;
+import eum.backed.server.domain.community.bank.bankacounttransaction.BankAccountTransaction;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.enums.Owner;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,7 +9,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity

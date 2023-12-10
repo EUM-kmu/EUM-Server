@@ -1,6 +1,6 @@
-package eum.backed.server.domain.bank.bankacounttransaction;
+package eum.backed.server.domain.community.bank.bankacounttransaction;
 
-import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
+import eum.backed.server.domain.community.bank.userbankaccount.UserBankAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

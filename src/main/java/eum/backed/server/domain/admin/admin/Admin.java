@@ -3,7 +3,7 @@ package eum.backed.server.domain.admin.admin;
 import eum.backed.server.domain.admin.inquiryanswer.InquiryAnswer;
 import eum.backed.server.domain.admin.notification.Notification;
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.bank.branchbankaccountlog.BranchBankAccountLog;
+import eum.backed.server.domain.community.bank.branchbankaccountlog.BranchBankAccountLog;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

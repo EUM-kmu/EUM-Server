@@ -20,6 +20,7 @@ import java.util.List;
 public class WithdrawalCategoryController {
     private final WithdrawalCategoryService withdrawalCategoryService;
     @GetMapping("/category")
+    @ApiOperation(value = "탈퇴 카테고리 조회")
     public ResponseEntity<APIResponse<List<InitialResponseDTO.WithdrawalCategoryResponse>>> getCategories(){
         return ResponseEntity.ok(withdrawalCategoryService.getCategories());
     }

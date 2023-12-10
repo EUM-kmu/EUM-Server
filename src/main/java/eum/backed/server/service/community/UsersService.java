@@ -164,4 +164,8 @@ public class UsersService {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid email"));
         return getUser;
     }
+    public Users findById(Long userId){
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid email"));
+        return getUser;
+    }
 }

@@ -3,7 +3,7 @@ package eum.backed.server.controller.bank;
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.bank.dto.request.BankAccountRequestDTO;
 import eum.backed.server.controller.bank.dto.response.BankAccountResponseDTO;
-import eum.backed.server.domain.bank.bankacounttransaction.TrasnactionType;
+import eum.backed.server.domain.community.bank.bankacounttransaction.TrasnactionType;
 import eum.backed.server.service.community.bank.BankAccountService;
 import eum.backed.server.service.community.bank.BankTransactionService;
 import io.swagger.annotations.Api;
@@ -35,8 +35,8 @@ public class BankAccountController {
     }
     @PostMapping("/other")
     @ApiOperation(value = "닉네임 별 조회")
-    public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> getOtherAccountInfo(@RequestBody @Validated BankAccountRequestDTO.CheckNickName checkNickName ){
-        return ResponseEntity.ok(bankAccountService.getOtherAccountInfo(checkNickName));
+    public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> getOtherAccountInfo(@RequestBody @Validated BankAccountRequestDTO.CheckNickName checkNickName ,@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(bankAccountService.getOtherAccountInfo(checkNickName,email));
     }
     @PutMapping
     @ApiOperation("계좌 이름 추가")

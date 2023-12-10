@@ -1,4 +1,4 @@
-package eum.backed.server.domain.bank.branchbankaccount;
+package eum.backed.server.domain.community.bank.branchbankaccount;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
