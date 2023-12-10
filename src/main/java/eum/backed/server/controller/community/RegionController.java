@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/regions")
+@RequestMapping("/api/v1/regions")
 @RequiredArgsConstructor
 @Api(tags = "region")
 @CrossOrigin("*")

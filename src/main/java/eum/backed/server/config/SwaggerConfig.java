@@ -25,7 +25,7 @@ public class SwaggerConfig {
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("eum.backed.server"))
                 .paths(PathSelectors.any())
-                .build();
+                .build().pathMapping("/");
     }
 
     public ApiInfo apiInfo() {

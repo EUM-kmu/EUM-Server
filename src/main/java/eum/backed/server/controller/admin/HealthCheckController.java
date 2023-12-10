@@ -7,7 +7,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @ApiIgnore
 public class HealthCheckController {
-    @GetMapping
+    @GetMapping()
     public String healthCheck(){
         return "ok";
     }

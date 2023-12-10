@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bank-account")
+@RequestMapping("/api/v1/bank-account")
 @RequiredArgsConstructor
 @Api(tags = "bank account ")
 @Slf4j

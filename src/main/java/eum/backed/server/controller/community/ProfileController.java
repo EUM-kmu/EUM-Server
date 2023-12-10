@@ -23,7 +23,7 @@ import javax.validation.Valid;
 
 @RestController
 @Slf4j
-@RequestMapping("/profile")
+@RequestMapping("/api/v1/profile")
 @RequiredArgsConstructor
 @Api(tags = "profile")
 @CrossOrigin("*")

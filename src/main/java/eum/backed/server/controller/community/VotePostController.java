@@ -16,7 +16,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/post/vote")
+@RequestMapping("/api/v1/post/vote")
 @RequiredArgsConstructor
 @Api(tags = "vote")
 @CrossOrigin("*")

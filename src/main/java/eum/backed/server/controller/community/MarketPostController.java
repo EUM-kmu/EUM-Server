@@ -31,7 +31,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/market/post")
+@RequestMapping("/api/v1/market/post")
 @RequiredArgsConstructor
 @Slf4j
 @Api(tags = "market")

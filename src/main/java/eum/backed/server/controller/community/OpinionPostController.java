@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/post/opinion")
+@RequestMapping("/api/v1/post/opinion")
 @RequiredArgsConstructor
 @Api(tags = "opinion")
 @CrossOrigin("*")
