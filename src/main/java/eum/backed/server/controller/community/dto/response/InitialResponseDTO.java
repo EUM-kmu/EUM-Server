@@ -17,7 +17,7 @@ public class InitialResponseDTO {
         private RegionType regionType;
 
         public Region(Regions regions) {
-            Long parentId = (regions.getParent() == null ) ? -1L : regions.getParent().getRegionId();
+            Long parentId = (regions.getParent() == null ) ? null : regions.getParent().getRegionId();
             this.regionId = regions.getRegionId();
             this.name = regions.getName();
             this.parentId = parentId;
