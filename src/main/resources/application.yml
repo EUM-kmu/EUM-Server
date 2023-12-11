@@ -3,8 +3,8 @@
 #    time-zone: Asia/Seoul
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://db-jt925-kr.vpc-pub-cdb.ntruss.com:3306/eum?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
-#    username: user
+#    url: jdbc:mysql://db-k5911-kr.vpc-pub-cdb.ntruss.com:3306/eum?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
+#    username: haetsal
 #    password: k-eum2023!
 #  mvc:
 #    pathmatch:
@@ -29,12 +29,20 @@
 #    init:
 #      mode: always
 #
+#springfox:
+#  documentation:
+##    swagger-ui:
+##      base-url: /api/docs/v1
+#server:
+#  port: 80
+#
 #jwt:
 #  header: Authorization
 #  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHN
 #kakao :
 #  client-id: 1a354a3d4dc989747906944c3c188196
-#  redirect-url: http://sunrise.k-eum.kr:8080/user/auth/kakao
+#  redirect-url: http://localhost:8080/user/auth/kakao
+#  admin-key: ${admin-key}
 
 spring:
   jackson:
@@ -79,5 +87,5 @@ jwt:
   secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHN
 kakao :
   client-id: 1a354a3d4dc989747906944c3c188196
-  redirect-url: http://localhost:8080/user/auth/kakao
+  redirect-url: http://localhost/api/v1/auth/kakao
   admin-key: ${admin-key}
