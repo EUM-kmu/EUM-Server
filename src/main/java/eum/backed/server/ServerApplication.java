@@ -19,7 +19,7 @@ public class ServerApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("https://www.haetsal.com/app","http://localhost:80");
+				registry.addMapping("/**").allowedOrigins("https://app.haetsal.com","http://localhost:80","http://localhost");
 			}
 		};
 	}
