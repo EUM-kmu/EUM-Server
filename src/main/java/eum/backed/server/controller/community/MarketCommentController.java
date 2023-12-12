@@ -28,7 +28,7 @@ import java.util.List;
 @CrossOrigin("*")
 public class MarketCommentController {
     private final CommentServiceImpl commentServiceImpl;
-    @ApiOperation(value = "댓글 삭제", notes = "댓글 조회")
+    @ApiOperation(value = "댓글 조회", notes = "댓글 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
