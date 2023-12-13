@@ -201,7 +201,7 @@ public class BankAccountService {
         userBankAccount.updateFreeze(true);
     }
     private void checkWithdrawal(Users user){
-        if(user.getIsDeleted()) throw new IllegalArgumentException("이미 탈토한 회원입니다");
+        if(user.isDeleted()) throw new IllegalArgumentException("이미 탈퇴한 회원입니다");
     }
     private void checkBlocked(Users opponent ,Users user){
         if(blockRepository.existsByBlockerAndBlocked(opponent,user) || blockRepository.existsByBlockerAndBlocked(user,opponent)){
