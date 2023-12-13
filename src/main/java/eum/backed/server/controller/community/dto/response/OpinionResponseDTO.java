@@ -3,10 +3,7 @@ package eum.backed.server.controller.community.dto.response;
 import eum.backed.server.common.DTO.Time;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
 import eum.backed.server.domain.community.user.Users;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,7 +11,13 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class OpinionResponseDTO {
-    private final Time time;
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    public static class MyActivity {
+        private boolean isWriter;
+        private boolean doLike;
+    }
     @Getter
     @Setter
     @Builder
@@ -35,7 +38,7 @@ public class OpinionResponseDTO {
         private String createdTime;
         private int likeCount;
         private int commentCount;
-        private UsersResponseDTO.MyActivity myActivity;
+        private MyActivity myActivity;
         private List<CommentResponseDTO.CommentResponse> commentResponses;
     }
 
@@ -75,7 +78,7 @@ public class OpinionResponseDTO {
     public OpinionPostWithComment newOpinionPostWithComment(OpinionPost opinionPost, List<CommentResponseDTO.CommentResponse> commentResponseDTO, Users user,boolean doLike){
         String createdTime = Time.localDateTimeToKoreaZoned(opinionPost.getCreateDate());
         ProfileResponseDTO.UserInfo writerInfo = ProfileResponseDTO.toUserInfo(opinionPost.getUser());
-        UsersResponseDTO.MyActivity myActivity = UsersResponseDTO.MyActivity.builder().isWriter(opinionPost.getUser() == user).doLike(doLike).build();
+        MyActivity myActivity = MyActivity.builder().isWriter(opinionPost.getUser() == user).doLike(doLike).build();
         return OpinionPostWithComment.builder()
                 .writerInfo(writerInfo)
                 .title(opinionPost.getTitle())

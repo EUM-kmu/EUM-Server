@@ -70,23 +70,11 @@ public class OpinionPostService {
         List<OpinionResponseDTO.AllOpinionPostsResponses> allOpinionPostsResponses = getAllOpinionResponseDTO(opinionPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, allOpinionPostsResponses);
     }
-    public APIResponse<OpinionResponseDTO.OpinionPostWithComment> getOpininonPostWithComment(Long opinionPostId,String email) {
+    public APIResponse<OpinionResponseDTO.OpinionPostWithComment> getOpininonPostWithComment(Long opinionPostId,String email,List<CommentResponseDTO.CommentResponse> commentResponses) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         OpinionPost getOpinionPost = opinionPostRepository.findById(opinionPostId).orElseThrow(() -> new NullPointerException("invalid id"));
-        List<OpinionComment> opinionComments = opinionCommentRepository.findByOpinionPostOrderByCreateDateDesc(getOpinionPost).orElse(Collections.emptyList());
         boolean doLike = likeOpinionPostRepository.existsByUserAndOpinionPost(getUser, getOpinionPost);
-        List<CommentResponseDTO.CommentResponse> commentResponseDTOS = opinionComments.stream().map(opinionComment -> {
-            String createdTime = Time.localDateTimeToKoreaZoned(opinionComment.getCreateDate());
-            CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
-                    .postId(opinionPostId)
-                    .commentId(opinionComment.getOpinionCommentId())
-                    .writerInfo(ProfileResponseDTO.toUserInfo(opinionComment.getUser()))
-                    .isPostWriter(getOpinionPost.getUser() == opinionComment.getUser())
-                    .createdTime(createdTime)
-                    .commentContent(opinionComment.getComment()).build();
-            return commentResponse;
-        }).collect(Collectors.toList());
-        OpinionResponseDTO.OpinionPostWithComment opinionPostWithComment = opinionResponseDTO.newOpinionPostWithComment(getOpinionPost,commentResponseDTOS,getUser,doLike);
+        OpinionResponseDTO.OpinionPostWithComment opinionPostWithComment = opinionResponseDTO.newOpinionPostWithComment(getOpinionPost,commentResponses,getUser,doLike);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, opinionPostWithComment);
     }
     private List<OpinionResponseDTO.AllOpinionPostsResponses> getAllOpinionResponseDTO(List<OpinionPost> opinionPosts) {

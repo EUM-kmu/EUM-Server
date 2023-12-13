@@ -67,7 +67,7 @@ public class MarketPostService {
                 .marketCategory(getMarketCategory)
                 .build();
         MarketPost getMarketPost = marketPostRepository.save(marketPost);
-        PostResponseDTO.MarketPostResponse marketPostResponse = PostResponseDTO.singleMarketPost(getMarketPost);
+        PostResponseDTO.MarketPostResponse marketPostResponse = PostResponseDTO.singleMarketPost(getMarketPost,0);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,marketPostResponse);
     }
 
@@ -100,7 +100,7 @@ public class MarketPostService {
         getMarketPost.updateMaxNumOfPeople(marketUpdate.getMaxNumOfPeople());
         getMarketPost.updatePay(pay);
         MarketPost updatedMarketPost = marketPostRepository.save(getMarketPost);
-        PostResponseDTO.MarketPostResponse marketPostResponse = PostResponseDTO.singleMarketPost(updatedMarketPost);
+        PostResponseDTO.MarketPostResponse marketPostResponse = PostResponseDTO.singleMarketPost(updatedMarketPost,updatedMarketPost.getMarketComments().size());
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,marketPostResponse);
 
     }

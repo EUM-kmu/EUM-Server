@@ -31,6 +31,7 @@ public class VotePost extends BaseTimeEntity {
     private int total;
 //    private int likeCount;
     private Date endTime;
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -72,8 +73,13 @@ public class VotePost extends BaseTimeEntity {
                 .agreeCount(0)
                 .disagreeCount(0)
                 .total(0)
+                .isDeleted(false)
                 .endTime(endTime)
                 .user(user)
                 .regions(user.getProfile().getRegions()).build();
+    }
+
+    public void updateDeleted() {
+        isDeleted = true;
     }
 }
