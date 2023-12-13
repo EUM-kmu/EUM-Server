@@ -98,9 +98,10 @@ public class UsersController {
 
         // Extract Bearer token from Authorization header
         String bearerToken = extractBearerToken(authorizationHeader);
+        usersService.logout(bearerToken);
 
         // Pass the Bearer token to the logout method
-        return ResponseEntity.ok(usersService.logout(bearerToken));
+        return ResponseEntity.ok( APIResponse.of(SuccessCode.UPDATE_SUCCESS,"로그아웃 되었습니다."));
     }
 
     @ApiOperation(value = "소셜 타입별 로그인",notes = "kakao,firebase")
@@ -140,7 +141,7 @@ public class UsersController {
     }
     @PostMapping("/withdrawal")
     @ApiOperation(value = "탈퇴하기")
-    public ResponseEntity<APIResponse> withdrawal(@RequestBody UsersRequestDTO.Withdrawal withdrawal,@AuthenticationPrincipal String email) throws FirebaseAuthException {
+    public ResponseEntity<APIResponse> withdrawal(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,@RequestBody UsersRequestDTO.Withdrawal withdrawal,@AuthenticationPrincipal String email) throws FirebaseAuthException {
         Users getUser = usersService.findByEmail(email);
 //        계좌동결
         bankAccountService.freezeAccount(getUser);
@@ -153,6 +154,8 @@ public class UsersController {
             FirebaseAuth.getInstance().deleteUser(getUser.getUid());
         }
         usersService.withdrawal(withdrawal,getUser);
+        String bearerToken = extractBearerToken(authorizationHeader);
+        usersService.logout(bearerToken);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.DELETE_SUCCESS, "탈퇴성공"));
     }
    @PostMapping("/block")

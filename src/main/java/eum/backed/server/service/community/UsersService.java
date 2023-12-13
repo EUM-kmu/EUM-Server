@@ -51,6 +51,7 @@ public class UsersService {
                 .email(signUp.getEmail())
                 .password(passwordEncoder.encode(signUp.getPassword()))
                 .isBanned(false)
+                .isDeleted(false)
                 .role(Role.ROLE_UNPROFILE_USER)
                 .socialType(SocialType.SELF)
                 .authorities(Collections.singletonList(Authority.ROLE_USER.name())).build();
@@ -100,7 +101,7 @@ public class UsersService {
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,tokenInfo);
     }
 
-    public APIResponse logout(String token) {
+    public void logout(String token) {
         // 1. Access Token 검증
         if (!jwtTokenProvider.validateToken(token)) {
             throw new TokenException("잘못된 토큰 입니다");
@@ -120,7 +121,6 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set(token, "logout", expiration, TimeUnit.MILLISECONDS);
 
-        return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"로그아웃 되었습니다.");
     }
 
     public APIResponse<UsersResponseDTO.TokenInfo> getToken(String email, String uid, SocialType socialType){
@@ -158,7 +158,7 @@ public class UsersService {
         WithdrawalUser withdrawalUser = WithdrawalUser.toEntity(user,withdrawal.getReason(),withdrawalCategory);
         withdrawalUserRepository.save(withdrawalUser);
         user.removeEmail();
-        user.setIsDeleted(true);
+        user.setDeleted();
         usersRepository.save(user);
     }
     public Users findByEmail(String email){

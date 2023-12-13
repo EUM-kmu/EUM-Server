@@ -80,6 +80,10 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         } catch (SignatureException e){
             handleUnauthorizedException("Invalid JWT Token",(HttpServletResponse) response);
             return;
+        }catch(io.jsonwebtoken.io.DecodingException e){
+            handleUnauthorizedException("Invalid JWT Token",(HttpServletResponse) response);
+            return;
+
         }catch (Exception e) {
             // 예외 처리
             handleException(e, (HttpServletResponse) response);

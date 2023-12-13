@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,7 +46,11 @@ public class Users extends BaseTimeEntity implements UserDetails {
     private String password;
     private String phone;
     private Boolean isBanned;
-    private Boolean isDeleted;
+    private boolean isDeleted;
+
+    public void setDeleted() {
+        isDeleted = true;
+    }
 
     @Column
     @Enumerated(EnumType.STRING)

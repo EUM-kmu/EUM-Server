@@ -235,6 +235,7 @@ public class GlobalExceptionHandler {
 //    토큰 401에러
     @ExceptionHandler({
             io.jsonwebtoken.security.SecurityException.class,
+            io.jsonwebtoken.io.DecodingException.class,
             MalformedJwtException.class,
             ExpiredJwtException.class,
             UnsupportedJwtException.class,
