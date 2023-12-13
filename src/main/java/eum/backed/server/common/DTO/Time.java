@@ -1,12 +1,14 @@
 package eum.backed.server.common.DTO;
 
+import org.springframework.stereotype.Component;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
+@Component
 public class Time {
     public static String localDateTimeToKoreaZoned(LocalDateTime dateTime){
         LocalDateTime dateTimeUTC = LocalDateTime.parse(dateTime.toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
