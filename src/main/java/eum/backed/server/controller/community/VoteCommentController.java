@@ -16,9 +16,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/post/vote")
+@RequestMapping("/api/v1/vote/post")
 @RequiredArgsConstructor
-@Api(tags = "vote comment")
+@Api(tags = "vote")
 @CrossOrigin("*")
 public class VoteCommentController {
     private final CommentServiceImpl commentService;

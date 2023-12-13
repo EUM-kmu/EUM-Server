@@ -31,11 +31,6 @@ public class UsersResponseDTO {
         private Boolean isPassword;
     }
 
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    public static class MyActivity {
-        private boolean isWriter;
-        private boolean doLike;
-    }
+
+
 }

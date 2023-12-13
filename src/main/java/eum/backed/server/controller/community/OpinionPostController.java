@@ -2,17 +2,17 @@ package eum.backed.server.controller.community;
 
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.community.dto.request.OpinionPostRequestDTO;
+import eum.backed.server.controller.community.dto.response.CommentResponseDTO;
 import eum.backed.server.controller.community.dto.response.OpinionResponseDTO;
+import eum.backed.server.domain.community.comment.CommentType;
 import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.service.community.BlockService;
-import eum.backed.server.service.community.LikeOpinionPostService;
-import eum.backed.server.service.community.OpinionPostService;
-import eum.backed.server.service.community.UsersService;
+import eum.backed.server.service.community.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +30,7 @@ public class OpinionPostController {
     private final LikeOpinionPostService likeOpinionPostService;
     private final BlockService blockService;
     private final UsersService usersService;
+    private final CommentService commentService;
     @ApiOperation(value = "의견 게시글 작성", notes = "의견 게시글 작성")
     @PostMapping()
     public ResponseEntity<APIResponse<OpinionResponseDTO.SavedOpinionResponse>> create(@RequestBody @Validated  OpinionPostRequestDTO.Create create , @AuthenticationPrincipal String email){
@@ -55,8 +56,9 @@ public class OpinionPostController {
 
     @GetMapping("/{postId}")
     @ApiOperation(value = "단일 의견 게시글 조회",notes = "입력받은 게시글의 정보 + 댓글")
-    public  ResponseEntity<APIResponse<OpinionResponseDTO.OpinionPostWithComment>> getOpinionPostWithComment(@PathVariable Long postId,@AuthenticationPrincipal String email){
-        return ResponseEntity.ok(opinionPostService.getOpininonPostWithComment(postId,email));
+    public  ResponseEntity<APIResponse<OpinionResponseDTO.OpinionPostWithComment>> getOpinionPostWithComment(@PathVariable Long postId, @AuthenticationPrincipal String email, Pageable pageable){
+        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, email, CommentType.OPINION,pageable);
+        return ResponseEntity.ok(opinionPostService.getOpininonPostWithComment(postId,email,commentResponses));
     }
     @GetMapping("/{postId}/like")
     @ApiOperation(value = "좋아요/좋아요 취소", notes = "db 에 좋아요 유무에 따른 처리")

@@ -93,7 +93,7 @@ public class PostResponseDTO {
         private Boolean isApplicant;
         private Boolean isScrap;
     }
-    public static PostResponseDTO.MarketPostResponse singleMarketPost(MarketPost marketPost){
+    public static PostResponseDTO.MarketPostResponse singleMarketPost(MarketPost marketPost, int count){
         String createdTime = Time.localDateTimeToKoreaZoned(marketPost.getCreateDate());
         String startTime = Time.dateToKoreaZone(marketPost.getStartDate());
         return MarketPostResponse.builder()
@@ -109,7 +109,7 @@ public class PostResponseDTO {
                 .location(marketPost.getLocation())
                 .category(marketPost.getMarketCategory().getContents())
                 .status(marketPost.getStatus())
-                .commentCount(0)
+                .commentCount(count)
                 .maxNumOfPeople(marketPost.getMaxNumOfPeople())
                 .build();
     }

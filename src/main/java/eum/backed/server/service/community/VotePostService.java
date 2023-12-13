@@ -17,6 +17,7 @@ import eum.backed.server.domain.community.votepost.VotePostRepository;
 import eum.backed.server.domain.community.voteresult.VoteResult;
 import eum.backed.server.domain.community.voteresult.VoteResultRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -37,40 +38,41 @@ public class VotePostService {
     private final VotePostRepository votePostRepository;
     private final UsersRepository usersRepository;
     private final VoteResultRepository voteResultRepository;
-    private final VoteCommentRepository voteCommentRepository;
     private final VotePostResponseDTO votePostResponseDTO;
-    SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd", Locale.KOREAN);
 
 
-    public APIResponse create(VotePostRequestDTO.Create create, String email) throws ParseException {
+    public APIResponse<VotePostResponseDTO.SavedVotePost> create(VotePostRequestDTO.Create create, String email) throws ParseException {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         if(getUser.getRole() == Role.ROLE_UNPROFILE_USER) throw new IllegalArgumentException("프로필이 없는 유저");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.KOREAN);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.KOREAN);
         VotePost votePost = VotePost.toEntity(create.getTitle(), create.getContent(), simpleDateFormat.parse(create.getEndDate()), getUser);
-        votePostRepository.save(votePost);
-        return APIResponse.of(SuccessCode.INSERT_SUCCESS);}
+        VotePost savedPost = votePostRepository.save(votePost);
+        VotePostResponseDTO.SavedVotePost response = VotePostResponseDTO.toSaveResponse(savedPost, getUser, 0, 0, 0);
+        return APIResponse.of(SuccessCode.INSERT_SUCCESS,response);}
 
-    public APIResponse update(Long postId,VotePostRequestDTO.Update update,String email) throws ParseException {
+    public APIResponse<VotePostResponseDTO.SavedVotePost> update(Long postId, VotePostRequestDTO.Update update, String email) throws ParseException {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         VotePost getVotePost = votePostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
         if(getVotePost.getUser() != getUser) throw new IllegalArgumentException("수정권한이 없는 유저");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", Locale.KOREAN);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.KOREAN);
         getVotePost.updateContent(update.getContent());
         getVotePost.updateTitle(update.getTitle());
         getVotePost.updateEndTime(simpleDateFormat.parse(update.getEndDate()));
-        votePostRepository.save(getVotePost);
-        return APIResponse.of(SuccessCode.UPDATE_SUCCESS);
+        VotePost savedPost = votePostRepository.save(getVotePost);
+        VotePostResponseDTO.SavedVotePost response = VotePostResponseDTO.toSaveResponse(savedPost, getUser, getVotePost.getAgreeCount(), getVotePost.getDisagreeCount(), getVotePost.getVoteComments().size());
+        return APIResponse.of(SuccessCode.UPDATE_SUCCESS,response);
     }
 
     public APIResponse delete(Long votePostId, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         VotePost getVotePost = votePostRepository.findById(votePostId).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
         if(getVotePost.getUser() != getUser) throw new IllegalArgumentException("삭제권한이 없는 유저");
-        votePostRepository.delete(getVotePost);
+        getVotePost.updateDeleted();
+        votePostRepository.save(getVotePost);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
-    private APIResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(Regions regions) {
-        List<VotePost> votePosts = votePostRepository.findByRegionsOrderByCreateDateDesc(regions).orElse(Collections.emptyList());
+    private APIResponse<List<VotePostResponseDTO.VotePostResponses>> getAllVotePosts(Regions regions,List<Users> blockedUsers) {
+        List<VotePost> votePosts = votePostRepository.findByRegionsOrderByCreateDateDesc(regions,blockedUsers).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, votePostResponses);
     }
@@ -90,30 +92,11 @@ public class VotePostService {
         votePostRepository.save(getVotePost);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS, "투표성공");
     }
-//    @Scheduled(cron = "0 * * * * *")
-    public APIResponse<VotePostResponseDTO.VotePostWithComment> getVotePostWithComment(Long postId, String email) {
+    public APIResponse<VotePostResponseDTO.VotePostWithComment> getVotePostWithComment(Long postId, String email,List<CommentResponseDTO.CommentResponse> commentResponses) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         VotePost getVotePost = votePostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid id"));
-        List<VoteComment> voteComments = voteCommentRepository.findByVotePostOrderByCreateDateDesc(getVotePost).orElse(Collections.emptyList());
         Boolean amIVote = voteResultRepository.existsByUserAndVotePost(getUser,getVotePost);
-        List<CommentResponseDTO.CommentResponse> commentResponses = voteComments.stream().map(voteComment ->{
-            LocalDateTime utcDateTime = LocalDateTime.parse(voteComment.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
-
-            // UTC 시간을 한국 시간대로 변환
-            ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
-
-            // 한국 시간대로 포맷팅
-            String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z"));
-            CommentResponseDTO.CommentResponse commentResponse = CommentResponseDTO.CommentResponse.builder()
-                    .postId(postId)
-                    .commentId(voteComment.getVoteCommentId())
-                    .writerInfo(ProfileResponseDTO.toUserInfo(voteComment.getUser()))
-                    .isPostWriter(getVotePost.getUser() == voteComment.getUser())
-                    .createdTime(formattedDateTime)
-                    .commentContent(voteComment.getContent()).build();
-            return commentResponse;
-        }).collect(Collectors.toList());
-        VotePostResponseDTO.VotePostWithComment votePostWithComment = votePostResponseDTO.newVotePostWithComment(getVotePost,commentResponses,amIVote);
+        VotePostResponseDTO.VotePostWithComment votePostWithComment = votePostResponseDTO.newVotePostWithComment(getVotePost,commentResponses,amIVote,getUser);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, votePostWithComment);
     }
     private void reflectResult(VotePost votePost, Boolean IsAgree){
@@ -128,23 +111,22 @@ public class VotePostService {
 
     public APIResponse<List<VotePostResponseDTO.VotePostResponses>> getMyPosts(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<VotePost> votePosts = votePostRepository.findByUserOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
+        List<VotePost> votePosts = votePostRepository.findByUserAndIsDeletedFalseOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, votePostResponses);
     }
 
-    private APIResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(String keyWord, Regions regions) {
-        List<VotePost> votePosts = votePostRepository.findByRegionsAndTitleContainingOrderByCreateDateDesc(regions, keyWord).orElse(Collections.emptyList());
+    private APIResponse<List<VotePostResponseDTO.VotePostResponses>> findByKeyWord(String keyWord, Regions regions,List<Users> blockedUsers) {
+        List<VotePost> votePosts = votePostRepository.findByRegionsAndTitleContainingOrderByCreateDateDesc(regions, keyWord,blockedUsers).orElse(Collections.emptyList());
         List<VotePostResponseDTO.VotePostResponses> votePostResponses = votePosts.stream().map(VotePostResponseDTO.VotePostResponses::new).collect(Collectors.toList());
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,votePostResponses);
     }
 
-    public APIResponse<List<VotePostResponseDTO.VotePostResponses>> findByFilter(String keyword, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+    public APIResponse<List<VotePostResponseDTO.VotePostResponses>> findByFilter(String keyword, Users getUser, List<Users> blockedUsers) {
         Regions getRegions = getUser.getProfile().getRegions();
         if(!(keyword == null || keyword.isBlank())) {
-            return findByKeyWord(keyword, getRegions);
+            return findByKeyWord(keyword, getRegions,blockedUsers);
         }
-        return getAllVotePosts(getRegions);
+        return getAllVotePosts(getRegions,blockedUsers);
     }
 }

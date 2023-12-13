@@ -1,6 +1,9 @@
 package eum.backed.server.controller.community.dto.response;
 
+import eum.backed.server.common.DTO.Time;
+import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.votepost.VotePost;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,62 +16,92 @@ import java.util.Date;
 import java.util.List;
 @Component
 public class VotePostResponseDTO {
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    public static class MyActivity {
+        private boolean isWriter;
+        private boolean doVote;
+    }
+    @Getter
+    @Setter
+    @Builder
+    public static class SavedVotePost{
+        private ProfileResponseDTO.UserInfo writerInfo;
+        private int agreeCounts;
+        private int disagreeCount;
+        private String createdTime;
+        private String title;
+        private String content;
+        private String voteEndDate;
+        private int commentCount;
+    }
+    public static SavedVotePost toSaveResponse(VotePost votePost, Users getUser,int agreeCount, int disagreeCount,int commentCount){
+        ProfileResponseDTO.UserInfo writerInfo = ProfileResponseDTO.toUserInfo(getUser);
+        String createdTime = Time.localDateTimeToKoreaZoned(votePost.getCreateDate());
+        String voteEndTime = Time.dateToKoreaZone(votePost.getEndTime());
+        return SavedVotePost.builder()
+                .writerInfo(writerInfo)
+                .agreeCounts(agreeCount)
+                .disagreeCount(disagreeCount)
+                .title(votePost.getTitle())
+                .content(votePost.getContent())
+                .createdTime(createdTime)
+                .voteEndDate(voteEndTime)
+                .commentCount(commentCount).build();
+    }
     @Getter
     @Setter
     public static class VotePostResponses{
+        private String userAddress;
         private Long postId;
-        private String postTitle;
-        private Boolean isVoting;
+        private String title;
+        private String voteEndTime;
         private int commentCount;
-        private LocalDateTime createdTime;
+        private String createdTime;
 
         public VotePostResponses(VotePost votePost) {
-            LocalDateTime now = LocalDateTime.now();
-            ZonedDateTime zonedDateTime = now.atZone(ZoneId.systemDefault());
-            Date currentDate = Date.from(zonedDateTime.toInstant());
+            String createdTime = Time.localDateTimeToKoreaZoned(votePost.getCreateDate());
+            String voteEndTime = Time.dateToKoreaZone(votePost.getEndTime());
+            this.userAddress = votePost.getUser().getProfile().getRegions().getName();
             this.postId = votePost.getVotePostId();
-            this.postTitle = votePost.getTitle();
-            this.isVoting = currentDate.before(votePost.getEndTime());
+            this.title = votePost.getTitle();
+            this.voteEndTime = voteEndTime;
             this.commentCount = votePost.getVoteComments().size();
-            this.createdTime = votePost.getCreateDate();
+            this.createdTime = createdTime;
         }
     }
     @Getter
     @Setter
     @Builder
     public static class VotePostWithComment{
-        private Long writerId;
-        private String writerNickName;
-        private String writerAddress;
+        private ProfileResponseDTO.UserInfo writerInfo;
         private int agreeCounts;
         private int disagreeCount;
-        private String postTitle;
-        private String postContent;
-        private Date voteEndDate;
-        private Boolean isVoting;
-        private Boolean amIVote;
+        private String createdTime;
+        private String title;
+        private String content;
+        private String voteEndDate;
+        private MyActivity myActivity;
         private int commentCount;
         private List<CommentResponseDTO.CommentResponse> commentResponses;
-        private LocalDateTime createdTime;
     }
 
-    public static VotePostWithComment newVotePostWithComment(VotePost votePost, List<CommentResponseDTO.CommentResponse> commentResponses,Boolean amIVote){
-        LocalDateTime now = LocalDateTime.now();
-        ZonedDateTime zonedDateTime = now.atZone(ZoneId.systemDefault());
-        Date currentDate = Date.from(zonedDateTime.toInstant());
+    public static VotePostWithComment newVotePostWithComment(VotePost votePost, List<CommentResponseDTO.CommentResponse> commentResponses, boolean doVote, Users user){
+        String createdTime = Time.localDateTimeToKoreaZoned(votePost.getCreateDate());
+        String voteEndTime = Time.dateToKoreaZone(votePost.getEndTime());
+        ProfileResponseDTO.UserInfo writerInfo = ProfileResponseDTO.toUserInfo(user);
+        MyActivity myActivity = MyActivity.builder().doVote(doVote).isWriter(votePost.getUser() == user).build();
         return VotePostWithComment.builder()
-                .writerId(votePost.getUser().getUserId())
-                .writerNickName(votePost.getUser().getProfile().getNickname())
-                .writerAddress(votePost.getUser().getProfile().getRegions().getName())
+                .writerInfo(writerInfo)
                 .agreeCounts(votePost.getAgreeCount())
                 .disagreeCount(votePost.getDisagreeCount())
-                .postTitle(votePost.getTitle())
-                .postContent(votePost.getContent())
-                .voteEndDate(votePost.getEndTime())
-                .isVoting(currentDate.before(votePost.getEndTime()))
-                .amIVote(amIVote)
+                .title(votePost.getTitle())
+                .content(votePost.getContent())
+                .voteEndDate(voteEndTime)
+                .myActivity(myActivity)
                 .commentResponses(commentResponses)
                 .commentCount(commentResponses.size())
-                .createdTime(votePost.getCreateDate()).build();
+                .createdTime(createdTime).build();
     }
 }
