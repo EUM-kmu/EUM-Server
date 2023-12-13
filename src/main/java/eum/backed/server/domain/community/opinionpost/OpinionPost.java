@@ -26,6 +26,7 @@ public class OpinionPost extends BaseTimeEntity {
     private String title;
     private String content;
     private int likeCount;
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -53,11 +54,16 @@ public class OpinionPost extends BaseTimeEntity {
         this.likeCount = likeCount;
     }
 
+    public void updateDeleted() {
+        isDeleted = true;
+    }
+
     public static OpinionPost toEntity(String title, String content, Users user, Regions regions){
         return OpinionPost.builder()
                 .regions(regions)
                 .title(title)
                 .content(content)
+                .isDeleted(false)
                 .user(user).build();
     }
 }

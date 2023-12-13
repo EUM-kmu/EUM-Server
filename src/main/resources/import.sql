@@ -12,6 +12,7 @@ INSERT INTO avatar (avatar_id,avatar_level_name,avatar_name,standard_id,avatar_p
 INSERT INTO avatar (avatar_id,avatar_level_name,avatar_name,standard_id,avatar_photo_url) values (13,"ORGANIZATION","ORGANIZATION",4,"https://kr.object.ncloudstorage.com/k-eum/characterAsset/organization.png");
 
 INSERT INTO users(user_id,email,password,role,is_banned,is_deleted) values (1,"test@email","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","TEST",0,0),(2,"test2@email","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","TEST",0,0);
+INSERT INTO users(user_id,email,password,role,is_banned,is_deleted) values (4,"student@email","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","ROLE_USER",0,0);
 INSERT INTO users(user_id,email,password,role,is_banned,is_deleted) values (3,"Jeong3Organization","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","ROLE_ORGANIZATION",0,0);
 
 insert into profile(profile_id,nickname,introduction,total_sunrise_pay,avatar_id,region_id,user_id)values (1,"세윤","저는 세윤 황씨죠",0,1,36,1),(2,"정환","저는 정환 박씨죠",0,4,36,2);

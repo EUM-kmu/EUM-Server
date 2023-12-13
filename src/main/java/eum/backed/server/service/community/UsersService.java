@@ -52,6 +52,7 @@ public class UsersService {
                 .password(passwordEncoder.encode(signUp.getPassword()))
                 .isBanned(false)
                 .role(Role.ROLE_UNPROFILE_USER)
+                .socialType(SocialType.SELF)
                 .authorities(Collections.singletonList(Authority.ROLE_USER.name())).build();
         usersRepository.save(users);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,"자체 회원가입 성공");

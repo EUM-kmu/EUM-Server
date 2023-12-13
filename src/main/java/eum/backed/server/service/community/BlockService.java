@@ -29,8 +29,7 @@ public class BlockService {
         return true;
 
     }
-    public List<Users> getBlockedUser(String email){
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+    public List<Users> getBlockedUser(Users getUser){
         List<Users> blockedUsers = new ArrayList<>();
 //        내가 차단한 사람들
         List<Block> blockers = blockRepository.findByBlocker(getUser).orElse(Collections.emptyList());
