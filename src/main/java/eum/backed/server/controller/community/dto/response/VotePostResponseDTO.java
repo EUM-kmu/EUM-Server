@@ -53,8 +53,8 @@ public class VotePostResponseDTO {
     @Getter
     @Setter
     public static class VotePostResponses{
-        private String userAddress;
         private Long postId;
+        private String userAddress;
         private String title;
         private String voteEndTime;
         private int commentCount;
@@ -76,6 +76,7 @@ public class VotePostResponseDTO {
     @Builder
     public static class VotePostWithComment{
         private ProfileResponseDTO.UserInfo writerInfo;
+        private Long postId;
         private int agreeCounts;
         private int disagreeCount;
         private String createdTime;
@@ -93,6 +94,7 @@ public class VotePostResponseDTO {
         ProfileResponseDTO.UserInfo writerInfo = ProfileResponseDTO.toUserInfo(user);
         MyActivity myActivity = MyActivity.builder().doVote(doVote).isWriter(votePost.getUser() == user).build();
         return VotePostWithComment.builder()
+                .postId(votePost.getVotePostId())
                 .writerInfo(writerInfo)
                 .agreeCounts(votePost.getAgreeCount())
                 .disagreeCount(votePost.getDisagreeCount())

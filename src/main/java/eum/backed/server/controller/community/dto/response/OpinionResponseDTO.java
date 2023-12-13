@@ -22,6 +22,7 @@ public class OpinionResponseDTO {
     @Setter
     @Builder
     public static class AllOpinionPostsResponses {
+        private Long postId;
         private String title;
         private String createdTime;
         private String userAddress;
@@ -33,6 +34,7 @@ public class OpinionResponseDTO {
     @Builder
     public static class OpinionPostWithComment{
         private ProfileResponseDTO.UserInfo writerInfo;
+        private Long postId;
         private String title;
         private String content;
         private String createdTime;
@@ -68,6 +70,7 @@ public class OpinionResponseDTO {
     public AllOpinionPostsResponses newOpinionPostsResponse(OpinionPost opinionPost){
         String createdTime = Time.localDateTimeToKoreaZoned(opinionPost.getCreateDate());
         return AllOpinionPostsResponses.builder()
+                .postId(opinionPost.getOpinionPostId())
                 .title(opinionPost.getTitle())
                 .createdTime(createdTime)
                 .userAddress(opinionPost.getUser().getProfile().getRegions().getName())
@@ -80,6 +83,7 @@ public class OpinionResponseDTO {
         ProfileResponseDTO.UserInfo writerInfo = ProfileResponseDTO.toUserInfo(opinionPost.getUser());
         MyActivity myActivity = MyActivity.builder().isWriter(opinionPost.getUser() == user).doLike(doLike).build();
         return OpinionPostWithComment.builder()
+                .postId(opinionPost.getOpinionPostId())
                 .writerInfo(writerInfo)
                 .title(opinionPost.getTitle())
                 .content(opinionPost.getContent())
