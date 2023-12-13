@@ -1,0 +1,36 @@
+INSERT INTO users (user_id, email, password, role, is_banned, is_deleted)
+VALUES
+    (5, "user1@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (6, "user2@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (7, "user3@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (8, "user4@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (9, "user5@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (10, "user6@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (11, "user7@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (12, "user8@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (13, "user9@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (14, "user10@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (15, "user11@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (16, "user12@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (17, "user13@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (18, "user14@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (19, "user15@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0),
+    (20, "user16@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0);
+INSERT INTO profile (profile_id, nickname, introduction, total_sunrise_pay, avatar_id, region_id, user_id)
+VALUES
+    (5, "세윤1", "", 0, 1, 36, 5),
+    (6, "세윤2", "", 0, 1, 36, 6),
+    (7, "세윤3", "", 0, 1, 36, 7),
+    (8, "세윤4", "", 0, 1, 36, 8),
+    (9, "세윤5", "", 0, 1, 36, 9),
+    (10, "세윤6", "", 0, 1, 36, 10),
+    (11, "세윤7", "", 0, 1, 36, 11),
+    (12, "세윤8", "", 0, 1, 36, 12),
+    (13, "세윤9", "", 0, 1, 36, 13),
+    (14, "세윤10", "", 0, 1, 36, 14),
+    (15, "세윤11", "", 0, 1, 36, 15),
+    (16, "세윤12", "", 0, 1, 36, 16),
+    (17, "세윤13", "", 0, 1, 36, 17),
+    (18, "세윤14", "", 0, 1, 36, 18),
+    (19, "세윤15", "", 0, 1, 36, 19),
+    (20, "세윤16", "", 0, 1, 36, 20);

@@ -40,6 +40,7 @@ public class  MarketPostController {
     private final ScrapService scrapService;
     private final CommentService commentService;
     private final BlockService blockService;
+    private final UsersService usersService;
 
 
     @ApiOperation(value = "게시글 작성", notes = "도움요청, 받기 게시글 작성")
@@ -111,7 +112,8 @@ public class  MarketPostController {
     public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category,
                                                                                          @RequestParam(name = "marketType",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,
                                                                                          @PageableDefault Pageable pageable, @AuthenticationPrincipal String email){
-        List<Users> blockedUsrs = blockService.getBlockedUser(email);
+        Users getUser = usersService.findByEmail(email);
+        List<Users> blockedUsrs = blockService.getBlockedUser(getUser);
         return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,email,pageable,blockedUsrs
         ));
     }
@@ -138,7 +140,8 @@ public class  MarketPostController {
     })
     @GetMapping("/user-activity/{serviceType}")
     public ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByServiceType(@PathVariable ServiceType serviceType, @AuthenticationPrincipal String email){
-        List<Users> blockedUser = blockService.getBlockedUser(email);
+        Users getUser = usersService.findByEmail(email);
+        List<Users> blockedUser = blockService.getBlockedUser(getUser);
         return ResponseEntity.ok(marketPostService.findByServiceType(serviceType,email,blockedUser));
     }
 

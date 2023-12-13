@@ -2,13 +2,13 @@ package eum.backed.server.controller.community.dto.response;
 
 import eum.backed.server.common.DTO.Time;
 import eum.backed.server.domain.community.opinionpost.OpinionPost;
+import eum.backed.server.domain.community.user.Users;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -19,51 +19,71 @@ public class OpinionResponseDTO {
     @Setter
     @Builder
     public static class AllOpinionPostsResponses {
-        private Long userId;
-        private String nickName;
         private String title;
-        private String content;
-        private String customCreatedTime;
+        private String createdTime;
         private String userAddress;
         private int likeCount;
         private int commentCount;
-        private LocalDateTime createdTime;
     }
     @Getter
     @Setter
     @Builder
     public static class OpinionPostWithComment{
-        private Long userId;
-        private String writerNickName;
+        private ProfileResponseDTO.UserInfo writerInfo;
         private String title;
-        private String postContent;
-        private String userAddress;
+        private String content;
+        private String createdTime;
         private int likeCount;
         private int commentCount;
-        private LocalDateTime createdTime;
+        private UsersResponseDTO.MyActivity myActivity;
         private List<CommentResponseDTO.CommentResponse> commentResponses;
     }
-    public AllOpinionPostsResponses newOpinionPostsResponse(OpinionPost opinionPost){
-        return AllOpinionPostsResponses.builder()
-                .userId(opinionPost.getUser().getUserId())
-                .nickName(opinionPost.getUser().getProfile().getNickname())
-                .userAddress(opinionPost.getUser().getProfile().getRegions().getName())
+
+    @Getter
+    @Setter
+    @Builder
+    public static class SavedOpinionResponse {
+        private ProfileResponseDTO.UserInfo writerInfo;
+        private String title;
+        private String content;
+        private String createdTime;
+        private int likeCount;
+        private int commentCount;
+    }
+    public static SavedOpinionResponse toCreateResponse(OpinionPost opinionPost, Users getUser){
+        String createdTime = Time.localDateTimeToKoreaZoned(opinionPost.getCreateDate());
+        ProfileResponseDTO.UserInfo writerInfo = ProfileResponseDTO.toUserInfo(getUser);
+        return SavedOpinionResponse.builder()
+                .writerInfo(writerInfo)
                 .title(opinionPost.getTitle())
-                .likeCount(opinionPost.getLikeCount())
                 .content(opinionPost.getContent())
-                .createdTime(opinionPost.getCreateDate())
+                .createdTime(createdTime)
+                .likeCount(0)
+                .commentCount(0).build();
+    }
+
+    public AllOpinionPostsResponses newOpinionPostsResponse(OpinionPost opinionPost){
+        String createdTime = Time.localDateTimeToKoreaZoned(opinionPost.getCreateDate());
+        return AllOpinionPostsResponses.builder()
+                .title(opinionPost.getTitle())
+                .createdTime(createdTime)
+                .userAddress(opinionPost.getUser().getProfile().getRegions().getName())
+                .likeCount(opinionPost.getLikeOpinionPosts().size())
+                .commentCount(opinionPost.getOpinionComments().size())
                 .build();
     }
-    public OpinionPostWithComment newOpinionPostWithComment(OpinionPost opinionPost, List<CommentResponseDTO.CommentResponse> commentResponseDTO){
+    public OpinionPostWithComment newOpinionPostWithComment(OpinionPost opinionPost, List<CommentResponseDTO.CommentResponse> commentResponseDTO, Users user,boolean doLike){
+        String createdTime = Time.localDateTimeToKoreaZoned(opinionPost.getCreateDate());
+        ProfileResponseDTO.UserInfo writerInfo = ProfileResponseDTO.toUserInfo(opinionPost.getUser());
+        UsersResponseDTO.MyActivity myActivity = UsersResponseDTO.MyActivity.builder().isWriter(opinionPost.getUser() == user).doLike(doLike).build();
         return OpinionPostWithComment.builder()
-                .userId(opinionPost.getUser().getUserId())
-                .writerNickName(opinionPost.getUser().getProfile().getNickname())
-                .userAddress(opinionPost.getUser().getProfile().getRegions().getName())
+                .writerInfo(writerInfo)
                 .title(opinionPost.getTitle())
-                .postContent(opinionPost.getContent())
-                .createdTime(opinionPost.getCreateDate())
-                .likeCount(opinionPost.getLikeCount())
+                .content(opinionPost.getContent())
+                .createdTime(createdTime)
+                .likeCount(opinionPost.getLikeOpinionPosts().size())
                 .commentCount(commentResponseDTO.size())
+                .myActivity(myActivity)
                 .commentResponses(commentResponseDTO).build();
     }
 }

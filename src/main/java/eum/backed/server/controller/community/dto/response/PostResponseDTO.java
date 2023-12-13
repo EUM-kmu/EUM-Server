@@ -1,5 +1,6 @@
 package eum.backed.server.controller.community.dto.response;
 
+import eum.backed.server.common.DTO.Time;
 import eum.backed.server.controller.community.dto.request.enums.MarketType;
 import eum.backed.server.domain.community.marketpost.Slot;
 import eum.backed.server.domain.community.marketpost.MarketPost;
@@ -7,6 +8,7 @@ import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.domain.community.user.Users;
 import io.swagger.annotations.ApiModel;
 import lombok.*;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -92,23 +94,13 @@ public class PostResponseDTO {
         private Boolean isScrap;
     }
     public static PostResponseDTO.MarketPostResponse singleMarketPost(MarketPost marketPost){
-        LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
-        Instant instant = marketPost.getStartDate().toInstant();
-        LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-        LocalDateTime startUTC = LocalDateTime.parse(localDateTime.toString(), DateTimeFormatter.ISO_DATE_TIME);
-
-        // UTC 시간을 한국 시간대로 변환
-        ZonedDateTime koreaZonedCreateime = createUTC.atZone(ZoneId.of("Asia/Seoul"));
-        ZonedDateTime koreaZonedStartTime = startUTC.atZone(ZoneId.of("Asia/Seoul"));
-
-        // 한국 시간대로 포맷팅
-        String formattedCreateTime = koreaZonedCreateime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
-        String formattedStartTime = koreaZonedStartTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        String createdTime = Time.localDateTimeToKoreaZoned(marketPost.getCreateDate());
+        String startTime = Time.dateToKoreaZone(marketPost.getStartDate());
         return MarketPostResponse.builder()
                 .postId(marketPost.getMarketPostId())
                 .title(marketPost.getTitle())
-                .createdDate(formattedCreateTime)
-                .startTime(formattedStartTime)
+                .createdDate(createdTime)
+                .startTime(startTime)
                 .slot(marketPost.getSlot())
                 .content(marketPost.getContents())
                 .pay(marketPost.getPay())
@@ -122,17 +114,11 @@ public class PostResponseDTO {
                 .build();
     }
     public static PostResponseDTO.PostResponse newPostResponse(MarketPost marketPost){
-        LocalDateTime utcDateTime = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
-
-        // UTC 시간을 한국 시간대로 변환
-        ZonedDateTime koreaZonedDateTime = utcDateTime.atZone(ZoneId.of("Asia/Seoul"));
-
-        // 한국 시간대로 포맷팅
-        String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        String createdTime = Time.localDateTimeToKoreaZoned(marketPost.getCreateDate());
         return PostResponse.builder()
                 .postId(marketPost.getMarketPostId())
                 .title(marketPost.getTitle())
-                .createdDate(formattedDateTime)
+                .createdDate(createdTime)
                 .pay(marketPost.getPay())
                 .volunteerTime(marketPost.getVolunteerTime())
                 .marketType(marketPost.getMarketType())
@@ -143,19 +129,8 @@ public class PostResponseDTO {
                 .build();
     }
     public TransactionPostWithComment newTransactionPostWithComment(Users user, MarketPost marketPost, List<CommentResponseDTO.CommentResponse> commentResponses, Boolean isApply, Boolean isScrap, eum.backed.server.domain.community.apply.Status tradingStatus){
-
-        LocalDateTime createUTC = LocalDateTime.parse(marketPost.getCreateDate().toString(), DateTimeFormatter.ISO_DATE_TIME);
-        Instant instant = marketPost.getStartDate().toInstant();
-        LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-        LocalDateTime startUTC = LocalDateTime.parse(localDateTime.toString(), DateTimeFormatter.ISO_DATE_TIME);
-
-        // UTC 시간을 한국 시간대로 변환
-        ZonedDateTime koreaZonedCreateime = createUTC.atZone(ZoneId.of("Asia/Seoul"));
-        ZonedDateTime koreaZonedStartTime = startUTC.atZone(ZoneId.of("Asia/Seoul"));
-
-        // 한국 시간대로 포맷팅
-        String formattedCreateTime = koreaZonedCreateime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
-        String formattedStartTime = koreaZonedStartTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
+        String createdTime = Time.localDateTimeToKoreaZoned(marketPost.getCreateDate());
+        String startTime = Time.dateToKoreaZone(marketPost.getStartDate());
         return TransactionPostWithComment.builder()
                 .writerInfo(ProfileResponseDTO.toUserInfo(marketPost.getUser()))
                 .isScrap(isScrap)
@@ -165,8 +140,8 @@ public class PostResponseDTO {
                 .postId(marketPost.getMarketPostId())
                 .title(marketPost.getTitle())
                 .content(marketPost.getContents())
-                .startDate(formattedStartTime)
-                .createdDate(formattedCreateTime)
+                .startDate(startTime)
+                .createdDate(createdTime)
                 .pay(marketPost.getPay())
                 .location(marketPost.getLocation())
                 .volunteerTime(marketPost.getVolunteerTime())

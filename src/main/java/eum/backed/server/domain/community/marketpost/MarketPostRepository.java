@@ -27,23 +27,18 @@ public interface MarketPostRepository extends JpaRepository<MarketPost,Long> {
             @Param("users") List<Users> users
     );
 
-    Optional<List<MarketPost>> findByMarketCategoryAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc(MarketCategory marketCategory,List<Users> users);
-
-
-    Optional<List<MarketPost>> findByMarketCategoryAndMarketTypeAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc(MarketCategory marketCategory, MarketType marketType,List<Users> users);
-
-    Optional<List<MarketPost>> findByMarketCategoryAndMarketTypeAndStatusAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc(MarketCategory marketCategory, MarketType marketType, Status status,List<Users> users);
-
-    Optional<List<MarketPost>> findByMarketCategoryAndStatusAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc(MarketCategory marketCategory, Status status,List<Users> user);
 
     Optional<List<MarketPost>> findByUserAndIsDeletedFalseOrderByCreateDateDesc(Users user);
     Optional<List<MarketPost>> findByUserAndIsDeletedFalse(Users user);
 
-    Optional<List<MarketPost>> findByTitleContainingAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc(String title,List<Users>user);
+    @Query("SELECT mp FROM MarketPost mp " +
+            "WHERE mp.title LIKE %:title% " +
+            "AND mp.isDeleted = false " +
+            "AND (COALESCE(:users, NULL) IS NULL OR mp.user NOT IN :users) " +
+            "ORDER BY mp.createDate DESC")
+    Optional<List<MarketPost>> findByTitleContainingAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc(
+            @Param("title") String title,
+            @Param("users") List<Users> users
+    );
 
-    Optional<List<MarketPost>> findAllByIsDeletedFalseOrderByCreateDateDesc(Pageable pageable);
-
-    Optional<List<MarketPost>> findByIsDeletedFalseAndUserNotInOrderByCreateDateDesc(List<Users> users);
-
-    Optional<List<MarketPost>> findByStatusAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc(Status status,List<Users> users);
 }

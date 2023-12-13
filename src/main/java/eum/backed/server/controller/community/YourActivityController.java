@@ -30,26 +30,15 @@ public class YourActivityController {
     private final OpinionPostService opinionPostService;
     private final VotePostService votePostService;
 
-//    @GetMapping("/opinion")
-//    @ApiOperation(value = "내가 작성한 의견 게시물")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
-//            @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
-//            @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
-//            @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
-//    })
-//    public ResponseEntity<APIResponse<List<OpinionResponseDTO.AllOpinionPostsResponses>>> getMyOpinionPosts(@AuthenticationPrincipal String email){
-//        return ResponseEntity.ok(opinionPostService.getMyOpinionPosts(email));
-//    }
-//    @GetMapping("/vote")
-//    @ApiOperation(value = "내가 작성한 투표 게시글")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
-//            @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
-//            @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
-//            @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
-//    })
-//    public ResponseEntity<APIResponse<List<VotePostResponseDTO.VotePostResponses>>>getMyPosts(@AuthenticationPrincipal String email){
-//        return ResponseEntity.ok(votePostService.getMyPosts(email));
-//    }
+    @GetMapping("/vote")
+    @ApiOperation(value = "내가 작성한 투표 게시글")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
+            @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
+            @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
+            @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
+    })
+    public ResponseEntity<APIResponse<List<VotePostResponseDTO.VotePostResponses>>>getMyPosts(@AuthenticationPrincipal String email){
+        return ResponseEntity.ok(votePostService.getMyPosts(email));
+    }
 }
