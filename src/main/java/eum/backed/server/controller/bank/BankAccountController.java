@@ -29,7 +29,7 @@ public class BankAccountController {
     private final BankTransactionService bankTransactionService;
 
     @GetMapping
-    @ApiOperation("내 계좌 정보 조회")
+    @ApiOperation(value = "내 계좌 정보 조회")
     public ResponseEntity<APIResponse<BankAccountResponseDTO.AccountInfo>> getAccountInfo(@AuthenticationPrincipal String email){
         return ResponseEntity.ok(bankAccountService.getAccountInfo(email));
     }
