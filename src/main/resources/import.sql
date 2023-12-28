@@ -59,4 +59,4 @@ update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/
 update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simeple_organization.png" where avatar_id =13;
 update avatar set avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/characterAsset/organization.png" where avatar_id = 13;
 
-insert into withdrawal_category(withdrawal_category_id,content) VALUES (1,"앱을 쓰지 않아요"),(2,"알림이 너무 많이 와요"),(3,"비매너 사용자를 만났어요"),(4,"새 계정을 만들고 싶어요"),(5,"기타")
+insert into withdrawal_category(withdrawal_category_id,content) VALUES (1,"앱을 쓰지 않아요"),(2,"알림이 너무 많이 와요"),(3,"비매너 사용자를 만났어요"),(4,"새 계정을 만들고 싶어요"),(5,"기타");
