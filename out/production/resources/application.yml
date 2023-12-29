@@ -1,0 +1,91 @@
+#spring:
+#  jackson:
+#    time-zone: Asia/Seoul
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://db-k5911-kr.vpc-pub-cdb.ntruss.com:3306/eum?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
+#    username: haetsal
+#    password: k-eum2023!
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ant_path_matcher
+#  ##F
+#  redis:
+#    host : localhost
+#    port: 6379
+#  jpa:
+#    show-sql: true
+#    hibernate:
+#      format-sql: true
+#      highlight-sql: true
+#      ddl-auto: create
+#
+#      dialect: org.hibernate.dialect.MySQL5InnoDBDialect # 수정된 부분
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.MySQL5InnoDBDialect # 중복 설정 제거
+#    generate-ddl: true
+#  sql:
+#    init:
+#      mode: always
+#
+#springfox:
+#  documentation:
+##    swagger-ui:
+##      base-url: /api/docs/v1
+#server:
+#  port: 80
+#
+#jwt:
+#  header: Authorization
+#  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHN
+#kakao :
+#  client-id: 1a354a3d4dc989747906944c3c188196
+#  redirect-url: http://localhost:8080/user/auth/kakao
+#  admin-key: ${admin-key}
+
+spring:
+  jackson:
+    time-zone: Asia/Seoul
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/eum?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
+    username: root
+    password: root
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  redis:
+    host : localhost
+    port: 6379
+  jpa:
+    show-sql: true
+    hibernate:
+      format-sql: true
+      highlight-sql: true
+      ddl-auto: create
+
+      dialect: org.hibernate.dialect.MySQL5Dialect # 수정된 부분
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect # 중복 설정 제거
+    generate-ddl: true
+
+  sql:
+    init:
+      mode: always
+
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: /api/docs/v1
+server:
+  port: 80
+
+jwt:
+  header: Authorization
+  secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVA9XkHN
+kakao :
+  client-id: 1a354a3d4dc989747906944c3c188196
+  redirect-url: http://localhost/api/v1/auth/kakao
+  admin-key: ${admin-key}
