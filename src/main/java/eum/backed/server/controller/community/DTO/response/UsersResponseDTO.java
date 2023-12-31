@@ -1,14 +1,11 @@
 package eum.backed.server.controller.community.DTO.response;
 
 import eum.backed.server.domain.community.user.Role;
-import eum.backed.server.enums.Authority;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import javax.persistence.Enumerated;
 
 public class UsersResponseDTO {
     @Builder

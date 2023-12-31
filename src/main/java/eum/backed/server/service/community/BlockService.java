@@ -3,7 +3,6 @@ package eum.backed.server.service.community;
 import eum.backed.server.domain.community.block.Block;
 import eum.backed.server.domain.community.block.BlockRepository;
 import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BlockService {
     private final BlockRepository blockRepository;
-    private final UsersRepository usersRepository;
 
     public Boolean blockedAction(Users blocker,Users blocked){
         if(blockRepository.existsByBlockerAndBlocked(blocker,blocked)){

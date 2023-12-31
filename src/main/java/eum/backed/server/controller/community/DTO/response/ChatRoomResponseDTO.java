@@ -14,7 +14,7 @@ public class ChatRoomResponseDTO {
 
     private ProfileResponseDTO.UserInfo myInfo;
     private ProfileResponseDTO.UserInfo opponentInfo;
-    private PostResponseDTO.PostResponse postInfo;
+    private MarketPostResponseDTO.MarketPostResponse marketPostInfo;
     private String chatRoomKeyFB;
     private Long chatRoomId;
     private Boolean isWriter;
@@ -31,7 +31,7 @@ public class ChatRoomResponseDTO {
                 .myInfo(ProfileResponseDTO.toUserInfo(mine))
                 .opponentInfo(ProfileResponseDTO.toUserInfo(opponent))
                 .chatRoomKeyFB(chatRoom.getChatRoomKeyFB())
-                .postInfo(PostResponseDTO.newPostResponse(chatRoom.getMarketPost()))
+                .marketPostInfo(MarketPostResponseDTO.toMarketPostResponse(chatRoom.getMarketPost(),chatRoom.getMarketPost().getMarketComments().size(),chatRoom.getMarketPost().getApplies().size()))
                 .isPostDeleted(chatRoom.getMarketPost().isDeleted())
                 .isRemittanceButton(mine == transactionUser.getSender())
                 .isWriter(mine == chatRoom.getPostWriter())

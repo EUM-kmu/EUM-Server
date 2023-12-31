@@ -35,7 +35,7 @@ public interface MarketPostRepository extends JpaRepository<MarketPost,Long> {
             "AND mp.isDeleted = false " +
             "AND (COALESCE(:users, NULL) IS NULL OR mp.user NOT IN :users) " +
             "ORDER BY mp.createDate DESC")
-    Optional<List<MarketPost>> findByTitleContainingAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc(
+    Optional<List<MarketPost>> findByKeywords(
             @Param("title") String title,
             @Param("users") List<Users> users
     );

@@ -21,7 +21,13 @@ import java.util.List;
 @CrossOrigin("*")
 public class RegionController {
     private final RegionService regionService;
-    @ApiOperation(value = "지역 정보 조회")
+
+    /**
+     * 지역 타입셜(시, 구, 동) 조회
+     * @param regionType : SI,GU,DONG
+     * @return : 지역 Id, 지역 이름 리스트
+     */
+    @ApiOperation(value = "지역 타입별 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
             @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
@@ -32,6 +38,12 @@ public class RegionController {
     public ResponseEntity<APIResponse<List<InitialResponseDTO.Region>>> getRegionByType(@RequestParam(name = "type",required = false) RegionType regionType){
         return ResponseEntity.ok(regionService.getRegionByType(regionType));
     }
+
+    /**
+     * 해딩 시, 구의 하위 지역 조회
+     * @param regionId 지역 id
+     * @return
+     */
     @ApiOperation(value = "지역 정보 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),

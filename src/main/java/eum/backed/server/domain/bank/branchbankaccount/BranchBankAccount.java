@@ -2,7 +2,7 @@ package eum.backed.server.domain.bank.branchbankaccount;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.bank.branchbankaccountlog.BranchBankAccountLog;
-import eum.backed.server.enums.Owner;
+import eum.backed.server.domain.bank.Owner;
 import lombok.*;
 
 import javax.persistence.*;
