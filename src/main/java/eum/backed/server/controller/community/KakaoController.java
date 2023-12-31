@@ -31,10 +31,9 @@ public class KakaoController {
     private KakaoService kakaoService;
     @Autowired
     private UsersService usersService;
-    @GetMapping("/api/v1/auth/kakao")
-
-    @ApiOperation(value = "카카오 로그인", notes = "카카오 restapi 버전, 리다이렉트 uri 수정 귀찮아서 엔드포인트 통일 아직 안해놓음")
 //    테스트용 카카오 로그인 사용 x
+    @GetMapping("/api/v1/auth/kakao")
+    @ApiOperation(value = "카카오 로그인", notes = "카카오 restapi 버전, 리다이렉트 uri 수정 귀찮아서 엔드포인트 통일 아직 안해놓음")
     public ResponseEntity<APIResponse<UsersResponseDTO.TokenInfo>> getToken(@RequestParam String code) throws IOException {
         String access = kakaoService.getKakaoAccessT(code);
         KakaoDTO.KaKaoInfo kaKaoInfo = kakaoService.createKakaoUser(access);

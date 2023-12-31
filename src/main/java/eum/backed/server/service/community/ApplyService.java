@@ -36,7 +36,13 @@ public class ApplyService {
 
     private final ChatRoomRepository chatRoomRepository;
 
-
+    /**
+     * 
+     * @param postId
+     * @param applyRequest
+     * @param email
+     * @return
+     */
     public APIResponse doApply(Long postId,ApplyRequestDTO.Apply applyRequest, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new NullPointerException("Invalid postId"));
@@ -78,6 +84,13 @@ public class ApplyService {
             Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
             if (getApply.getMarketPost().getUser() != getUser) throw new IllegalArgumentException("해당 게시글에 대한 권한이 없다");
             if(getApply.getIsAccepted() == true || getApply.getStatus() == eum.backed.server.domain.community.apply.Status.TRADING_CANCEL) throw new IllegalArgumentException("이미 선정했더나 과거 거래 취소를 했던 사람입니다");
+            try {
+                chatService.createChatRoomWithFireStore(applyId);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             MarketPost marketPost = getApply.getMarketPost();
             getApply.updateAccepted(true);
             getApply.updateStatus(eum.backed.server.domain.community.apply.Status.TRADING);
@@ -87,13 +100,6 @@ public class ApplyService {
             }
             marketPostRepository.save(marketPost);
             applyRepository.save(getApply);
-            try {
-                chatService.createChatRoomWithFireStore(applyId);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
         });
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS, "선정성공, 채팅방 개설 완료");
     }

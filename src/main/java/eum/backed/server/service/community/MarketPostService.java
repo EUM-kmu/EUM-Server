@@ -6,7 +6,7 @@ import eum.backed.server.controller.community.DTO.request.MarketPostRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
 import eum.backed.server.controller.community.DTO.request.enums.ServiceType;
 import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
-import eum.backed.server.controller.community.DTO.response.PostResponseDTO;
+import eum.backed.server.controller.community.DTO.response.MarketPostResponseDTO;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.apply.ApplyRepository;
 import eum.backed.server.domain.community.category.MarketCategory;
@@ -38,39 +38,65 @@ public class MarketPostService {
     private final MarketPostRepository marketPostRepository;
     private final MarketCategoryRepository marketCategoryRepository;
     private final ScrapRepository scrapRepository;
-    private final PostResponseDTO postResponseDTO;
+    private final MarketPostResponseDTO marketPostResponseDTO;
     private final UsersRepository usersRepository;
 
     private final ApplyRepository applyRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-    public APIResponse<PostResponseDTO.MarketPostResponse> create(MarketPostRequestDTO.MarketCreate marketCreate, String email) throws ParseException {
+    /**
+     * 게시글 작성 메소드
+     * @param marketCreate : 작성한 게시글 내용
+     * @param email : 로그인한 유저 이메일
+     * @return : 성공 여부
+     * @throws ParseException : 활동 날짜 parsing 예외
+     */
+    public APIResponse<MarketPostResponseDTO.MarketPostResponse> create(MarketPostRequestDTO.MarketCreate marketCreate, String email) throws ParseException {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketCategory getMarketCategory = marketCategoryRepository.findByContents(marketCreate.getCategory()).orElseThrow(() -> new IllegalArgumentException("없는 카테고리 입니다"));
-        Long pay = Long.valueOf(marketCreate.getVolunteerTime());
-        if(marketCreate.getMarketType()==MarketType.REQUEST_HELP && user.getUserBankAccount().getBalance() < pay * marketCreate.getMaxNumOfPeople()) throw new IllegalArgumentException("잔액보다 크게 돈 설정 불가");
+
+        Long pay = Long.valueOf(marketCreate.getVolunteerTime()); //금액은 활동시간과 같은 값 설정
+        if(marketCreate.getMarketType()==MarketType.REQUEST_HELP && user.getUserBankAccount().getBalance() < pay * marketCreate.getMaxNumOfPeople()) throw new IllegalArgumentException("잔액보다 크게 돈 설정 불가"); //잔액에 따른 예외처리
+
         MarketPost marketPost = MarketPost.toEntity(marketCreate,pay,user,getMarketCategory);
         MarketPost getMarketPost = marketPostRepository.save(marketPost);
-        PostResponseDTO.MarketPostResponse marketPostResponse = PostResponseDTO.singleMarketPost(getMarketPost,0);
+
+        MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(getMarketPost,0,0);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,marketPostResponse);
     }
 
-
+    /**
+     * 게시글 삭제
+     * @param postId : 삭제할 게시글 id
+     * @param email : 로그인한 유저 이메일
+     * @return : 성공 여부
+     */
     public  APIResponse delete(Long postId,String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
-        getMarketPost.updateDeleted(true);
-        List<Scrap> scraps = scrapRepository.findByMarketPost(getMarketPost).orElse(Collections.emptyList());
+        getMarketPost.updateDeleted(true); //논리삭제
+        List<Scrap> scraps = scrapRepository.findByMarketPost(getMarketPost).orElse(Collections.emptyList()); // 삭제된 게시글 스크랩 취소 처리
         scrapRepository.deleteAll(scraps);
+
         marketPostRepository.save(getMarketPost);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
     }
 
-    public  APIResponse<PostResponseDTO.MarketPostResponse> update(Long postId, MarketPostRequestDTO.MarketUpdate marketUpdate, String email) throws ParseException {
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+    /**
+     * 게시글 업데이트
+     * @param postId : 게시글 id
+     * @param marketUpdate : 수정된 게시글 내용
+     * @param email : 로그인한 유저 email
+     * @return : 성동 여부
+     * @throws ParseException : 활동날짜 parsing 예외
+     */
+    public  APIResponse<MarketPostResponseDTO.MarketPostResponse> update(Long postId, MarketPostRequestDTO.MarketUpdate marketUpdate, String email) throws ParseException {
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid email"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+        //수정
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.KOREAN);
         getMarketPost.updateTitle(marketUpdate.getTitle());
         getMarketPost.updateContents(marketUpdate.getContent());
@@ -79,92 +105,89 @@ public class MarketPostService {
         getMarketPost.updateLocation(marketUpdate.getLocation());
         Long pay = Long.valueOf(marketUpdate.getVolunteerTime());
         if(getMarketPost.getMarketType()==MarketType.REQUEST_HELP && (user.getUserBankAccount().getBalance() < (pay * marketUpdate.getMaxNumOfPeople()))) throw new IllegalArgumentException("잔액보다 크게 돈 설정 불가");
-        log.info(String.valueOf(pay * marketUpdate.getMaxNumOfPeople()));
         getMarketPost.updateVolunteerTime(marketUpdate.getVolunteerTime());
         getMarketPost.updateMaxNumOfPeople(marketUpdate.getMaxNumOfPeople());
         getMarketPost.updatePay(pay);
+
         MarketPost updatedMarketPost = marketPostRepository.save(getMarketPost);
-        PostResponseDTO.MarketPostResponse marketPostResponse = PostResponseDTO.singleMarketPost(updatedMarketPost,updatedMarketPost.getMarketComments().size());
+        MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(updatedMarketPost,updatedMarketPost.getMarketComments().size(),updatedMarketPost.getApplies().size());
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,marketPostResponse);
 
     }
 
+    /**
+     * 게시글 상태 업데이트
+     * @param postId
+     * @param status
+     * @param email
+     * @return : 성공 여부
+     */
     public  APIResponse updateState(Long postId,Status status, String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
         if(user.getUserId() != getMarketPost.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
+
         getMarketPost.updateStatus(status);
         marketPostRepository.save(getMarketPost);
+
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,"게시글 상태 변경");
     }
-    public  APIResponse<PostResponseDTO.TransactionPostWithComment> getTransactionPostWithComment(Long postId,String email,List<CommentResponseDTO.CommentResponse> commentResponses) {
+
+    /**
+     * 게시글 정보 + 해당 게시글 댓글 들 조회
+     * @param postId
+     * @param email
+     * @param commentResponses
+     * @return 게시글 정보 + 댓글 리스트 조회 , 로그인한 유저 활동 조회(스크랩 여부, 지원여부, 작성자 여부)
+     */
+    public  APIResponse<MarketPostResponseDTO.MarketPostWithComment> getMarketPostWithComment(Long postId, String email, List<CommentResponseDTO.CommentResponse> commentResponses) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
+
+//        유저활동
         Boolean isScrap = scrapRepository.existsByMarketPostAndUser(getMarketPost,user);
         Boolean isApply = applyRepository.existsByUserAndMarketPost(user, getMarketPost);
         eum.backed.server.domain.community.apply.Status tradingStatus = eum.backed.server.domain.community.apply.Status.NONE;
+
         if(isApply){
             tradingStatus = applyRepository.findByUserAndMarketPost(user,getMarketPost).get().getStatus();
         }
-        PostResponseDTO.TransactionPostWithComment singlePostResponse = postResponseDTO.newTransactionPostWithComment(user,getMarketPost,commentResponses,isApply,isScrap,tradingStatus);
+        MarketPostResponseDTO.MarketPostWithComment singlePostResponse = marketPostResponseDTO.toMarketPostWithComment(user,getMarketPost,commentResponses,isApply,isScrap,tradingStatus);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,singlePostResponse);
 
     }
-    public  APIResponse<List<PostResponseDTO.PostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, String email, Pageable pageable,List<Users> blockedUsers) {
+
+    /**
+     * 필터 조회(검색어, 카테고리, 게시글 유형(모집중, 모집완료), 모집중
+     * @param keyword : 검색어
+     * @param category : 카테고리
+     * @param marketType : 게시글 유형
+     * @param status : 모집중
+     * @param pageable
+     * @param blockedUsers : 차단한, 차단된 유저들은 제외하고 조회
+     * @return : 검색어(게시글 전체) > 카테고리 > 카테고리 내 게시글 유형 , 카테고리 내 모집중
+     */
+    public  APIResponse<List<MarketPostResponseDTO.MarketPostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, Pageable pageable, List<Users> blockedUsers) {
+//        검색 키워드 있을떄
         if (!(keyword == null || keyword.isBlank())) {
             return findByKeyWord(keyword,blockedUsers);
         }
-            MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElse(null);
+        MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElse(null);
 
-        List<MarketPost> marketPosts = getMarketPosts(marketCategory, marketType, status,blockedUsers);
-        List<PostResponseDTO.PostResponse> postResponses = getAllPostResponse(marketPosts);
+        List<MarketPost> marketPosts = marketPostRepository.findByFilters(marketCategory, marketType,status,blockedUsers).orElse(Collections.emptyList()); //조건에 맞는 리스트 조회
+        List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = getAllPostResponse(marketPosts); //리스트 dto
 
-        return APIResponse.of(SuccessCode.SELECT_SUCCESS,postResponses);
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS,marketPostResponses);
      }
 
-
-//    }
-    private List<MarketPost> getMarketPosts(MarketCategory marketCategory, MarketType marketType, Status status,List<Users> blockedUsers) {
-        return marketPostRepository.findByFilters(marketCategory, marketType,status,blockedUsers).orElse(Collections.emptyList());
-    }
-
-    private  APIResponse<List<PostResponseDTO.PostResponse>> findByScrap(String email,List<Users> blockedUsers) {
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<Scrap> scraps = scrapRepository.findScrapPostsForUser(user,blockedUsers).orElse(Collections.emptyList());
-        List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
-        for (Scrap scrap : scraps) {
-            MarketPost marketPost = scrap.getMarketPost();
-            PostResponseDTO.PostResponse singlePostResponse = postResponseDTO.newPostResponse(marketPost);
-            postResponseArrayList.add(singlePostResponse);
-        }
-        return APIResponse.of(SuccessCode.SELECT_SUCCESS, postResponseArrayList);
-    }
-    private List<PostResponseDTO.PostResponse> getAllPostResponse(List<MarketPost> marketPosts){
-        List<PostResponseDTO.PostResponse> postResponseArrayList = new ArrayList<>();
-        for (MarketPost marketPost : marketPosts) {
-            PostResponseDTO.PostResponse singlePostResponse = postResponseDTO.newPostResponse(marketPost);
-            postResponseArrayList.add(singlePostResponse);
-        }
-        return postResponseArrayList;
-    }
-
-
-    private APIResponse<List<PostResponseDTO.PostResponse>> getMyPosts(String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<MarketPost> marketPosts = marketPostRepository.findByUserAndIsDeletedFalseOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
-        List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
-        return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
-    }
-
-    private APIResponse<List<PostResponseDTO.PostResponse>> findByKeyWord(String keyWord, List<Users> blockedUsers) {
-//        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
-        List<MarketPost> marketPosts = marketPostRepository.findByTitleContainingAndIsDeletedFalseAndUserNotInOrderByCreateDateDesc( keyWord,blockedUsers).orElse(Collections.emptyList());
-        List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
-        return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
-    }
-
-
-    public APIResponse<List<PostResponseDTO.PostResponse>> findByServiceType(ServiceType serviceType, String email,List<Users> blockedUsers) {
+    /**
+     * 내 게시글 활동
+     * @param serviceType : scrap, postlist,apply(내 스크랩, 내가 작성한 게시글, 지원)
+     * @param email
+     * @param blockedUsers
+     * @return : 게시글 정보 조회 차단된, 차단한 유저 제외
+     */
+    public APIResponse<List<MarketPostResponseDTO.MarketPostResponse>> findByServiceType(ServiceType serviceType, String email, List<Users> blockedUsers) {
         if(serviceType == ServiceType.scrap){
             return findByScrap(email,blockedUsers);
         } else if (serviceType == ServiceType.postlist) {
@@ -175,17 +198,87 @@ public class MarketPostService {
         return null;
     }
 
-    private APIResponse<List<PostResponseDTO.PostResponse>> getMyApplyList(String email) {
+    /**
+     * 게시글 객체 리스트를 받았을때 dto로 전환하는 함수
+     * @param marketPosts : jpa로 조회한 게시글 리스트
+     * @return
+     */
+    private List<MarketPostResponseDTO.MarketPostResponse> getAllPostResponse(List<MarketPost> marketPosts){
+        List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = new ArrayList<>();
+        for (MarketPost marketPost : marketPosts) {
+            MarketPostResponseDTO.MarketPostResponse marketPostResponse = marketPostResponseDTO.toMarketPostResponse(marketPost,marketPost.getMarketComments().size(),marketPost.getApplies().size());
+            marketPostResponses.add(marketPostResponse);
+        }
+        return marketPostResponses;
+    }
+
+    /**
+     * 스크랩 게시글 조회 함수
+     * @param email
+     * @param blockedUsers
+     * @return
+     */
+    private  APIResponse<List<MarketPostResponseDTO.MarketPostResponse>> findByScrap(String email, List<Users> blockedUsers) {
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        List<Scrap> scraps = scrapRepository.findScrapPostsForUser(user,blockedUsers).orElse(Collections.emptyList());
+
+        List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = new ArrayList<>();
+        for (Scrap scrap : scraps) {
+            MarketPost marketPost = scrap.getMarketPost();
+            MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(marketPost,marketPost.getMarketComments().size(),marketPost.getApplies().size());
+            marketPostResponses.add(marketPostResponse);
+        }
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, marketPostResponses);
+    }
+
+    /**
+     * 내가 작성한 게시글
+     * @param email
+     * @return
+     */
+    private APIResponse<List<MarketPostResponseDTO.MarketPostResponse>> getMyPosts(String email) {
+        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+        List<MarketPost> marketPosts = marketPostRepository.findByUserAndIsDeletedFalseOrderByCreateDateDesc(getUser).orElse(Collections.emptyList());
+
+        List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = getAllPostResponse(marketPosts);
+
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, marketPostResponses);
+    }
+
+    /**
+     * 검색한 게시글
+     * @param keyWord : 검색할 키워드
+     * @param blockedUsers
+     * @return
+     */
+    private APIResponse<List<MarketPostResponseDTO.MarketPostResponse>> findByKeyWord(String keyWord, List<Users> blockedUsers) {
+        List<MarketPost> marketPosts = marketPostRepository.findByKeywords(keyWord,blockedUsers).orElse(Collections.emptyList());
+        List<MarketPostResponseDTO.MarketPostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
+        return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
+    }
+
+    /**
+     * 내가 지원한 게시글
+     * @param email
+     * @return
+     */
+    private APIResponse<List<MarketPostResponseDTO.MarketPostResponse>> getMyApplyList(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid argument"));
         List<Apply> applies = applyRepository.findByUserIsDeletedFalse(getUser).orElse(Collections.emptyList());
+
         List<MarketPost> marketPosts = new ArrayList<>();
         for(Apply apply : applies){
             MarketPost marketPost = apply.getMarketPost();
             marketPosts.add(marketPost);
         }
-        List<PostResponseDTO.PostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
+        List<MarketPostResponseDTO.MarketPostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }
+
+    /**
+     * 거래 상태 업데이트 함수 -> 지원 데이터에 상태 업데이트로 바뀌어야함
+     * @param chatRoomId : 채팅방 Id
+     */
     public void updateStatusCompleted(Long chatRoomId){
         MarketPost marketPost = chatRoomRepository.findById(chatRoomId).orElseThrow(()->new NullPointerException("invalid chatRoomdId")).getMarketPost();
         marketPost.updateStatus(Status.TRANSACTION_COMPLETED);

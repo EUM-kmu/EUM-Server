@@ -25,7 +25,7 @@ public class ProfileService {
     private final AvatarRepository avatarRepository;
     private final StandardRepository standardRepository;
     private final LevelService levelService;
-    public APIResponse<ProfileResponseDTO.AllProfile> create(ProfileRequestDTO.CreateProfile createProfile, String email) {
+    public APIResponse<ProfileResponseDTO.ProfileResponse> create(ProfileRequestDTO.CreateProfile createProfile, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
         Regions getRegions = regionsRepository.findById(createProfile.getRegionId()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
@@ -44,15 +44,15 @@ public class ProfileService {
 
         int getNextStandard = standardRepository.findById(2L).orElseThrow(() -> new IllegalArgumentException("초기데이터 설정오류")).getStandard();
 
-        ProfileResponseDTO.AllProfile createProfileResponse = ProfileResponseDTO.toProfileResponse(updatedUser, savedProfile,getNextStandard);
+        ProfileResponseDTO.ProfileResponse createProfileResponse = ProfileResponseDTO.toProfileResponse(updatedUser, savedProfile,getNextStandard);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,createProfileResponse);
 
     }
 
-    public APIResponse<ProfileResponseDTO.AllProfile> getMyProfile(String email, int nextStandard) {
+    public APIResponse<ProfileResponseDTO.ProfileResponse> getMyProfile(String email, int nextStandard) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (!profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("프로필이 없는 유저");
-        ProfileResponseDTO.AllProfile profileResponseDTO = ProfileResponseDTO.toProfileResponse(getUser, getUser.getProfile(),nextStandard);
+        ProfileResponseDTO.ProfileResponse profileResponseDTO = ProfileResponseDTO.toProfileResponse(getUser, getUser.getProfile(),nextStandard);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);
     }
     private void validateNickname(String nickname){

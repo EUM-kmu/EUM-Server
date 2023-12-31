@@ -5,7 +5,7 @@ import eum.backed.server.controller.community.DTO.request.MarketPostRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
 import eum.backed.server.controller.community.DTO.request.enums.ServiceType;
 import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
-import eum.backed.server.controller.community.DTO.response.PostResponseDTO;
+import eum.backed.server.controller.community.DTO.response.MarketPostResponseDTO;
 import eum.backed.server.domain.community.comment.CommentType;
 import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.domain.community.user.Users;
@@ -46,7 +46,7 @@ public class  MarketPostController {
      * @param marketCreate : 작성할 게시글 내용
      * @param email : jwt에 담긴 email
      * @return
-     * @throws Exception :
+     * @throws ParseException : 활동 날짜 parsing 에러 처리
      */
     @ApiOperation(value = "게시글 작성", notes = "도움요청, 받기 게시글 작성")
     @ApiResponses(value = {
@@ -57,9 +57,16 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PostMapping()
-    public ResponseEntity<APIResponse<PostResponseDTO.MarketPostResponse>> create(@RequestBody @Validated MarketPostRequestDTO.MarketCreate marketCreate, @AuthenticationPrincipal String email ) throws Exception {
+    public ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> create(@RequestBody @Validated MarketPostRequestDTO.MarketCreate marketCreate, @AuthenticationPrincipal String email ) throws ParseException {
         return new ResponseEntity<>(marketPostService.create(marketCreate, email), HttpStatus.CREATED);
     }
+
+    /**
+     * 게시글 삭제
+     * @param postId : 게시글 id
+     * @param email : jwt에 담긴 email
+     * @return
+     */
     @ApiOperation(value = "게시글 삭제", notes = "게시글 아이디로 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -72,6 +79,14 @@ public class  MarketPostController {
         return ResponseEntity.ok(marketPostService.delete(postId,email));
     }
 
+    /**
+     * 게시글 수정
+     * @param postId : 게시글 Id
+     * @param marketUpdate : 수정할 내용
+     * @param email : jwt에 담긴 email
+     * @return
+     * @throws ParseException : 활동 날짜 parsing 에러
+     */
     @ApiOperation(value = "게시글 수정", notes = "게시글 아이디 받고 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -80,9 +95,18 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PutMapping("/{postId}")
-    public  ResponseEntity<APIResponse<PostResponseDTO.MarketPostResponse>> update(@PathVariable Long postId, @RequestBody @Validated MarketPostRequestDTO.MarketUpdate marketUpdate, @AuthenticationPrincipal String email) throws ParseException {
+    public  ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> update(@PathVariable Long postId, @RequestBody @Validated MarketPostRequestDTO.MarketUpdate marketUpdate, @AuthenticationPrincipal String email) throws ParseException {
         return ResponseEntity.ok(marketPostService.update(postId,marketUpdate,email));
     }
+
+    /**
+     * 게시글 상태 수정
+     * RECRUITING, RECRUITMENT_COMPLETED, TRANSACTION_COMPLETED
+     * @param postId : 게시글 id
+     * @param status : 바꿀 상태 프론트에서는 (모집중, 모집완료)만 요청 예정
+     * @param email : jwt에 담긴 email
+     * @return
+     */
     @ApiOperation(value = "게시글 상태 수정", notes = "게시글 아이디받고 거래 상태 상태 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -94,6 +118,14 @@ public class  MarketPostController {
     public  ResponseEntity<APIResponse> updateState(@PathVariable Long postId, @RequestBody MarketPostRequestDTO.UpdateStatus status, @AuthenticationPrincipal String email){
         return ResponseEntity.ok(marketPostService.updateState(postId,status.getStatus(), email));
     }
+
+    /**
+     * 게시글 id로 조회
+     * @param postId : 게시글 id
+     * @param email : jwt에 담긴 email
+     * @param pageable : 페이지네이션
+     * @return : 게시글 정보 + 댓글들
+     */
     @ApiOperation(value = "단일 게시글 조회", notes = "게시글 정보 + 댓글  조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -102,10 +134,21 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("{postId}")
-    public  ResponseEntity<APIResponse<PostResponseDTO.TransactionPostWithComment>> findById(@PathVariable Long postId,@AuthenticationPrincipal String email, Pageable pageable){
+    public  ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostWithComment>> findById(@PathVariable Long postId, @AuthenticationPrincipal String email, Pageable pageable){
         List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, email, CommentType.TRANSACTION,pageable);
-        return ResponseEntity.ok(marketPostService.getTransactionPostWithComment(postId,email,commentResponses));
+        return ResponseEntity.ok(marketPostService.getMarketPostWithComment(postId,email,commentResponses));
     }
+
+    /**
+     *
+     * @param keyword : 검색어 파라미터
+     * @param category : 카테고리 명
+     * @param marketType : REQUEST_HELP,PROVIDE_HELP (도움요청, 도움제공)
+     * @param status :RECRUITING (모집중)
+     * @param pageable : 페이지네이젼
+     * @param email :
+     * @return
+     */
     @ApiOperation(value = "필터 조회", notes = "필터 별 게시글 리스트 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -114,15 +157,20 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("")
-    public  ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category,
-                                                                                         @RequestParam(name = "marketType",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,
-                                                                                         @PageableDefault Pageable pageable, @AuthenticationPrincipal String email){
+    public  ResponseEntity<APIResponse<List<MarketPostResponseDTO.MarketPostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category,
+                                                                                               @RequestParam(name = "marketType",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,
+                                                                                               @PageableDefault Pageable pageable, @AuthenticationPrincipal String email){
         Users getUser = usersService.findByEmail(email);
-        List<Users> blockedUsrs = blockService.getBlockedUser(getUser);
-        return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,email,pageable,blockedUsrs
-        ));
+        List<Users> blockedUsers = blockService.getBlockedUser(getUser);
+        return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,pageable,blockedUsers));
     }
 
+    /**
+     * 게시글 관심 설정
+     * @param postId : 게시글 Id
+     * @param email : jwt에 담긴 email
+     * @return
+     */
     @GetMapping("/{postId}/scrap")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -136,6 +184,13 @@ public class  MarketPostController {
     public  ResponseEntity<APIResponse> doScrap(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         return scrapService.scrap(postId, email);
     }
+
+    /**
+     * 내활동 타입별 게시글 조회 : 내가 스크랩 한 글, 내가 작성한 게시글, 내 지원 글
+     * @param serviceType : scrap, postlist,apply
+     * @param email : jwt에 담긴 email
+     * @return : 게시글 정보
+     */
     @ApiOperation(value = "거래 게시글 관려 내서비스 조회", notes = "내 관심 거래글(scrap), 내가 작성한 거래 게시글(postlist) , 지원한 게시글(apply)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -144,7 +199,7 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/user-activity/{serviceType}")
-    public ResponseEntity<APIResponse<List<PostResponseDTO.PostResponse>>> findByServiceType(@PathVariable ServiceType serviceType, @AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse<List<MarketPostResponseDTO.MarketPostResponse>>> findByServiceType(@PathVariable ServiceType serviceType, @AuthenticationPrincipal String email){
         Users getUser = usersService.findByEmail(email);
         List<Users> blockedUser = blockService.getBlockedUser(getUser);
         return ResponseEntity.ok(marketPostService.findByServiceType(serviceType,email,blockedUser));

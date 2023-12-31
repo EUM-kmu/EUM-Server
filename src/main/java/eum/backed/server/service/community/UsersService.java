@@ -13,7 +13,7 @@ import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategory;
 import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategoryRepository;
 import eum.backed.server.domain.community.withdrawaluser.WithdrawalUser;
 import eum.backed.server.domain.community.withdrawaluser.WithdrawalUserRepository;
-import eum.backed.server.enums.Authority;
+import eum.backed.server.domain.community.user.Authority;
 import eum.backed.server.exception.TokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

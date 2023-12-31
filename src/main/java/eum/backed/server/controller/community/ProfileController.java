@@ -25,11 +25,16 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Api(tags = "profile")
 @CrossOrigin("*")
-public class ProfileController {
+public class   ProfileController {
     private final ProfileService profileService;
     private final LevelService levelService;
 
-
+    /**
+     * 프로필 작성
+     * @param createProfile : 작성할 프로필 정보
+     * @param email : jwt에 담긴 email
+     * @return : 성공 여부
+     */
     @PostMapping("")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "성공",content = @Content(schema = @Schema(implementation = APIResponse.class))),
@@ -39,9 +44,15 @@ public class ProfileController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @ApiOperation(value = "프로필 생성", notes = "프로필 생성, ROLE_TEMPORARY_USER -> ROLE_USER 전환")
-    public ResponseEntity<APIResponse<ProfileResponseDTO.AllProfile>> createProfile(@RequestBody @Validated ProfileRequestDTO.CreateProfile createProfile, @AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse<ProfileResponseDTO.ProfileResponse>> createProfile(@RequestBody @Validated ProfileRequestDTO.CreateProfile createProfile, @AuthenticationPrincipal String email){
         return new ResponseEntity<>(profileService.create(createProfile, email), HttpStatus.CREATED);
     }
+
+    /**
+     * 프로필 조회
+     * @param email
+     * @return
+     */
     @GetMapping("")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -50,7 +61,7 @@ public class ProfileController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @ApiOperation(value = "내 프로필 조회")
-    public ResponseEntity<APIResponse<ProfileResponseDTO.AllProfile>> getMyProfile(@AuthenticationPrincipal String email){
+    public ResponseEntity<APIResponse<ProfileResponseDTO.ProfileResponse>> getMyProfile(@AuthenticationPrincipal String email){
         int nextStandard = levelService.getNextLevel(email);
         return ResponseEntity.ok(profileService.getMyProfile(email,nextStandard));
     }

@@ -1,0 +1,36 @@
+INSERT INTO users (user_id, email, password, role, is_banned, is_deleted,social_type)
+VALUES
+    (5, "eunhasu@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (6, "user2@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (7, "user3@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (8, "user4@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (9, "user5@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (10, "user6@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (11, "user7@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (12, "user8@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (13, "user9@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (14, "user10@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (15, "user11@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (16, "user12@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (17, "user13@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (18, "user14@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (19, "user15@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF"),
+    (20, "user16@email.com", "$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.", "ROLE_USER", 0, 0,"SELF");
+INSERT INTO profile (profile_id, nickname, introduction, total_sunrise_pay, avatar_id, region_id, user_id)
+VALUES
+    (5, "은하수", "", 0, 1, 36, 5),
+    (6, "별이", "", 0, 1, 36, 6),
+    (7, "강아지", "", 0, 1, 36, 7),
+    (8, "달마시안", "", 0, 1, 36, 8),
+    (9, "세윤5", "", 0, 1, 36, 9),
+    (10, "별", "", 0, 1, 36, 10),
+    (11, "비밀의숲", "", 0, 1, 36, 11),
+    (12, "해나", "", 0, 1, 36, 12),
+    (13, "연어", "", 0, 1, 36, 13),
+    (14, "솔", "", 0, 1, 36, 14),
+    (15, "감자", "", 0, 1, 36, 15),
+    (16, "세윤12", "", 0, 1, 36, 16),
+    (17, "세윤13", "", 0, 1, 36, 17),
+    (18, "세윤14", "", 0, 1, 36, 18),
+    (19, "세윤15", "", 0, 1, 36, 19),
+    (20, "세윤16", "", 0, 1, 36, 20);

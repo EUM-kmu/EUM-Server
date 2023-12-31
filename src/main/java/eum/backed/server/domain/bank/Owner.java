@@ -1,4 +1,4 @@
-package eum.backed.server.enums;
+package eum.backed.server.domain.bank;
 
 public enum Owner {
     USER,ADMIN,MASTER
