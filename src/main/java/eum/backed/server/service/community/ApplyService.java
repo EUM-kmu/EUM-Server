@@ -37,7 +37,17 @@ public class ApplyService {
 
     private final ChatRoomRepository chatRoomRepository;
 
+<<<<<<< Updated upstream
 
+=======
+    /**
+     *
+     * @param postId
+     * @param applyRequest
+     * @param email
+     * @return
+     */
+>>>>>>> Stashed changes
     public APIResponse doApply(Long postId,ApplyRequestDTO.Apply applyRequest, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new NullPointerException("Invalid postId"));
