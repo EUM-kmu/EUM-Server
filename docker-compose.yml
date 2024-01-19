@@ -12,6 +12,11 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --skip-character-set-client-handshake
+      - --general-log=1
+      - --general-log-file=/var/log/mysql/general.log
+    volumes:
+      - mysql-data:/var/lib/mysql
+
     networks:
       - eum-test
   redis-docker:
@@ -27,3 +32,5 @@ services:
       - eum-test
 networks:
   eum-test:
+volumes:
+  mysql-data:
