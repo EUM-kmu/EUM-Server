@@ -3,7 +3,6 @@ package eum.backed.server.domain.community.profile;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.controller.community.DTO.request.ProfileRequestDTO;
 import eum.backed.server.domain.community.avatar.Avatar;
-import eum.backed.server.domain.community.region.Regions;
 import eum.backed.server.domain.community.user.Users;
 import lombok.*;
 
@@ -28,9 +27,6 @@ public class Profile extends BaseTimeEntity {
     private int totalSunrisePay;
 
 
-    @ManyToOne
-    @JoinColumn(name = "region_id")
-    private Regions regions;
 
     @ManyToOne
     @JoinColumn(name="avatar_id")
@@ -52,9 +48,6 @@ public class Profile extends BaseTimeEntity {
         this.address = address;
     }
 
-    public void updateRegions(Regions regions) {
-        this.regions = regions;
-    }
 
     public void upDateAvatar(Avatar avatar) {
         this.avatar = avatar;
@@ -64,10 +57,9 @@ public class Profile extends BaseTimeEntity {
         this.totalSunrisePay += totalSunrisePay;
     }
 
-    public static Profile toEntity(ProfileRequestDTO.CreateProfile createProfile, Regions regions, Avatar avatar, Users user){
+    public static Profile toEntity(ProfileRequestDTO.CreateProfile createProfile, Avatar avatar, Users user){
         return Profile.builder()
                 .nickname(createProfile.getNickname())
-                .regions(regions)
                 .introduction("")
                 .totalSunrisePay(0)
                 .avatar(avatar)

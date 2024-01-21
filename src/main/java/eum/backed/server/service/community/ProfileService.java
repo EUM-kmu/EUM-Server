@@ -7,9 +7,6 @@ import eum.backed.server.controller.community.DTO.response.ProfileResponseDTO;
 import eum.backed.server.domain.community.avatar.*;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
-import eum.backed.server.domain.community.region.RegionType;
-import eum.backed.server.domain.community.region.Regions;
-import eum.backed.server.domain.community.region.RegionsRepository;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
@@ -21,20 +18,19 @@ import org.springframework.stereotype.Service;
 public class ProfileService {
     private final ProfileRepository profileRepository;
     private final UsersRepository userRepository;
-    private final RegionsRepository regionsRepository;
     private final AvatarRepository avatarRepository;
     private final StandardRepository standardRepository;
     private final LevelService levelService;
     public APIResponse<ProfileResponseDTO.ProfileResponse> create(ProfileRequestDTO.CreateProfile createProfile, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
-        Regions getRegions = regionsRepository.findById(createProfile.getRegionId()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
-        if(getRegions.getRegionType() != RegionType.DONG) throw new IllegalArgumentException("행정동으로만 설정가능");
+
+
         Standard initialLevel = standardRepository.findById(1L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
         Avatar getAvatar = avatarRepository.findByAvatarNameAndStandard(createProfile.getAvatarName(),initialLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());
 
-        Profile profile = Profile.toEntity(createProfile, getRegions, getAvatar,getUser);
+        Profile profile = Profile.toEntity(createProfile, getAvatar,getUser);
         Profile savedProfile = profileRepository.save(profile);
 
         Role role = (getUser.getRole() == Role.ROLE_ORGANIZATION) ? Role.ROLE_ORGANIZATION : Role.ROLE_UNPASSWORD_USER;
@@ -62,7 +58,6 @@ public class ProfileService {
     public APIResponse updateMyProfile(ProfileRequestDTO.UpdateProfile updateProfile,String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
-        Regions getRegions = regionsRepository.findById(updateProfile.getRegionId()).orElseThrow(()-> new IllegalArgumentException("Invalid argument"));
 
 
         Standard currentLevel = getProfile.getAvatar().getStandard();
@@ -72,7 +67,6 @@ public class ProfileService {
 
         validateNickname(updateProfile.getNickname());
         getProfile.updateNickName(updateProfile.getNickname());
-        getProfile.updateRegions(getRegions);
         getProfile.upDateAvatar(getAvatar);
         getProfile.updateInstroduction(updateProfile.getIntroduction());
         profileRepository.save(getProfile);

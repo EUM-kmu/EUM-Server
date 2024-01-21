@@ -6,7 +6,6 @@ import eum.backed.server.controller.community.DTO.request.enums.MarketType;
 import eum.backed.server.controller.community.DTO.request.enums.ServiceType;
 import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
 import eum.backed.server.controller.community.DTO.response.MarketPostResponseDTO;
-import eum.backed.server.domain.community.comment.CommentType;
 import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.service.community.*;
@@ -135,7 +134,7 @@ public class  MarketPostController {
     })
     @GetMapping("{postId}")
     public  ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostWithComment>> findById(@PathVariable Long postId, @AuthenticationPrincipal String email, Pageable pageable){
-        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, email, CommentType.TRANSACTION,pageable);
+        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, email,pageable);
         return ResponseEntity.ok(marketPostService.getMarketPostWithComment(postId,email,commentResponses));
     }
 

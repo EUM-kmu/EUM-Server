@@ -1,7 +1,6 @@
 package eum.backed.server.domain.bank.branchbankaccountlog;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.admin.admin.Admin;
 import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
 import lombok.*;
 
@@ -22,8 +21,5 @@ public class BranchBankAccountLog extends BaseTimeEntity {
     @JoinColumn(name = "branch_bank_account_id")
     private BranchBankAccount branchBankAccount;
 
-    @ManyToOne
-    @JoinColumn(name = "admin")
-    private Admin admin;
 
 }

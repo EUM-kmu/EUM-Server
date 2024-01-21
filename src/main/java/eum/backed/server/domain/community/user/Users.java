@@ -1,25 +1,19 @@
 package eum.backed.server.domain.community.user;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.admin.inquiry.Inquiry;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.block.Block;
-import eum.backed.server.domain.community.comment.OpinionComment;
 import eum.backed.server.domain.community.comment.MarketComment;
-import eum.backed.server.domain.community.comment.VoteComment;
-import eum.backed.server.domain.community.likeopinionpost.LikeOpinionPost;
-import eum.backed.server.domain.community.opinionpost.OpinionPost;
-import eum.backed.server.domain.community.profile.Profile;
-import eum.backed.server.domain.community.promotionpost.PromotionPost;
-import eum.backed.server.domain.community.scrap.Scrap;
-import eum.backed.server.domain.community.sleeperuser.SleeperUser;
 import eum.backed.server.domain.community.marketpost.MarketPost;
-import eum.backed.server.domain.community.votepost.VotePost;
-import eum.backed.server.domain.community.voteresult.VoteResult;
+import eum.backed.server.domain.community.profile.Profile;
+import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.withdrawaluser.WithdrawalUser;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -85,8 +79,7 @@ public class Users extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<MarketPost> marketPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<OpinionPost> opinionPosts = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<MarketComment> marketComments = new ArrayList<>();
@@ -97,33 +90,9 @@ public class Users extends BaseTimeEntity implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Apply> applies = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true)
-    private SleeperUser sleeperUser;
 
     @OneToOne(mappedBy = "user", orphanRemoval = true)
     private WithdrawalUser withdrawalUser;
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<Inquiry> inquiries = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<VotePost> votePosts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<VoteComment> voteComments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<VoteResult> voteResults = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<OpinionComment> opinionComments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<PromotionPost> promotionPosts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<LikeOpinionPost> likeOpinionPosts  = new ArrayList<>();
-
 
 
 

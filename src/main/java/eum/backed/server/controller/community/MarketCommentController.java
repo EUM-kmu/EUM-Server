@@ -4,7 +4,6 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.DTO.request.CommentRequestDTO;
 import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
-import eum.backed.server.domain.community.comment.CommentType;
 import eum.backed.server.service.community.CommentServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.comments.CommentType;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class MarketCommentController {
     })
     @GetMapping("/{postId}/comment")
     ResponseEntity<APIResponse<List<CommentResponseDTO.CommentResponse>>> getComments(@PathVariable Long postId,  Pageable pageable, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS,commentServiceImpl.getComments(postId, email,CommentType.TRANSACTION,pageable)));
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS,commentServiceImpl.getComments(postId, email,pageable)));
     }
 
     /**
@@ -65,7 +65,7 @@ public class MarketCommentController {
     })
     @PostMapping("/{postId}/comment")
     ResponseEntity<APIResponse> create(@PathVariable Long postId, @RequestBody @Validated CommentRequestDTO.CommentCreate commentCreate, @AuthenticationPrincipal String email){
-        return new ResponseEntity<>(commentServiceImpl.createComment(postId, commentCreate, email, CommentType.TRANSACTION), HttpStatus.CREATED);
+        return new ResponseEntity<>(commentServiceImpl.createComment(postId, commentCreate, email), HttpStatus.CREATED);
     }
 
     /**
@@ -85,7 +85,7 @@ public class MarketCommentController {
     })
     @PutMapping("{postId}/comment/{commentId}")
     ResponseEntity<APIResponse> update(@PathVariable Long commentId, @RequestBody @Validated CommentRequestDTO.CommentUpdate commentUpdate, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(commentServiceImpl.updateComment(commentId, commentUpdate, email,CommentType.TRANSACTION));
+        return ResponseEntity.ok(commentServiceImpl.updateComment(commentId, commentUpdate, email));
     }
 
     /**
@@ -104,7 +104,7 @@ public class MarketCommentController {
     })
     @DeleteMapping("/{postId}/comment/{commentId}")
     ResponseEntity<APIResponse> delete(@PathVariable Long commentId, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(commentServiceImpl.deleteComment(commentId, email,CommentType.TRANSACTION));
+        return ResponseEntity.ok(commentServiceImpl.deleteComment(commentId, email));
     }
 
 

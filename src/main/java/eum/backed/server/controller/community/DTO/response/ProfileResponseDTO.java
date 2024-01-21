@@ -1,7 +1,6 @@
 package eum.backed.server.controller.community.DTO.response;
 
 import eum.backed.server.domain.community.profile.Profile;
-import eum.backed.server.domain.community.region.RegionType;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import lombok.Builder;
@@ -31,18 +30,14 @@ public class ProfileResponseDTO {
     }
 
     public static ProfileResponse toProfileResponse(Users user, Profile profile, int nextStandard){
-        if(profile.getRegions().getRegionType()!= RegionType.DONG) throw new IllegalArgumentException("주소는 행정동만 들어갈수있습니다");
-        String si = profile.getRegions().getParent().getParent().getName();
-        String gu = profile.getRegions().getParent().getName();
-        String dong = profile.getRegions().getName();
-        String fullAddress = si + " " + gu + " " + dong;
+
 
         return ProfileResponse.builder()
                 .userId(user.getUserId())
                 .profileId(profile.getProfileId())
                 .nickname(profile.getNickname())
                 .introduction(profile.getIntroduction())
-                .address(fullAddress)
+                .address("주소였던것")
                 .role(user.getRole())
                 .totalSunrisePay(profile.getTotalSunrisePay())
                 .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
@@ -66,7 +61,7 @@ public class ProfileResponseDTO {
                 .userId(user.getUserId())
                 .nickName(user.getProfile().getNickname())
                 .avatarPhotoUrl(user.getProfile().getAvatar().getSimpleAvatarPhotoUrl())
-                .address(user.getProfile().getRegions().getName()).build();
+                .address("주소였던것").build();
     }
 
 }
