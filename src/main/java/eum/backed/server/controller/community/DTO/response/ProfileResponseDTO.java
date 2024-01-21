@@ -29,21 +29,17 @@ public class ProfileResponseDTO {
 
     }
 
-    public static ProfileResponse toProfileResponse(Users user, Profile profile, int nextStandard){
+    public static ProfileResponse toProfileResponse(Users user, Profile profile){
 
 
         return ProfileResponse.builder()
                 .userId(user.getUserId())
                 .profileId(profile.getProfileId())
                 .nickname(profile.getNickname())
-                .introduction(profile.getIntroduction())
                 .address("주소였던것")
                 .role(user.getRole())
-                .totalSunrisePay(profile.getTotalSunrisePay())
                 .avatarPhotoURL(profile.getAvatar().getAvatarPhotoUrl())
                 .characterName(profile.getAvatar().getAvatarName().toString())
-                .nextStandard(nextStandard)
-                .levelName(profile.getAvatar().getStandard().getName())
                 .build();
     }
 

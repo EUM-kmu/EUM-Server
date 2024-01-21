@@ -9,7 +9,6 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,10 +20,8 @@ public class Profile extends BaseTimeEntity {
 
     @Column
     private String name;
-    private String introduction;
     private String nickname;
     private String address;
-    private int totalSunrisePay;
 
 
 
@@ -36,9 +33,6 @@ public class Profile extends BaseTimeEntity {
     @JoinColumn(name="user_id")
     private Users user;
 
-    public void updateInstroduction(String introduction) {
-        this.introduction = introduction;
-    }
 
     public void updateNickName(String nickname) {
         this.nickname = nickname;
@@ -53,15 +47,10 @@ public class Profile extends BaseTimeEntity {
         this.avatar = avatar;
     }
 
-    public void addTotalSunrisePay(int totalSunrisePay) {
-        this.totalSunrisePay += totalSunrisePay;
-    }
 
     public static Profile toEntity(ProfileRequestDTO.CreateProfile createProfile, Avatar avatar, Users user){
         return Profile.builder()
                 .nickname(createProfile.getNickname())
-                .introduction("")
-                .totalSunrisePay(0)
                 .avatar(avatar)
                 .user(user)
                 .build();

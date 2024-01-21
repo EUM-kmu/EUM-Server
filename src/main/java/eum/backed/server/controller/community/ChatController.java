@@ -71,11 +71,8 @@ public class ChatController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     public ResponseEntity<APIResponse> remittance(@PathVariable Long chatRoomId, @RequestBody BankAccountRequestDTO.Password password, @AuthenticationPrincipal String email){
-        BankTransactionDTO.UpdateTotalSunrise updateTotalSunrise =bankAccountService.remittanceByChat(password.getPassword(),chatRoomId, email); //송금 처리
+        bankAccountService.remittanceByChat(password.getPassword(),chatRoomId, email); //송금 처리
         marketPostService.updateStatusCompleted(chatRoomId); // 거래 상태 업데이트
-//        계좌에 송금 결과 반영
-        profileService.updateTotalSunrise(updateTotalSunrise.getMe().getProfile(), updateTotalSunrise.getAmount() );
-        profileService.updateTotalSunrise(updateTotalSunrise.getReceiver().getProfile(), updateTotalSunrise.getAmount());
         return new ResponseEntity<>(APIResponse.of(SuccessCode.INSERT_SUCCESS), HttpStatus.CREATED);
     }
     /**

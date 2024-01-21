@@ -1,5 +1,6 @@
 package eum.backed.server.domain.community.withdrawaluser;
 
+import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategory;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WithdrawalUser {
+public class WithdrawalUser extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long withdrawalUserId;

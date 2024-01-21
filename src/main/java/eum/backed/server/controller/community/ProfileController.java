@@ -3,7 +3,6 @@ package eum.backed.server.controller.community;
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.community.DTO.request.ProfileRequestDTO;
 import eum.backed.server.controller.community.DTO.response.ProfileResponseDTO;
-import eum.backed.server.service.community.LevelService;
 import eum.backed.server.service.community.ProfileService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("*")
 public class   ProfileController {
     private final ProfileService profileService;
-    private final LevelService levelService;
 
     /**
      * 프로필 작성
@@ -62,8 +60,7 @@ public class   ProfileController {
     })
     @ApiOperation(value = "내 프로필 조회")
     public ResponseEntity<APIResponse<ProfileResponseDTO.ProfileResponse>> getMyProfile(@AuthenticationPrincipal String email){
-        int nextStandard = levelService.getNextLevel(email);
-        return ResponseEntity.ok(profileService.getMyProfile(email,nextStandard));
+        return ResponseEntity.ok(profileService.getMyProfile(email));
     }
     @PutMapping("")
     @ApiResponses(value = {

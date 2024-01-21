@@ -19,15 +19,12 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final UsersRepository userRepository;
     private final AvatarRepository avatarRepository;
-    private final StandardRepository standardRepository;
-    private final LevelService levelService;
     public APIResponse<ProfileResponseDTO.ProfileResponse> create(ProfileRequestDTO.CreateProfile createProfile, String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
 
 
-        Standard initialLevel = standardRepository.findById(1L).orElseThrow(() -> new NullPointerException("초기 데이터 미설정"));
-        Avatar getAvatar = avatarRepository.findByAvatarNameAndStandard(createProfile.getAvatarName(),initialLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
+        Avatar getAvatar = avatarRepository.findByAvatarId(createProfile.getAvatarId()).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());
 
         Profile profile = Profile.toEntity(createProfile, getAvatar,getUser);
@@ -38,17 +35,15 @@ public class ProfileService {
         Users updatedUser= userRepository.save(getUser);
 
 
-        int getNextStandard = standardRepository.findById(2L).orElseThrow(() -> new IllegalArgumentException("초기데이터 설정오류")).getStandard();
-
-        ProfileResponseDTO.ProfileResponse createProfileResponse = ProfileResponseDTO.toProfileResponse(updatedUser, savedProfile,getNextStandard);
+        ProfileResponseDTO.ProfileResponse createProfileResponse = ProfileResponseDTO.toProfileResponse(updatedUser, savedProfile);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,createProfileResponse);
 
     }
 
-    public APIResponse<ProfileResponseDTO.ProfileResponse> getMyProfile(String email, int nextStandard) {
+    public APIResponse<ProfileResponseDTO.ProfileResponse> getMyProfile(String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (!profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("프로필이 없는 유저");
-        ProfileResponseDTO.ProfileResponse profileResponseDTO = ProfileResponseDTO.toProfileResponse(getUser, getUser.getProfile(),nextStandard);
+        ProfileResponseDTO.ProfileResponse profileResponseDTO = ProfileResponseDTO.toProfileResponse(getUser, getUser.getProfile());
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);
     }
     private void validateNickname(String nickname){
@@ -60,27 +55,16 @@ public class ProfileService {
         Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
 
 
-        Standard currentLevel = getProfile.getAvatar().getStandard();
         Avatar getAvatar = (getUser.getRole() == Role.ROLE_ORGANIZATION)
-                ? avatarRepository.findByAvatarName(AvatarName.ORGANIZATION).orElseThrow(()->new IllegalArgumentException("초기데이터 미세팅"))
-                :avatarRepository.findByAvatarNameAndStandard(updateProfile.getAvatarName(),currentLevel).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
+                ? avatarRepository.findById(13L).orElseThrow(()->new IllegalArgumentException("초기데이터 미세팅"))
+                :avatarRepository.findByAvatarId(updateProfile.getAvatarId()).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
 
         validateNickname(updateProfile.getNickname());
         getProfile.updateNickName(updateProfile.getNickname());
         getProfile.upDateAvatar(getAvatar);
-        getProfile.updateInstroduction(updateProfile.getIntroduction());
         profileRepository.save(getProfile);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS);
     }
 
-    public void updateTotalSunrise(Profile profile, Long amount){
-        if(profile.getAvatar().getAvatarName() != AvatarName.ORGANIZATION){
-            int sunrise = amount.intValue();
-            profile.addTotalSunrisePay(sunrise);
-            Profile updatedProfile=profileRepository.save(profile);
-
-            levelService.levelUp(updatedProfile);
-        }
-    }
 
 }

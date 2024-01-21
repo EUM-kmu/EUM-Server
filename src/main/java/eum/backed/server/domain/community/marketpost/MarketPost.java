@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Locale;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

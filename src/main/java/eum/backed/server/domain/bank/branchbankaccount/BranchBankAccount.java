@@ -1,16 +1,12 @@
 package eum.backed.server.domain.bank.branchbankaccount;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.bank.branchbankaccountlog.BranchBankAccountLog;
 import eum.backed.server.domain.bank.Owner;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +24,5 @@ public class BranchBankAccount extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Owner owner;
 
-    @OneToMany(mappedBy = "branchBankAccount")
-    private List<BranchBankAccountLog> branchBankAccountLogs = new ArrayList<>();
 
 }
