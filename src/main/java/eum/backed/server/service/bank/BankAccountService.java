@@ -41,7 +41,14 @@ public class BankAccountService {
     private final ChatRoomRepository chatRoomRepository;
     private final MarketPostRepository marketPostRepository;
     private final BlockRepository blockRepository;
-    //일반 유저 계정 생성
+
+    /**
+     * 유저 계좌 생성
+     * @param cardName
+     * @param password
+     * @param user
+     * @return
+     */
     private UserBankAccount createUserBankAccount(String cardName, String password,Users user){
         UserBankAccount userBankAccount = UserBankAccount.toEntity(cardName,passwordEncoder.encode(password),user);
         UserBankAccount savedUserBankAccount =  userBankAccountRepository.save(userBankAccount);
@@ -55,6 +62,13 @@ public class BankAccountService {
         return UpdatedBankAccount;
 
     }
+
+    /**
+     * 계좌 비밀번호 변경
+     * @param password
+     * @param email
+     * @return
+     */
     public APIResponse updatePassword(BankAccountRequestDTO.Password password, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
@@ -63,15 +77,21 @@ public class BankAccountService {
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS, "비밀번호 업데이트");
     }
 
-
+    /**
+     * 송금
+     * @param remittance :
+     * @param email
+     * @return
+     */
     public APIResponse remittance(BankAccountRequestDTO.Remittance remittance, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
 
+//        닉네임으로 유저 추출
         Profile getProfile = profileRepository.findByNickname(remittance.getNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
         Users receiver = getProfile.getUser();
 
-        checkBlocked(getUser,receiver);
-        checkWithdrawal(receiver);
+        checkBlocked(getUser,receiver); //차단 여부
+        checkWithdrawal(receiver); //탈퇴 여부
         if(!passwordEncoder.matches(remittance.getPassword(),getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
         UserBankAccount receiverBankAccount = userBankAccountRepository.findByUser(receiver).orElseThrow(() -> new NullPointerException("InValid receiver"));
@@ -96,7 +116,13 @@ public class BankAccountService {
 
     }
 
-
+    /**
+     * 채팅 송금
+     * @param password 계좌 비밀 번호
+     * @param ChatRoomId 채팅방 id
+     * @param email
+     * @return
+     */
     public BankTransactionDTO.UpdateTotalSunrise remittanceByChat(String password,Long ChatRoomId, String email) {
         ChatRoom getChatRoom = chatRoomRepository.findById(ChatRoomId).orElseThrow(() -> new NullPointerException("Invalid id"));
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));

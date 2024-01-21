@@ -15,8 +15,14 @@ import java.util.List;
 public class BlockService {
     private final BlockRepository blockRepository;
 
+    /**
+     * 차단하기
+     * @param blocker 차단하는 유저
+     * @param blocked 처덩덩헌 유저
+     * @return
+     */
     public Boolean blockedAction(Users blocker,Users blocked){
-        if(blockRepository.existsByBlockerAndBlocked(blocker,blocked)){
+        if(blockRepository.existsByBlockerAndBlocked(blocker,blocked)){ //차단 / 해제
             Block block = blockRepository.findByBlockerAndBlocked(blocker, blocked).get();
             blockRepository.delete(block);
             return false;

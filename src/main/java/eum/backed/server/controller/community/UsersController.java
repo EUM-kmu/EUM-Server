@@ -191,7 +191,7 @@ public class UsersController {
     public ResponseEntity<APIResponse> withdrawal(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,@RequestBody UsersRequestDTO.Withdrawal withdrawal,@AuthenticationPrincipal String email) throws FirebaseAuthException {
         Users getUser = usersService.findByEmail(email);
         bankAccountService.freezeAccount(getUser); //계좌 동결
-        chatService.blockedChat(getUser); //탈퇴 유저와의 채팅 block
+        chatService.blockedChatInWithdrawal(getUser); //탈퇴 유저와의 채팅 block
         applyService.withdrawalApply(getUser); //탈퇴 유저 지원취소 처리
 
 //        소셜 로그인 타입별 정보 제거
@@ -207,7 +207,7 @@ public class UsersController {
     }
 
     /**
-     *
+     * 차단하기 , 차단해제 같은 controller에 담은 -> 프론트 요청으로 다른 컨트롤러로 분리해야함
      * @param blockedAction : 차단할 유저 id
      * @param email : jwt에 담긴 email
      * @return

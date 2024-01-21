@@ -37,7 +37,7 @@ public class ApplyService {
     private final ChatRoomRepository chatRoomRepository;
 
     /**
-     * 
+     * 지원하기
      * @param postId
      * @param applyRequest
      * @param email
@@ -46,27 +46,36 @@ public class ApplyService {
     public APIResponse doApply(Long postId,ApplyRequestDTO.Apply applyRequest, String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new NullPointerException("Invalid postId"));
+
         if(getMarketPost.isDeleted()) throw new IllegalArgumentException("Deleted post");
         if(getMarketPost.getUser() == getUser) throw new IllegalArgumentException("자기 게시글에는 신청할수 없습니다");
         if(getMarketPost.getMarketType()== MarketType.PROVIDE_HELP && getMarketPost.getPay() > getUser.getUserBankAccount().getBalance())
-            throw new IllegalArgumentException("잔액보다 큰 요구 햇살");
+            throw new IllegalArgumentException("잔액보다 큰 요구 햇살"); //지원하려는 게시글의 요구 햇살이 내 잔액보다 클때
         if(getMarketPost.getCurrentAcceptedPeople() >= getMarketPost.getMaxNumOfPeople()) throw new RuntimeException("최대 신청자 수를 넘었습니다");
         if (applyRepository.existsByUserAndMarketPost(getUser, getMarketPost)) throw new IllegalArgumentException("이미 신청했음");
         Apply apply = Apply.toEntity(applyRequest.getIntroduction(), getUser, getMarketPost);
-//        getMarketPost.addCurrentAcceptedPeople();
         applyRepository.save(apply);
         marketPostRepository.save(getMarketPost);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS);
     }
 
+    /**
+     * 게시글 별 지원리스트 조회
+     * @param postId 조회할 게시글 id
+     * @return 지원리스트
+     */
     public APIResponse<List<ApplyResponseDTO.ApplyListResponse>> getApplyList(Long postId) {
-//        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new NullPointerException("Invalid id"));
-//        List<MarketPost> marketPosts = marketPostRepository.findByUserAndIsDeletedFalseOrderByCreateDateDesc(getUser).orElse(Collections.emptyList()); //로그인 유저가 작성한 게시글 목록 조회
-        List<ApplyResponseDTO.ApplyListResponse> getAllApplicants = findByTransactionPosts(getMarketPost);
+        List<ApplyResponseDTO.ApplyListResponse> getAllApplicants = findByMarketPosts(getMarketPost);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, getAllApplicants);
     }
-    private List<ApplyResponseDTO.ApplyListResponse> findByTransactionPosts(MarketPost marketPost){
+
+    /**
+     * 햇터 게시글로 찾은 지원리스트 DTO로 변환
+     * @param marketPost
+     * @return 지원 리스트 DTO
+     */
+    private List<ApplyResponseDTO.ApplyListResponse> findByMarketPosts(MarketPost marketPost){
         List<ApplyResponseDTO.ApplyListResponse> applyListResponses = new ArrayList<>();
         List<Apply> applies = applyRepository.findByMarketPostOrderByCreateDateDesc(marketPost).orElse(Collections.emptyList());
         for(Apply apply : applies){
@@ -78,84 +87,130 @@ public class ApplyService {
         return applyListResponses;
     }
 
+    /**
+     * 지언 수락
+     * @param applyIds 수락할 지원 id들
+     * @param email
+     * @return
+     */
     public APIResponse accept(List<Long> applyIds, String email) {
         Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
         applyIds.stream().forEach(applyId -> {
             Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
+
             if (getApply.getMarketPost().getUser() != getUser) throw new IllegalArgumentException("해당 게시글에 대한 권한이 없다");
             if(getApply.getIsAccepted() == true || getApply.getStatus() == eum.backed.server.domain.community.apply.Status.TRADING_CANCEL) throw new IllegalArgumentException("이미 선정했더나 과거 거래 취소를 했던 사람입니다");
+
+            MarketPost marketPost = getApply.getMarketPost();
+            getApply.updateAccepted(true); //수락
+            getApply.updateStatus(eum.backed.server.domain.community.apply.Status.TRADING); //지원 상태 변경
+            marketPost.addCurrentAcceptedPeople(); //게시글에 반영
+            if(marketPost.getCurrentAcceptedPeople() == marketPost.getMaxNumOfPeople()) {
+                marketPost.updateStatus(Status.RECRUITMENT_COMPLETED); //정원이 다차면 완료 처리
+            }
+
+            marketPostRepository.save(marketPost);
+            applyRepository.save(getApply);
+
             try {
-                chatService.createChatRoomWithFireStore(applyId);
+                chatService.createChatRoomWithFireStore(applyId); //채팅방 생성
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            MarketPost marketPost = getApply.getMarketPost();
-            getApply.updateAccepted(true);
-            getApply.updateStatus(eum.backed.server.domain.community.apply.Status.TRADING);
-            marketPost.addCurrentAcceptedPeople();
-            if(marketPost.getCurrentAcceptedPeople() == marketPost.getMaxNumOfPeople()) {
-                marketPost.updateStatus(Status.RECRUITMENT_COMPLETED);
-            }
-            marketPostRepository.save(marketPost);
-            applyRepository.save(getApply);
         });
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS, "선정성공, 채팅방 개설 완료");
     }
 
+    /**
+     * 선정 전 지원 취소
+     * @param postId
+     * @param applyId
+     * @param email
+     * @return
+     */
     public APIResponse unApply(Long postId, Long applyId, String email) {
         Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
         Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
+
         if(getApply.getMarketPost().getMarketPostId() != postId) throw new IllegalArgumentException("invalid postId");
         if(getApply.getUser() != getUser) throw new IllegalArgumentException("신청 취소할 권한이 없습니다");
         if(getApply.getIsAccepted() == true) throw new IllegalArgumentException("이미 선정되서 취소할 수 없습니다");
+
         applyRepository.delete(getApply);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
 
     }
 
+    /**
+     * 선정 후 활동 파기
+     * @param postId
+     * @param chatId
+     * @param email
+     * @return
+     */
     public APIResponse cancel(Long postId, Long chatId, String email) {
         Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
         ChatRoom chatRoom = chatRoomRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException("해딩 채팅방이 없습니다"));
         if(chatRoom.getMarketPost().getMarketPostId() != postId) throw new IllegalArgumentException("invalid postId");
+
         MarketPost getMarketPost = chatRoom.getMarketPost();
         Apply getApply = applyRepository.findByUserAndMarketPost(chatRoom.getApplicant(), getMarketPost).orElseThrow(()->new IllegalArgumentException("신청한 이력이 없는데 채팅방이 있다"));
+
         if(!(getUser == chatRoom.getApplicant() || getUser == chatRoom.getPostWriter() )) throw new IllegalArgumentException("활동 파기할수있는 권한이 없습니다");
-//        블록 상태 처리
+//        채팅 금지 처리
         chatRoom.upDateBlocked(true);
         cancel(getApply);
         return APIResponse.of(SuccessCode.DELETE_SUCCESS);
 
     }
 
+    /**
+     * 차단 할 때 지원 리스트 반영
+     * @param blocker 차단하는 유저
+     * @param blocked 처단 당한 유저
+     */
     public void blockedAction(Users blocker, Users blocked) {
         List<Apply> applies = new ArrayList<>();
-        List<MarketPost> myPosts = marketPostRepository.findByUserAndIsDeletedFalse(blocker).orElse(Collections.emptyList());
-        List<Apply> tradingList = applyRepository.findTradingAppliesByApplicantAndPostIn(blocked,myPosts).orElse(Collections.emptyList());
+        List<MarketPost> myPosts = marketPostRepository.findByUserAndIsDeletedFalse(blocker).orElse(Collections.emptyList()); //차단한 유저의 게시글(나)
+        List<Apply> tradingList = applyRepository.findTradingAppliesByApplicantAndPostIn(blocked,myPosts).orElse(Collections.emptyList()); // 개사굴애소 자원리스트 조회
         applies.addAll(tradingList);
 
-        List<MarketPost> opponentsPosts = marketPostRepository.findByUserAndIsDeletedFalse(blocked).orElse(Collections.emptyList());
+        List<MarketPost> opponentsPosts = marketPostRepository.findByUserAndIsDeletedFalse(blocked).orElse(Collections.emptyList()); //차단된 유저의 게시글(상대)
         List<Apply> tradedList = applyRepository.findTradingAppliesByApplicantAndPostIn(blocker,opponentsPosts).orElse(Collections.emptyList());
         applies.addAll(tradedList);
 
-        cancelByType(applies);
+        cancelByType(applies); //지원 상태 타입별 처리
     }
 
+    /**
+     * 탈퇴 유저의 지원 리스트 처리
+     * @param getUser
+     */
     public void withdrawalApply(Users getUser) {
-        List<Apply> applies = applyRepository.findByUser(getUser).orElse(Collections.emptyList());
+        List<Apply> applies = applyRepository.findByUser(getUser).orElse(Collections.emptyList()); //탈퇴한 유저의 지원 리트 조회
         cancelByType(applies);
     }
 
+    /**
+     * 취소 DB에 반영
+     * @param getApply
+     */
     private void cancel(Apply getApply){
-        getApply.updateStatus(eum.backed.server.domain.community.apply.Status.TRADING_CANCEL);
+        getApply.updateStatus(eum.backed.server.domain.community.apply.Status.TRADING_CANCEL); //상태변경
         getApply.updateAccepted(false);
         applyRepository.save(getApply);
 
-        getApply.getMarketPost().subCurrentAcceptedPeople();
-        getApply.getMarketPost().updateStatus(Status.RECRUITING);
+        getApply.getMarketPost().subCurrentAcceptedPeople(); //게시글 반영
+        getApply.getMarketPost().updateStatus(Status.RECRUITING); //모집중으로 변경
         marketPostRepository.save(getApply.getMarketPost());
     }
+
+    /**
+     * 선정 전, 선정 후 타입별 지원 처리
+     * @param applies
+     */
     private void cancelByType(List<Apply> applies){
         for (Apply apply:applies) {
             if (apply.getStatus() == eum.backed.server.domain.community.apply.Status.WAITING) {

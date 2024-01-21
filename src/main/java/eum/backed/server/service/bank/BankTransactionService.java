@@ -25,16 +25,33 @@ public class BankTransactionService {
     private final UsersRepository usersRepository;
     private final UserBankAccountRepository userBankAccountRepository;
     private final BankAccountResponseDTO bankAccountResponseDTO;
+
+    /**
+     * 유저 계좌 간 송금 거래 내역 저장
+     * @param bankTransactionDTO
+     */
     public void createTransactionWithUserBankAccount(BankTransactionDTO.Transaction bankTransactionDTO){
         BankAccountTransaction bankAccountTransaction = BankAccountTransaction.toEntity(bankTransactionDTO.getAmount(), bankTransactionDTO.getCode(),bankTransactionDTO.getStatus(),bankTransactionDTO.getTransactionType(),bankTransactionDTO.getMyBankAccount(),bankTransactionDTO.getReceiverBankAccount(),bankTransactionDTO.getSenderBankAccount(),null);
         bankAccountTransactionRepository.save(bankAccountTransaction);
     }
+
+    /**
+     * 중앙은행과 송금 거래내역
+     * @param bankTransactionDTO
+     */
     public void createTransactionWithBranchBank(BankTransactionDTO.Transaction bankTransactionDTO){
         UserBankAccount myBankAccount = bankTransactionDTO.getMyBankAccount();
         BankAccountTransaction bankAccountTransaction = BankAccountTransaction.toEntity(bankTransactionDTO.getAmount(), bankTransactionDTO.getCode(),bankTransactionDTO.getStatus(),bankTransactionDTO.getTransactionType(),myBankAccount,null,null,bankTransactionDTO.getBranchBankAccount());
         bankAccountTransactionRepository.save(bankAccountTransaction);
 
     }
+
+    /**
+     * 가레네약 조회
+     * @param email
+     * @param transactionType DEPOSIT(입금),WITHDRAW(출금)
+     * @return
+     */
     public APIResponse<List<BankAccountResponseDTO.HistoryWithInfo>> getAllHistory(String email, TransactionType transactionType) {
         Users geUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
         UserBankAccount bankAccount = userBankAccountRepository.findByUser(geUser).orElseThrow(() -> new NullPointerException("Invalid user"));
@@ -49,6 +66,12 @@ public class BankTransactionService {
         BankAccountResponseDTO.HistoryWithInfo historyWithInfo = BankAccountResponseDTO.HistoryWithInfo.builder().cardName(bankAccount.getAccountName()).balance(bankAccount.getBalance()).histories(getAllHistories).build();
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, historyWithInfo);
     }
+
+    /**
+     * 전체 거래내역 dto에 저장
+     * @param bankAccountTransactions
+     * @return
+     */
     private List<BankAccountResponseDTO.History> getAllHistories(List<BankAccountTransaction> bankAccountTransactions){
         List<BankAccountResponseDTO.History> allHistories = new ArrayList<>();
         for(BankAccountTransaction bankAccountTransaction: bankAccountTransactions){

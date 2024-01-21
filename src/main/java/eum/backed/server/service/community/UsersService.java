@@ -39,7 +39,11 @@ public class UsersService {
     private final RedisTemplate redisTemplate;
     private final WithdrawalUserRepository withdrawalUserRepository;
 
-
+    /**
+     * 자체 회원가입
+     * @param signUp
+     * @return
+     */
     public APIResponse signUp(UsersRequestDTO.SignUp signUp){
         if(usersRepository.existsByEmail(signUp.getEmail())){
             throw new IllegalArgumentException("이미 존재하는 이메일 입니다");
@@ -56,6 +60,11 @@ public class UsersService {
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,"자체 회원가입 성공");
     }
 
+    /**
+     * 자체 로그인
+     * @param signIn
+     * @return
+     */
     public APIResponse<UsersResponseDTO.TokenInfo> signIn(UsersRequestDTO.SignIn signIn) {
         Users getUser = usersRepository.findByEmail(signIn.getEmail()).orElseThrow(() -> new IllegalArgumentException("잘못된 이메일 정보"));
         if(!passwordEncoder.matches(signIn.getPassword(),getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
@@ -69,6 +78,11 @@ public class UsersService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,tokenInfo);
     }
 
+    /**
+     * 토큰 경신
+     * @param reissue
+     * @return
+     */
     public APIResponse<UsersResponseDTO.TokenInfo> reissue(UsersRequestDTO.Reissue reissue) {
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(reissue.getRefreshToken())) {
@@ -98,6 +112,10 @@ public class UsersService {
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,tokenInfo);
     }
 
+    /**
+     * 로그이웃
+     * @param token
+     */
     public void logout(String token) {
         // 1. Access Token 검증
         if (!jwtTokenProvider.validateToken(token)) {
@@ -120,20 +138,26 @@ public class UsersService {
 
     }
 
+    /**
+     * 자체 jwt 토큰 발급
+     * @param email
+     * @param uid
+     * @param socialType
+     * @return
+     */
     public APIResponse<UsersResponseDTO.TokenInfo> getToken(String email, String uid, SocialType socialType){
         UsersResponseDTO.TokenInfo tokenInfo = null;
         if(email.isBlank()) throw new IllegalArgumentException("email is empty");
         Role role;
         if(usersRepository.existsByEmail(email)){
-            if(usersRepository.existsByEmailAndRole(email,Role.ROLE_USER)){
+            if(usersRepository.existsByEmailAndRole(email,Role.ROLE_USER)){ //활동 가능한 유저
                 role = Role.ROLE_USER;
                 tokenInfo = jwtTokenProvider.generateToken(email,role);
-//                return new DataResponse<>(tokenInfo).success(tokenInfo, "로그인 성공");
             } else if (usersRepository.existsByEmailAndRole(email,Role.ROLE_UNPROFILE_USER) ||usersRepository.existsByEmailAndRole(email,Role.ROLE_UNPASSWORD_USER )) {
-                role = Role.ROLE_UNPROFILE_USER;
+                role = usersRepository.findByEmail(email).get().getRole();
                 tokenInfo = jwtTokenProvider.generateToken(email,role);
             }
-        }else{
+        }else{ //이메일이 없으면 최초 가입 유저 == 프로필이 없는 상태
             role = Role.ROLE_UNPROFILE_USER;
             Users temporaryUser = Users.builder().email(email).role(role).uid(uid).isDeleted(false).isBanned(false
             ).socialType(socialType).build();
@@ -145,17 +169,27 @@ public class UsersService {
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, tokenInfo);
     }
 
+    /**
+     * 토큰 검증 및 유저의 가입 상태
+     * @param email
+     * @return
+     */
     public APIResponse<UsersResponseDTO.UserRole> validateToken(String email) {
         Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid email"));
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, UsersResponseDTO.UserRole.builder().role(getUser.getRole()).build());
     }
 
+    /**
+     * 탈퇴하기
+     * @param withdrawal 탈퇴 사유 및 카테고리
+     * @param user
+     */
     public void withdrawal(UsersRequestDTO.Withdrawal withdrawal, Users user) {
         WithdrawalCategory withdrawalCategory = withdrawalCategoryRepository.findById(withdrawal.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("초기 카테고리 데이터 미설정"));
         WithdrawalUser withdrawalUser = WithdrawalUser.toEntity(user,withdrawal.getReason(),withdrawalCategory);
         withdrawalUserRepository.save(withdrawalUser);
-        user.removeEmail();
-        user.setDeleted();
+        user.removeEmail(); //이메일 빈값 처리
+        user.setDeleted(); // 회원탈퇴 상태 처리
         usersRepository.save(user);
     }
     public Users findByEmail(String email){
