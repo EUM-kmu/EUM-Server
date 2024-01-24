@@ -5,6 +5,8 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.bank.DTO.request.BankAccountRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.ChatType;
 import eum.backed.server.controller.community.DTO.response.ChatRoomResponseDTO;
+import eum.backed.server.domain.auth.CustomUserDetails;
+import eum.backed.server.domain.auth.dto.CustomUserInfoDto;
 import eum.backed.server.service.bank.BankAccountService;
 import eum.backed.server.service.bank.DTO.BankTransactionDTO;
 import eum.backed.server.service.community.ApplyService;
@@ -38,7 +40,7 @@ public class ChatController {
     /**
      *
      * @param chatType : 내 게시글, 상대 게시글 조회
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 email
      * @return : 내정보, 상대 정보, 게시글 정보, 파이어베이스에 저장된 키값
      */
     @GetMapping("")
@@ -49,15 +51,15 @@ public class ChatController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    public ResponseEntity<APIResponse<List<ChatRoomResponseDTO>>> getChatListFilter(@RequestParam(name = "type",required = false) ChatType chatType, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(chatService.getChatListFilter(chatType,email));
+    public ResponseEntity<APIResponse<List<ChatRoomResponseDTO>>> getChatListFilter(@RequestParam(name = "type",required = false) ChatType chatType, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(chatService.getChatListFilter(chatType,Long.valueOf(customUserDetails.getUsername())));
     }
 
     /**
      *
      * @param chatRoomId : 채팅방 id
      * @param password : 송금 확인 비밀번호
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 email
      * @return
      */
 
@@ -70,8 +72,8 @@ public class ChatController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    public ResponseEntity<APIResponse> remittance(@PathVariable Long chatRoomId, @RequestBody BankAccountRequestDTO.Password password, @AuthenticationPrincipal String email){
-        bankAccountService.remittanceByChat(password.getPassword(),chatRoomId, email); //송금 처리
+    public ResponseEntity<APIResponse> remittance(@PathVariable Long chatRoomId, @RequestBody BankAccountRequestDTO.Password password, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        bankAccountService.remittanceByChat(password.getPassword(),chatRoomId, Long.valueOf(customUserDetails.getUsername())); //송금 처리
         marketPostService.updateStatusCompleted(chatRoomId); // 거래 상태 업데이트
         return new ResponseEntity<>(APIResponse.of(SuccessCode.INSERT_SUCCESS), HttpStatus.CREATED);
     }
@@ -79,7 +81,7 @@ public class ChatController {
      * 채팅방안에서 활동파기
      * @param postId : 게시글 Id
      * @param chatId : 파기할 채팅 id
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 email
      * @return
      */
     @DeleteMapping("{postId}/cancel/{chatId}")
@@ -89,8 +91,8 @@ public class ChatController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    public ResponseEntity<APIResponse> cancelTrading(@PathVariable Long postId, @PathVariable Long chatId, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(applyService.cancel(postId,chatId,email));
+    public ResponseEntity<APIResponse> cancelTrading(@PathVariable Long postId, @PathVariable Long chatId, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(applyService.cancel(postId,chatId,Long.valueOf(customUserDetails.getUsername())));
     }
 
 }

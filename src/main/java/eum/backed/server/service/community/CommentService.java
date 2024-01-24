@@ -11,11 +11,11 @@ import java.util.List;
 
 @Service
 public interface CommentService {
-    List<CommentResponseDTO.CommentResponse> getComments(Long postId, String email, Pageable pageable);
+    List<CommentResponseDTO.CommentResponse> getComments(Long postId, Long userId, Pageable pageable);
 
-    APIResponse createComment(Long postId, CommentRequestDTO.CommentCreate commentCreate, String email);
+    APIResponse createComment(Long postId, CommentRequestDTO.CommentCreate commentCreate, Long userId);
 
-    APIResponse updateComment(Long postId, CommentRequestDTO.CommentUpdate commentUpdate, String email);
+    APIResponse updateComment(Long postId, CommentRequestDTO.CommentUpdate commentUpdate, Long userId);
 
-    APIResponse deleteComment(Long commentId,String email);
+    APIResponse deleteComment(Long commentId,Long userId);
 }

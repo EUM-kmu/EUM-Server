@@ -3,9 +3,9 @@ package eum.backed.server.domain.community.comment;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.Users;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 
 @Entity
 @Builder

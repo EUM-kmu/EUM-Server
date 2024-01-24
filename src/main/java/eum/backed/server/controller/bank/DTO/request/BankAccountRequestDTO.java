@@ -1,11 +1,10 @@
 package eum.backed.server.controller.bank.DTO.request;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
 
 public class BankAccountRequestDTO {
     @Getter

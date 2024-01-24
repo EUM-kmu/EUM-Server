@@ -5,6 +5,7 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.config.jwt.JwtTokenProvider;
 import eum.backed.server.controller.community.DTO.request.UsersRequestDTO;
 import eum.backed.server.controller.community.DTO.response.UsersResponseDTO;
+import eum.backed.server.domain.auth.dto.CustomUserInfoDto;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.SocialType;
 import eum.backed.server.domain.community.user.Users;
@@ -17,6 +18,7 @@ import eum.backed.server.domain.community.user.Authority;
 import eum.backed.server.exception.TokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -37,6 +40,7 @@ public class UsersService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate redisTemplate;
+    private final ModelMapper modelMapper;
     private final WithdrawalUserRepository withdrawalUserRepository;
 
     /**
@@ -48,11 +52,13 @@ public class UsersService {
         if(usersRepository.existsByEmail(signUp.getEmail())){
             throw new IllegalArgumentException("이미 존재하는 이메일 입니다");
         }
+        String uuid = UUID.randomUUID().toString();
         Users users = Users.builder()
                 .email(signUp.getEmail())
                 .password(passwordEncoder.encode(signUp.getPassword()))
                 .isBanned(false)
                 .isDeleted(false)
+                .uid(uuid)
                 .role(Role.ROLE_UNPROFILE_USER)
                 .socialType(SocialType.SELF)
                 .authorities(Collections.singletonList(Authority.ROLE_USER.name())).build();
@@ -68,12 +74,13 @@ public class UsersService {
     public APIResponse<UsersResponseDTO.TokenInfo> signIn(UsersRequestDTO.SignIn signIn) {
         Users getUser = usersRepository.findByEmail(signIn.getEmail()).orElseThrow(() -> new IllegalArgumentException("잘못된 이메일 정보"));
         if(!passwordEncoder.matches(signIn.getPassword(),getUser.getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
-        UsersResponseDTO.TokenInfo  tokenInfo = jwtTokenProvider.generateToken(getUser.getEmail(),getUser.getRole());
+        CustomUserInfoDto userInfo = modelMapper.map(getUser, CustomUserInfoDto.class);
+        UsersResponseDTO.TokenInfo  tokenInfo = jwtTokenProvider.generateToken(userInfo,getUser.getRole());
 
 
         // 4. RefreshToken Redis 저장 (expirationTime 설정을 통해 자동 삭제 처리)
         redisTemplate.opsForValue()
-                .set("RT:" + getUser.getEmail(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+                .set("RT:" + getUser.getUserId(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,tokenInfo);
     }
@@ -150,19 +157,22 @@ public class UsersService {
         if(email.isBlank()) throw new IllegalArgumentException("email is empty");
         Role role;
         if(usersRepository.existsByEmail(email)){
+            Users getUser = usersRepository.findByEmail(email).get();
+            CustomUserInfoDto info = modelMapper.map(getUser, CustomUserInfoDto.class);
             if(usersRepository.existsByEmailAndRole(email,Role.ROLE_USER)){ //활동 가능한 유저
                 role = Role.ROLE_USER;
-                tokenInfo = jwtTokenProvider.generateToken(email,role);
+                tokenInfo = jwtTokenProvider.generateToken(info,role);
             } else if (usersRepository.existsByEmailAndRole(email,Role.ROLE_UNPROFILE_USER) ||usersRepository.existsByEmailAndRole(email,Role.ROLE_UNPASSWORD_USER )) {
                 role = usersRepository.findByEmail(email).get().getRole();
-                tokenInfo = jwtTokenProvider.generateToken(email,role);
+                tokenInfo = jwtTokenProvider.generateToken(info,role);
             }
         }else{ //이메일이 없으면 최초 가입 유저 == 프로필이 없는 상태
             role = Role.ROLE_UNPROFILE_USER;
             Users temporaryUser = Users.builder().email(email).role(role).uid(uid).isDeleted(false).isBanned(false
             ).socialType(socialType).build();
-            usersRepository.save(temporaryUser);
-            tokenInfo = jwtTokenProvider.generateToken(email,role);
+//            usersRepository.save(temporaryUser);
+            CustomUserInfoDto info = modelMapper.map(temporaryUser, CustomUserInfoDto.class);
+            tokenInfo = jwtTokenProvider.generateToken(info,role);
         }
         redisTemplate.opsForValue()
                 .set("RT:" +email, tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
@@ -171,11 +181,11 @@ public class UsersService {
 
     /**
      * 토큰 검증 및 유저의 가입 상태
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse<UsersResponseDTO.UserRole> validateToken(String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid email"));
+    public APIResponse<UsersResponseDTO.UserRole> validateToken(Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, UsersResponseDTO.UserRole.builder().role(getUser.getRole()).build());
     }
 
@@ -192,10 +202,7 @@ public class UsersService {
         user.setDeleted(); // 회원탈퇴 상태 처리
         usersRepository.save(user);
     }
-    public Users findByEmail(String email){
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("invalid email"));
-        return getUser;
-    }
+
     public Users findById(Long userId){
         Users getUser = usersRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid email"));
         return getUser;

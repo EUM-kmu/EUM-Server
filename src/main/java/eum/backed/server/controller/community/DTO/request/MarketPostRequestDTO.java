@@ -3,10 +3,10 @@ package eum.backed.server.controller.community.DTO.request;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
 import eum.backed.server.domain.community.marketpost.Slot;
 import eum.backed.server.domain.community.marketpost.Status;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.*;
 
 public class MarketPostRequestDTO {
 

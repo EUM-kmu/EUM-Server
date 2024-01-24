@@ -6,6 +6,8 @@ import eum.backed.server.controller.community.DTO.request.enums.MarketType;
 import eum.backed.server.controller.community.DTO.request.enums.ServiceType;
 import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
 import eum.backed.server.controller.community.DTO.response.MarketPostResponseDTO;
+import eum.backed.server.domain.auth.CustomUserDetails;
+import eum.backed.server.domain.auth.dto.CustomUserInfoDto;
 import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.service.community.*;
@@ -43,7 +45,6 @@ public class  MarketPostController {
     /**
      * 거래 게시글 작성
      * @param marketCreate : 작성할 게시글 내용
-     * @param email : jwt에 담긴 email
      * @return
      * @throws ParseException : 활동 날짜 parsing 에러 처리
      */
@@ -56,15 +57,15 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PostMapping()
-    public ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> create(@RequestBody @Validated MarketPostRequestDTO.MarketCreate marketCreate, @AuthenticationPrincipal String email ) throws ParseException {
-        return new ResponseEntity<>(marketPostService.create(marketCreate, email), HttpStatus.CREATED);
+    public ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> create(@RequestBody @Validated MarketPostRequestDTO.MarketCreate marketCreate, @AuthenticationPrincipal  CustomUserDetails customUserDetails ) throws ParseException {
+        return new ResponseEntity<>(marketPostService.create(marketCreate, Long.valueOf(customUserDetails.getUsername())), HttpStatus.CREATED);
     }
 
     /**
      * 게시글 삭제
      * @param postId : 게시글 id
-     * @param email : jwt에 담긴 email
-     * @return
+     * @param customUserDetails : jwt에 담긴 email
+     * @retur
      */
     @ApiOperation(value = "게시글 삭제", notes = "게시글 아이디로 삭제")
     @ApiResponses(value = {
@@ -74,15 +75,14 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @DeleteMapping("/{postId}")
-    public  ResponseEntity<APIResponse> delete(@PathVariable Long postId,@AuthenticationPrincipal String email){
-        return ResponseEntity.ok(marketPostService.delete(postId,email));
+    public  ResponseEntity<APIResponse> delete(@PathVariable Long postId,@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(marketPostService.delete(postId,Long.valueOf(customUserDetails.getUsername())));
     }
 
     /**
      * 게시글 수정
      * @param postId : 게시글 Id
      * @param marketUpdate : 수정할 내용
-     * @param email : jwt에 담긴 email
      * @return
      * @throws ParseException : 활동 날짜 parsing 에러
      */
@@ -94,8 +94,8 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PutMapping("/{postId}")
-    public  ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> update(@PathVariable Long postId, @RequestBody @Validated MarketPostRequestDTO.MarketUpdate marketUpdate, @AuthenticationPrincipal String email) throws ParseException {
-        return ResponseEntity.ok(marketPostService.update(postId,marketUpdate,email));
+    public  ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> update(@PathVariable Long postId, @RequestBody @Validated MarketPostRequestDTO.MarketUpdate marketUpdate, @AuthenticationPrincipal CustomUserDetails customUserDetails) throws ParseException {
+        return ResponseEntity.ok(marketPostService.update(postId,marketUpdate,Long.valueOf(customUserDetails.getUsername())));
     }
 
     /**
@@ -103,7 +103,6 @@ public class  MarketPostController {
      * RECRUITING, RECRUITMENT_COMPLETED, TRANSACTION_COMPLETED
      * @param postId : 게시글 id
      * @param status : 바꿀 상태 프론트에서는 (모집중, 모집완료)만 요청 예정
-     * @param email : jwt에 담긴 email
      * @return
      */
     @ApiOperation(value = "게시글 상태 수정", notes = "게시글 아이디받고 거래 상태 상태 수정")
@@ -114,14 +113,13 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PutMapping("/{postId}/status")
-    public  ResponseEntity<APIResponse> updateState(@PathVariable Long postId, @RequestBody MarketPostRequestDTO.UpdateStatus status, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(marketPostService.updateState(postId,status.getStatus(), email));
+    public  ResponseEntity<APIResponse> updateState(@PathVariable Long postId, @RequestBody MarketPostRequestDTO.UpdateStatus status, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(marketPostService.updateState(postId,status.getStatus(), Long.valueOf(customUserDetails.getUsername())));
     }
 
     /**
      * 게시글 id로 조회
      * @param postId : 게시글 id
-     * @param email : jwt에 담긴 email
      * @param pageable : 페이지네이션
      * @return : 게시글 정보 + 댓글들
      */
@@ -133,9 +131,9 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("{postId}")
-    public  ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostWithComment>> findById(@PathVariable Long postId, @AuthenticationPrincipal String email, Pageable pageable){
-        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, email,pageable);
-        return ResponseEntity.ok(marketPostService.getMarketPostWithComment(postId,email,commentResponses));
+    public  ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostWithComment>> findById(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails customUserDetails, Pageable pageable){
+        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, Long.valueOf(customUserDetails.getUsername()),pageable);
+        return ResponseEntity.ok(marketPostService.getMarketPostWithComment(postId,Long.valueOf(customUserDetails.getUsername()),commentResponses));
     }
 
     /**
@@ -145,7 +143,6 @@ public class  MarketPostController {
      * @param marketType : REQUEST_HELP,PROVIDE_HELP (도움요청, 도움제공)
      * @param status :RECRUITING (모집중)
      * @param pageable : 페이지네이젼
-     * @param email :
      * @return
      */
     @ApiOperation(value = "필터 조회", notes = "필터 별 게시글 리스트 조회")
@@ -158,8 +155,8 @@ public class  MarketPostController {
     @GetMapping("")
     public  ResponseEntity<APIResponse<List<MarketPostResponseDTO.MarketPostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category,
                                                                                                @RequestParam(name = "marketType",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,
-                                                                                               @PageableDefault Pageable pageable, @AuthenticationPrincipal String email){
-        Users getUser = usersService.findByEmail(email);
+                                                                                                     @PageableDefault Pageable pageable, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        Users getUser = usersService.findById(Long.valueOf(customUserDetails.getUsername()));
         List<Users> blockedUsers = blockService.getBlockedUser(getUser);
         return ResponseEntity.ok(marketPostService.findByFilter(keyword,category,marketType,status,pageable,blockedUsers));
     }
@@ -167,7 +164,6 @@ public class  MarketPostController {
     /**
      * 게시글 관심 설정
      * @param postId : 게시글 Id
-     * @param email : jwt에 담긴 email
      * @return
      */
     @GetMapping("/{postId}/scrap")
@@ -180,14 +176,14 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @ApiOperation(value = "거래 게시글 관심설정", notes = "관심 설정")
-    public  ResponseEntity<APIResponse> doScrap(@PathVariable Long postId, @AuthenticationPrincipal String email) {
-        return scrapService.scrap(postId, email);
+    public  ResponseEntity<APIResponse> doScrap(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return scrapService.scrap(postId, Long.valueOf(customUserDetails.getUsername()));
     }
 
     /**
      * 내활동 타입별 게시글 조회 : 내가 스크랩 한 글, 내가 작성한 게시글, 내 지원 글
      * @param serviceType : scrap, postlist,apply
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 email
      * @return : 게시글 정보
      */
     @ApiOperation(value = "거래 게시글 관려 내서비스 조회", notes = "내 관심 거래글(scrap), 내가 작성한 거래 게시글(postlist) , 지원한 게시글(apply)")
@@ -198,10 +194,10 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/user-activity/{serviceType}")
-    public ResponseEntity<APIResponse<List<MarketPostResponseDTO.MarketPostResponse>>> findByServiceType(@PathVariable ServiceType serviceType, @AuthenticationPrincipal String email){
-        Users getUser = usersService.findByEmail(email);
+    public ResponseEntity<APIResponse<List<MarketPostResponseDTO.MarketPostResponse>>> findByServiceType(@PathVariable ServiceType serviceType, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        Users getUser = usersService.findById(Long.valueOf(customUserDetails.getUsername()));
         List<Users> blockedUser = blockService.getBlockedUser(getUser);
-        return ResponseEntity.ok(marketPostService.findByServiceType(serviceType,email,blockedUser));
+        return ResponseEntity.ok(marketPostService.findByServiceType(serviceType,Long.valueOf(customUserDetails.getUsername()),blockedUser));
     }
 
 

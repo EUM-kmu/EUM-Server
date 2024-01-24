@@ -1,13 +1,12 @@
 package eum.backed.server.controller.community.DTO.request;
 
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
 
 public class UsersRequestDTO {
     @Getter

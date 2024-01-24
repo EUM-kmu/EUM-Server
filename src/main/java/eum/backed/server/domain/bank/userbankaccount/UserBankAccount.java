@@ -5,9 +5,9 @@ import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransactio
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.bank.Owner;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

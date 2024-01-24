@@ -8,6 +8,7 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.DTO.request.UsersRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.SignInType;
 import eum.backed.server.controller.community.DTO.response.UsersResponseDTO;
+import eum.backed.server.domain.auth.CustomUserDetails;
 import eum.backed.server.domain.community.user.SocialType;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.service.community.*;
@@ -45,7 +46,7 @@ public class UsersController {
 
     /**
      *
-     * @param email : jwt 토큰에 담겨있는 email
+     * @param customUserDetails : jwt 토큰에 담겨있는 customUserDetails
      * @return :
      * 기능 :
      *  프로필 작성 중단하고 서비스를 재사용할때 상태 판별을 위한 토큰 조회 controller
@@ -61,8 +62,8 @@ public class UsersController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/token")
-    public ResponseEntity<APIResponse<UsersResponseDTO.UserRole>>validateToken(@AuthenticationPrincipal String email) {
-        return new ResponseEntity<>(usersService.validateToken(email), HttpStatus.OK);
+    public ResponseEntity<APIResponse<UsersResponseDTO.UserRole>>validateToken(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return new ResponseEntity<>(usersService.validateToken(Long.valueOf(customUserDetails.getUsername())), HttpStatus.OK);
     }
 
     /**
@@ -178,9 +179,9 @@ public class UsersController {
 
     /**
      *
-     * @param authorizationHeader : redis에 유저 정보(email)을 삭제하기 위해 받는 헤더 정보
+     * @param authorizationHeader : redis에 유저 정보(customUserDetails)을 삭제하기 위해 받는 헤더 정보
      * @param withdrawal : 탈퇴 사유를 위한 body
-     * @param email : jwt 토큰에 담겨있는 email
+     * @param customUserDetails : jwt 토큰에 담겨있는 customUserDetails
      * @return
      * @throws FirebaseAuthException
      *
@@ -188,8 +189,8 @@ public class UsersController {
      */
     @PostMapping("/withdrawal")
     @ApiOperation(value = "탈퇴하기")
-    public ResponseEntity<APIResponse> withdrawal(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,@RequestBody UsersRequestDTO.Withdrawal withdrawal,@AuthenticationPrincipal String email) throws FirebaseAuthException {
-        Users getUser = usersService.findByEmail(email);
+    public ResponseEntity<APIResponse> withdrawal(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,@RequestBody UsersRequestDTO.Withdrawal withdrawal,@AuthenticationPrincipal CustomUserDetails customUserDetails) throws FirebaseAuthException {
+        Users getUser = usersService.findById(Long.valueOf(customUserDetails.getUsername()));
         bankAccountService.freezeAccount(getUser); //계좌 동결
         chatService.blockedChatInWithdrawal(getUser); //탈퇴 유저와의 채팅 block
         applyService.withdrawalApply(getUser); //탈퇴 유저 지원취소 처리
@@ -209,13 +210,13 @@ public class UsersController {
     /**
      * 차단하기 , 차단해제 같은 controller에 담은 -> 프론트 요청으로 다른 컨트롤러로 분리해야함
      * @param blockedAction : 차단할 유저 id
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 customUserDetails
      * @return
      */
    @PostMapping("/block")
    @ApiOperation(value = "차단하기",notes = "동일한 메소드 한번더 보낼땐 차단해제, 클라이언트에는 현재 없는 기능이지만 테스트용으로 존재")
-    public ResponseEntity<APIResponse> blockedAction(@RequestBody UsersRequestDTO.BlockedAction blockedAction, @AuthenticationPrincipal String email){
-       Users blocker = usersService.findByEmail(email);
+    public ResponseEntity<APIResponse> blockedAction(@RequestBody UsersRequestDTO.BlockedAction blockedAction, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+       Users blocker = usersService.findById(Long.valueOf(customUserDetails.getUsername()));
        Users blocked = usersService.findById(blockedAction.getUserId()); //차단할 유저 객체
 
        Boolean isBlocked = blockService.blockedAction(blocker, blocked); //차단•해제에 대한 판별

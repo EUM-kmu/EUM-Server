@@ -48,13 +48,13 @@ public class BankTransactionService {
 
     /**
      * 가레네약 조회
-     * @param email
+     * @param userId
      * @param transactionType DEPOSIT(입금),WITHDRAW(출금)
      * @return
      */
-    public APIResponse<List<BankAccountResponseDTO.HistoryWithInfo>> getAllHistory(String email, TransactionType transactionType) {
-        Users geUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
-        UserBankAccount bankAccount = userBankAccountRepository.findByUser(geUser).orElseThrow(() -> new NullPointerException("Invalid user"));
+    public APIResponse<List<BankAccountResponseDTO.HistoryWithInfo>> getAllHistory(Long userId, TransactionType transactionType) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("Invalid userId"));
+        UserBankAccount bankAccount = userBankAccountRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("Invalid user"));
         if (!(transactionType ==null)){
             List<BankAccountTransaction> bankAccountTransactions = bankAccountTransactionRepository.findByMyBankAccountAndTransactionTypeOrderByCreateDateDesc(bankAccount, transactionType).orElse(Collections.emptyList());
             List<BankAccountResponseDTO.History> getAllHistories = getAllHistories(bankAccountTransactions);

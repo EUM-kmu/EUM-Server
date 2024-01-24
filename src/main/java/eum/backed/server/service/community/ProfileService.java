@@ -12,6 +12,7 @@ import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,11 +24,12 @@ public class ProfileService {
     /**
      * 프로필 생성
      * @param createProfile
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse<ProfileResponseDTO.ProfileResponse> create(ProfileRequestDTO.CreateProfile createProfile, String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+    @Transactional
+    public APIResponse<ProfileResponseDTO.ProfileResponse> create(ProfileRequestDTO.CreateProfile createProfile, Long userId) {
+        Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
 
 
@@ -40,7 +42,6 @@ public class ProfileService {
         Role role = (getUser.getRole() == Role.ROLE_ORGANIZATION) ? Role.ROLE_ORGANIZATION : Role.ROLE_UNPASSWORD_USER;
         getUser.updateRole(role);
         Users updatedUser= userRepository.save(getUser);
-
 
         ProfileResponseDTO.ProfileResponse createProfileResponse = ProfileResponseDTO.toProfileResponse(updatedUser, savedProfile);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,createProfileResponse);
@@ -70,11 +71,11 @@ public class ProfileService {
     /**
      * 프로필 수정
      * @param updateProfile
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse updateMyProfile(ProfileRequestDTO.UpdateProfile updateProfile,String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+    public APIResponse updateMyProfile(ProfileRequestDTO.UpdateProfile updateProfile,Long userId) {
+        Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
 
         Avatar getAvatar = (getUser.getRole() == Role.ROLE_ORGANIZATION)

@@ -4,44 +4,41 @@ package eum.backed.server.config.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eum.backed.server.common.DTO.ErrorResponse;
 import eum.backed.server.common.DTO.enums.ErrorCode;
+import eum.backed.server.service.auth.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import lombok.AllArgsConstructor;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
-@AllArgsConstructor
-public class JwtAuthenticationFilter extends GenericFilterBean {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_TYPE = "Bearer";
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
 
     private final RedisTemplate redisTemplate;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    private  final CustomUserDetailsService customUserDetailsService;
+
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         // Request Header에서 JWT 토큰 추출
-        String token = resolveToken((HttpServletRequest) request);
+        String token = resolveToken( request);
 
         try {
             // validateToken으로 토큰 유효성 검사
@@ -54,37 +51,37 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                     if( !(refreshToken == null || refreshToken.isBlank())){
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }else {
-                        handleUnauthorizedException("로그아웃한 유저",(HttpServletResponse) response);;
+                        handleUnauthorizedException("로그아웃한 유저",response);;
                         return;
                     }
                 }
             }
         } catch (SecurityException | MalformedJwtException e) {
             // 401 Unauthorized
-            handleUnauthorizedException("Invalid JWT Token",(HttpServletResponse) response);
+            handleUnauthorizedException("Invalid JWT Token", response);
             return;
         } catch (ExpiredJwtException e) {
             // 401 Forbidden
-            handleUnauthorizedException("Expired JWT Token",(HttpServletResponse) response);
+            handleUnauthorizedException("Expired JWT Token",response);
             return;
         } catch (UnsupportedJwtException e) {
             // 400 Bad Request
-            handleBadRequestException("Unsupported JWT Token",(HttpServletResponse) response);
+            handleBadRequestException("Unsupported JWT Token", response);
             return;
         } catch (IllegalArgumentException e) {
             // 400 Bad Request
-            handleBadRequestException("JWT claims string is empty",(HttpServletResponse) response);
+            handleBadRequestException("JWT claims string is empty",response);
             return;
         } catch (SignatureException e){
-            handleUnauthorizedException("Invalid JWT Token",(HttpServletResponse) response);
+            handleUnauthorizedException("Invalid JWT Token", response);
             return;
         }catch(io.jsonwebtoken.io.DecodingException e){
-            handleUnauthorizedException("Invalid JWT Token",(HttpServletResponse) response);
+            handleUnauthorizedException("Invalid JWT Token",response);
             return;
 
         }catch (Exception e) {
             // 예외 처리
-            handleException(e, (HttpServletResponse) response);
+            handleException(e,  response);
             return;
         }
 

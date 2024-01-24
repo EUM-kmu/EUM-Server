@@ -3,6 +3,7 @@ package eum.backed.server.controller.community;
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.controller.community.DTO.request.ApplyRequestDTO;
 import eum.backed.server.controller.community.DTO.response.ApplyResponseDTO;
+import eum.backed.server.domain.auth.CustomUserDetails;
 import eum.backed.server.service.community.ApplyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,7 +31,6 @@ public class ApplyController {
      * 지원하기
      * @param postId : 지원할 게시글 id
      * @param apply : 지원 폼
-     * @param email : jwt에 담긴 이메일
      * @return
      */
     @PostMapping("/{postId}/apply")
@@ -42,15 +42,15 @@ public class ApplyController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    public ResponseEntity<APIResponse> apply(@PathVariable Long postId,@RequestBody ApplyRequestDTO.Apply apply, @AuthenticationPrincipal String email){
-        return new ResponseEntity<>(applyService.doApply(postId,apply, email), HttpStatus.CREATED);
+    public ResponseEntity<APIResponse> apply(@PathVariable Long postId,@RequestBody ApplyRequestDTO.Apply apply, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return new ResponseEntity<>(applyService.doApply(postId,apply, Long.valueOf(customUserDetails.getUsername())), HttpStatus.CREATED);
     }
 
     /**
      * 지원취소
      * @param postId : 게시글 id
      * @param applyId : 지원취소할 id
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 email
      * @return
      */
     @DeleteMapping("/{postId}/apply/{applyId}")
@@ -62,8 +62,8 @@ public class ApplyController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    public ResponseEntity<APIResponse> unapply(@PathVariable Long postId,@PathVariable Long applyId, @AuthenticationPrincipal String email){
-        return new ResponseEntity<>(applyService.unApply(postId,applyId, email), HttpStatus.CREATED);
+    public ResponseEntity<APIResponse> unapply(@PathVariable Long postId,@PathVariable Long applyId, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return new ResponseEntity<>(applyService.unApply(postId,applyId, Long.valueOf(customUserDetails.getUsername())), HttpStatus.CREATED);
     }
 
     /**
@@ -96,8 +96,8 @@ public class ApplyController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
-    public ResponseEntity<APIResponse> acceptByPost(@RequestBody ApplyRequestDTO.AcceptList acceptList,@AuthenticationPrincipal String email){
-        return ResponseEntity.ok(applyService.accept(acceptList.getApplyIds(),email));
+    public ResponseEntity<APIResponse> acceptByPost(@RequestBody ApplyRequestDTO.AcceptList acceptList,@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(applyService.accept(acceptList.getApplyIds(),Long.valueOf(customUserDetails.getUsername())));
     }
 
 

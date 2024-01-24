@@ -4,9 +4,8 @@ import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.controller.community.DTO.request.ProfileRequestDTO;
 import eum.backed.server.domain.community.avatar.Avatar;
 import eum.backed.server.domain.community.user.Users;
+import jakarta.persistence.*;
 import lombok.*;
-
-import javax.persistence.*;
 
 @Entity
 @Builder

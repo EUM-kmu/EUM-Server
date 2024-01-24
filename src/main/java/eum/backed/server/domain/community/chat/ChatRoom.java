@@ -4,9 +4,9 @@ import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.user.Users;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 
 @Entity
 @Builder

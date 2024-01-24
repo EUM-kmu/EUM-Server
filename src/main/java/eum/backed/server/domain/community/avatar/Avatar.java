@@ -1,17 +1,17 @@
 package eum.backed.server.domain.community.avatar;
 
 import eum.backed.server.domain.community.profile.Profile;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Entity
 public class Avatar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

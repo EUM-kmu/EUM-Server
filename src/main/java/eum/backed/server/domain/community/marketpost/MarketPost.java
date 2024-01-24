@@ -10,9 +10,9 @@ import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.user.Users;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

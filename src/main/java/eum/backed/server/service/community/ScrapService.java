@@ -20,8 +20,8 @@ public class ScrapService {
     private final MarketPostRepository marketPostRepository;
     private final UsersRepository userRepository;
 
-    public ResponseEntity<APIResponse> scrap(Long postId, String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
+    public ResponseEntity<APIResponse> scrap(Long postId, Long userId) {
+        Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(()->new IllegalArgumentException("Invalid postId"));
         if(getMarketPost.getUser() == getUser) throw new IllegalArgumentException("자기 게시글 스크랩 불가");
         if(scrapRepository.existsByMarketPostAndUser(getMarketPost,getUser)) {

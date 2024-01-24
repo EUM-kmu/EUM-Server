@@ -1,15 +1,17 @@
 package eum.backed.server.config.jwt;
 
 import eum.backed.server.controller.community.DTO.response.UsersResponseDTO;
+import eum.backed.server.domain.auth.dto.CustomUserInfoDto;
 import eum.backed.server.domain.community.user.Role;
 import eum.backed.server.domain.community.user.Users;
 import eum.backed.server.domain.community.user.UsersRepository;
 import eum.backed.server.exception.TokenException;
-import eum.backed.server.service.community.CustomUsersDetailsService;
+import eum.backed.server.service.auth.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +23,24 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class JwtTokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
+    private static final String USER_ID = "userId";
+    private static final String UID = "uid";
+    private static final String ROLE = "role";
     private static final String BEARER_TYPE = "Bearer";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 12 * 60 * 60 * 1000L;
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;    // 7일
     @Autowired
-    private CustomUsersDetailsService customUsersDetailsService;
+    private CustomUserDetailsService customUserDetailsService;
     private final Key key;
     @Autowired
     private UsersRepository usersRepository;
@@ -74,25 +81,56 @@ public class JwtTokenProvider {
                 .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
                 .build();
     }
-    public UsersResponseDTO.TokenInfo generateToken(String email, Role role) {
+    public UsersResponseDTO.TokenInfo generateToken(CustomUserInfoDto user, Role role) {
+        Claims claims = Jwts.claims();
+        claims.put(USER_ID, user.getUserId());
+        claims.put(UID, user.getUid());
+        claims.put(ROLE, user.getRole());
+//        log.info(claims.get("userId",Long.class).toString());
         // Check if the user has the TEST role
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid user"));
-        if (getUser.getRole() == Role.TEST) {
-            // Set the access token expiration time to infinity for TEST users
-            long now = (new Date()).getTime();
-            Date accessTokenExpiresIn = new Date(Long.MAX_VALUE);
+//        if (getUser.getRole() == Role.TEST) {
+//            // Set the access token expiration time to infinity for TEST users
+//            long now = (new Date()).getTime();
+//            Date accessTokenExpiresIn = new Date(Long.MAX_VALUE);
+//
+//            // Generate the access token
+//            String accessToken = Jwts.builder()
+//                    .setSubject(email)
+//                    .claim(AUTHORITIES_KEY, "authorities")
+//                    .setExpiration(accessTokenExpiresIn)
+//                    .signWith(key, SignatureAlgorithm.HS256)
+//                    .compact();
+//
+//            // Generate the refresh token
+//            String refreshToken = Jwts.builder()
+//                    .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+//                    .signWith(key, SignatureAlgorithm.HS256)
+//                    .compact();
+//
+//            return UsersResponseDTO.TokenInfo.builder()
+//                    .grantType(BEARER_TYPE)
+//                    .accessToken(accessToken)
+//                    .refreshToken(refreshToken)
+//                    .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
+//                    .role(role)
+//                    .build();
+//        } else {
+//            // Generate the access and refresh tokens normally for non-TEST users
+            ZonedDateTime now = ZonedDateTime.now();
+            ZonedDateTime accessTokenExpiresIn = now.plusSeconds( ACCESS_TOKEN_EXPIRE_TIME);
+            ZonedDateTime refreshTokenExpiresIn = now.plusSeconds( REFRESH_TOKEN_EXPIRE_TIME);
 
             // Generate the access token
             String accessToken = Jwts.builder()
-                    .setSubject(email)
-                    .claim(AUTHORITIES_KEY, "authorities")
-                    .setExpiration(accessTokenExpiresIn)
+                    .setClaims(claims)
+                    .setIssuedAt(Date.from(now.toInstant()))
+                    .setExpiration(Date.from(accessTokenExpiresIn.toInstant()))
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
 
             // Generate the refresh token
             String refreshToken = Jwts.builder()
-                    .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                    .setExpiration(Date.from(refreshTokenExpiresIn.toInstant()))
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
 
@@ -103,54 +141,18 @@ public class JwtTokenProvider {
                     .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
                     .role(role)
                     .build();
-        } else {
-            // Generate the access and refresh tokens normally for non-TEST users
-            long now = (new Date()).getTime();
-            Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-
-            // Generate the access token
-            String accessToken = Jwts.builder()
-                    .setSubject(email)
-                    .claim(AUTHORITIES_KEY, "authorities")
-                    .setExpiration(accessTokenExpiresIn)
-                    .signWith(key, SignatureAlgorithm.HS256)
-                    .compact();
-
-            // Generate the refresh token
-            String refreshToken = Jwts.builder()
-                    .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
-                    .signWith(key, SignatureAlgorithm.HS256)
-                    .compact();
-
-            return UsersResponseDTO.TokenInfo.builder()
-                    .grantType(BEARER_TYPE)
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
-                    .role(role)
-                    .build();
-        }
+//        }
     }
 
     // JWT 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
     public Authentication getAuthentication(String accessToken) {
         // 토큰 복호화
         Claims claims = parseClaims(accessToken);
-//        if (claims.get(AUTHORITIES_KEY) == null) {
-//            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-//        }
-//
-//        // 클레임에서 권한 정보 가져오기
-//        Collection<? extends GrantedAuthority> authorities =
-//                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-//                        .map(SimpleGrantedAuthority::new)
-//                        .collect(Collectors.toList());
 
-        // UserDetails 객체를 만들어서 Authentication 리턴
-//        UserDetails principal = new User(claims.getSubject(), "", authorities);
-        UserDetails userDetails = customUsersDetailsService.loadUserByUsername(claims.getSubject());
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.get(USER_ID,Long.class).toString());
 //        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
-        return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), accessToken, userDetails.getAuthorities());
+        log.info(userDetails.getUsername());
+        return new UsernamePasswordAuthenticationToken(userDetails, accessToken, userDetails.getAuthorities());
     }
 
 

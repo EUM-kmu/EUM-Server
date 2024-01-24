@@ -4,6 +4,7 @@ import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.DTO.request.CommentRequestDTO;
 import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
+import eum.backed.server.domain.auth.CustomUserDetails;
 import eum.backed.server.service.community.CommentServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +33,7 @@ public class MarketCommentController {
      * 게시글 id에 해당하는 댓글들 조회
      * @param postId : 게시글 id
      * @param pageable : 페이지 네이션 (디폴트 값 설정해야함)
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 email
      * @return : 댓글 내용, 작성자 정보, 게시글 작성자/댓글 작성자 판별
      */
     @ApiOperation(value = "댓글 조회", notes = "댓글 조회")
@@ -44,15 +45,15 @@ public class MarketCommentController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @GetMapping("/{postId}/comment")
-    ResponseEntity<APIResponse<List<CommentResponseDTO.CommentResponse>>> getComments(@PathVariable Long postId,  Pageable pageable, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS,commentServiceImpl.getComments(postId, email,pageable)));
+    ResponseEntity<APIResponse<List<CommentResponseDTO.CommentResponse>>> getComments(@PathVariable Long postId,  Pageable pageable, @AuthenticationPrincipal CustomUserDetails customUserDetails ){
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS,commentServiceImpl.getComments(postId, Long.valueOf(customUserDetails.getUsername()),pageable)));
     }
 
     /**
      * 댓글 작성
      * @param postId : 게시글
      * @param commentCreate : 댓글 내용
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 email
      * @return
      */
     @ApiOperation(value = "거래 댓글 작성", notes = "댓글 작성")
@@ -64,15 +65,15 @@ public class MarketCommentController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PostMapping("/{postId}/comment")
-    ResponseEntity<APIResponse> create(@PathVariable Long postId, @RequestBody @Validated CommentRequestDTO.CommentCreate commentCreate, @AuthenticationPrincipal String email){
-        return new ResponseEntity<>(commentServiceImpl.createComment(postId, commentCreate, email), HttpStatus.CREATED);
+    ResponseEntity<APIResponse> create(@PathVariable Long postId, @RequestBody @Validated CommentRequestDTO.CommentCreate commentCreate, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return new ResponseEntity<>(commentServiceImpl.createComment(postId, commentCreate, Long.valueOf(customUserDetails.getUsername())), HttpStatus.CREATED);
     }
 
     /**
      * 댓글 수정
      * @param commentId : 수정할 댓글 id
      * @param commentUpdate : 수정할 댓글 내용
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 customUserDetails
      * @return
      */
     @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
@@ -84,14 +85,14 @@ public class MarketCommentController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @PutMapping("{postId}/comment/{commentId}")
-    ResponseEntity<APIResponse> update(@PathVariable Long commentId, @RequestBody @Validated CommentRequestDTO.CommentUpdate commentUpdate, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(commentServiceImpl.updateComment(commentId, commentUpdate, email));
+    ResponseEntity<APIResponse> update(@PathVariable Long commentId, @RequestBody @Validated CommentRequestDTO.CommentUpdate commentUpdate, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(commentServiceImpl.updateComment(commentId, commentUpdate, Long.valueOf(customUserDetails.getUsername())));
     }
 
     /**
      * 댓글 삭제
      * @param commentId : 삭제할 댓글 id
-     * @param email : jwt에 담긴 email
+     * @param customUserDetails : jwt에 담긴 email
      * @return
      */
     @ApiOperation(value = "댓글 삭제", notes = "댓글 삭제")
@@ -103,8 +104,8 @@ public class MarketCommentController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
     })
     @DeleteMapping("/{postId}/comment/{commentId}")
-    ResponseEntity<APIResponse> delete(@PathVariable Long commentId, @AuthenticationPrincipal String email){
-        return ResponseEntity.ok(commentServiceImpl.deleteComment(commentId, email));
+    ResponseEntity<APIResponse> delete(@PathVariable Long commentId, @AuthenticationPrincipal CustomUserDetails customUserDetails){
+        return ResponseEntity.ok(commentServiceImpl.deleteComment(commentId, Long.valueOf(customUserDetails.getUsername())));
     }
 
 

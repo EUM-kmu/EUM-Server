@@ -17,13 +17,13 @@ public interface MarketPostRepository extends JpaRepository<MarketPost,Long> {
             "AND (:marketType IS NULL OR e.marketType = :marketType) " +
             "AND (:status IS NULL OR e.status = :status) " +
             "AND e.isDeleted = false " +
-            "AND (COALESCE(:users, NULL) IS NULL OR e.user NOT IN :users) " +
+//            "AND (COALESCE(:users, NULL) IS NULL OR e.user NOT IN :users) " +
             "ORDER BY e.createDate DESC")
     Optional<List<MarketPost>> findByFilters(
             @Param("marketCategory") MarketCategory marketCategory,
             @Param("marketType") MarketType marketType,
-            @Param("status") Status status,
-            @Param("users") List<Users> users
+            @Param("status") Status status
+//            @Param("users") List<Users> users
     );
 
 

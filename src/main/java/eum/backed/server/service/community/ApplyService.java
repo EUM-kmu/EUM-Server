@@ -40,11 +40,11 @@ public class ApplyService {
      * 지원하기
      * @param postId
      * @param applyRequest
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse doApply(Long postId,ApplyRequestDTO.Apply applyRequest, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("Invalid email"));
+    public APIResponse doApply(Long postId,ApplyRequestDTO.Apply applyRequest, Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("Invalid userId"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new NullPointerException("Invalid postId"));
 
         if(getMarketPost.isDeleted()) throw new IllegalArgumentException("Deleted post");
@@ -90,11 +90,11 @@ public class ApplyService {
     /**
      * 지언 수락
      * @param applyIds 수락할 지원 id들
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse accept(List<Long> applyIds, String email) {
-        Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
+    public APIResponse accept(List<Long> applyIds, Long userId) {
+        Users getUser = usersRepository.findById(userId). orElseThrow(() -> new NullPointerException("Invalid email"));
         applyIds.stream().forEach(applyId -> {
             Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
 
@@ -127,11 +127,11 @@ public class ApplyService {
      * 선정 전 지원 취소
      * @param postId
      * @param applyId
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse unApply(Long postId, Long applyId, String email) {
-        Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
+    public APIResponse unApply(Long postId, Long applyId, Long userId) {
+        Users getUser = usersRepository.findById(userId). orElseThrow(() -> new NullPointerException("Invalid email"));
         Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
 
         if(getApply.getMarketPost().getMarketPostId() != postId) throw new IllegalArgumentException("invalid postId");
@@ -147,11 +147,11 @@ public class ApplyService {
      * 선정 후 활동 파기
      * @param postId
      * @param chatId
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse cancel(Long postId, Long chatId, String email) {
-        Users getUser = usersRepository.findByEmail(email). orElseThrow(() -> new NullPointerException("Invalid email"));
+    public APIResponse cancel(Long postId, Long chatId, Long userId) {
+        Users getUser = usersRepository.findById(userId). orElseThrow(() -> new NullPointerException("Invalid email"));
         ChatRoom chatRoom = chatRoomRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException("해딩 채팅방이 없습니다"));
         if(chatRoom.getMarketPost().getMarketPostId() != postId) throw new IllegalArgumentException("invalid postId");
 

@@ -2,9 +2,9 @@ package eum.backed.server.domain.bank.branchbankaccount;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.bank.Owner;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 
 @Entity
 @Builder

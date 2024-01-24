@@ -1,8 +1,8 @@
 package eum.backed.server.util;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class RequestUtil {
 

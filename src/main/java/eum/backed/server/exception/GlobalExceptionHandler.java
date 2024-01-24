@@ -8,6 +8,7 @@ import eum.backed.server.common.DTO.enums.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.validation.UnexpectedTypeException;
 import java.io.IOException;
 
 @RestControllerAdvice

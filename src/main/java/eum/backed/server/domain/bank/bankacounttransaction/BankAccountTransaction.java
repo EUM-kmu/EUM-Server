@@ -4,9 +4,9 @@ import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 
 @Entity
 @Builder

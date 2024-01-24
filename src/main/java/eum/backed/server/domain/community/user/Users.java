@@ -10,6 +10,7 @@ import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.withdrawaluser.WithdrawalUser;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Users extends BaseTimeEntity implements UserDetails {
+public class Users extends BaseTimeEntity  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
@@ -97,37 +97,37 @@ public class Users extends BaseTimeEntity implements UserDetails {
 
 
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public String getUsername() {
+//        return email;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isEnabled() {
+//        return true;
+//    }
+//
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return this.authorities.stream()
+//                .map(SimpleGrantedAuthority::new)
+//                .collect(Collectors.toList());
+//    }
 
     public void updateRole(Role role) {
         this.role = role;

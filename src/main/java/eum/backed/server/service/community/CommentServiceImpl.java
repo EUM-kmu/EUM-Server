@@ -28,8 +28,8 @@ public class CommentServiceImpl implements CommentService {
     private final MarketPostRepository marketPostRepository;
     private final UsersRepository userRepository;
     @Override
-    public List<CommentResponseDTO.CommentResponse> getComments(Long postId, String email, Pageable pageable) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+    public List<CommentResponseDTO.CommentResponse> getComments(Long postId, Long userId, Pageable pageable) {
+        Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         List<CommentResponseDTO.CommentResponse> commentResponses ;
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
         List<MarketComment> marketComments = marketCommentRepository.findByMarketPostOrderByCreateDateDesc(getMarketPost,pageable).orElse(Collections.emptyList());
@@ -46,16 +46,16 @@ public class CommentServiceImpl implements CommentService {
         return commentResponses;
     }
     @Override
-    public APIResponse createComment(Long postId, CommentRequestDTO.CommentCreate commentCreate, String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+    public APIResponse createComment(Long postId, CommentRequestDTO.CommentCreate commentCreate, Long userId) {
+        Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
             MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postID"));
             MarketComment marketComment = MarketComment.toEntity(commentCreate.getContent(), getUser, getMarketPost);
             marketCommentRepository.save(marketComment);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS);
     }
     @Override
-    public APIResponse updateComment(Long commentId, CommentRequestDTO.CommentUpdate commentUpdate, String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+    public APIResponse updateComment(Long commentId, CommentRequestDTO.CommentUpdate commentUpdate, Long userId) {
+        Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
 
         MarketComment getMarketComment = marketCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
         if(getUser.getUserId() != getMarketComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
@@ -64,8 +64,8 @@ public class CommentServiceImpl implements CommentService {
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS);
     }
     @Override
-    public APIResponse deleteComment(Long commentId, String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+    public APIResponse deleteComment(Long commentId, Long userId) {
+        Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         MarketComment getMarketComment = marketCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Invalid commentID"));
         if(getUser.getUserId() != getMarketComment.getUser().getUserId()) throw new IllegalArgumentException("잘못된 접근 사용자");
         marketCommentRepository.delete(getMarketComment);

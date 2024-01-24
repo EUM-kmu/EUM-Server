@@ -1,9 +1,9 @@
 package eum.backed.server.domain.community.category;
 
 import eum.backed.server.domain.community.marketpost.MarketPost;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

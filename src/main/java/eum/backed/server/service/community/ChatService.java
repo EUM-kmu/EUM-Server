@@ -46,22 +46,22 @@ public class ChatService {
 
 
 //내 게시글 채팅방 리스트
-    private APIResponse<List<ChatRoomResponseDTO>> getChatListInMyPost(String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
+    private APIResponse<List<ChatRoomResponseDTO>> getChatListInMyPost(Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
         List<ChatRoom> chatRooms = chatRoomRepository.findByPostWriter(getUser).orElse(Collections.emptyList());
         List<ChatRoomResponseDTO> chatRoomResponseDTOS = getChatRoomResponses(chatRooms, getUser,true);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,chatRoomResponseDTOS);
     }
 //    상대방 게시글 채팅방 리스트
-    private APIResponse<List<ChatRoomResponseDTO>> getChatListInOtherPost(String email){
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
+    private APIResponse<List<ChatRoomResponseDTO>> getChatListInOtherPost(Long userId){
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
         List<ChatRoom> chatRooms = chatRoomRepository.findByApplicant(getUser).orElse(Collections.emptyList());
         List<ChatRoomResponseDTO> chatRoomResponseDTOS = getChatRoomResponses(chatRooms, getUser,false);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,chatRoomResponseDTOS);
     }
 //    전체 채팅 조회 -> 위에 세개 합쳐서 쿼리문으로 작성해야함
-    private APIResponse<List<ChatRoomResponseDTO>> getAllChatList(String email){
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("invalid email"));
+    private APIResponse<List<ChatRoomResponseDTO>> getAllChatList(Long userId){
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
         List<ChatRoom> chatRooms = chatRoomRepository.findByPostWriterOrApplicant(getUser,getUser).orElse(Collections.emptyList());
         List<ChatRoomResponseDTO> chatRoomResponseDTOS = getAllChatRoomResponses(chatRooms, getUser);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,chatRoomResponseDTOS);
@@ -107,13 +107,13 @@ public class ChatService {
         return chatRoomResponseDTOS;
     }
 
-    public APIResponse<List<ChatRoomResponseDTO>> getChatListFilter(ChatType chatType, String email) {
+    public APIResponse<List<ChatRoomResponseDTO>> getChatListFilter(ChatType chatType, Long userId) {
         if(chatType == ChatType.mine){
-            return getChatListInMyPost(email);
+            return getChatListInMyPost(userId);
         } else if (chatType ==ChatType.others) {
-            return getChatListInOtherPost(email);
+            return getChatListInOtherPost(userId);
         }
-        return getAllChatList(email);
+        return getAllChatList(userId);
     }
 
     /**

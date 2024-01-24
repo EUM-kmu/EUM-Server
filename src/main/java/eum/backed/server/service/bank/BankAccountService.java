@@ -66,11 +66,11 @@ public class BankAccountService {
     /**
      * 계좌 비밀번호 변경
      * @param password
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse updatePassword(BankAccountRequestDTO.Password password, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+    public APIResponse updatePassword(BankAccountRequestDTO.Password password, Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("Invalid userId"));
         UserBankAccount myBankAccount = getUser.getUserBankAccount();
         myBankAccount.updatePassword(passwordEncoder.encode(password.getPassword()));
         userBankAccountRepository.save(myBankAccount);
@@ -80,11 +80,11 @@ public class BankAccountService {
     /**
      * 송금
      * @param remittance :
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse remittance(BankAccountRequestDTO.Remittance remittance, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+    public APIResponse remittance(BankAccountRequestDTO.Remittance remittance, Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("Invalid userId"));
 
 //        닉네임으로 유저 추출
         Profile getProfile = profileRepository.findByNickname(remittance.getNickname()).orElseThrow(() -> new IllegalArgumentException("Invalid nickname"));
@@ -120,12 +120,12 @@ public class BankAccountService {
      * 채팅 송금
      * @param password 계좌 비밀 번호
      * @param ChatRoomId 채팅방 id
-     * @param email
+     * @param userId
      * @return
      */
-    public BankTransactionDTO.UpdateTotalSunrise remittanceByChat(String password,Long ChatRoomId, String email) {
+    public BankTransactionDTO.UpdateTotalSunrise remittanceByChat(String password,Long ChatRoomId, Long userId) {
         ChatRoom getChatRoom = chatRoomRepository.findById(ChatRoomId).orElseThrow(() -> new NullPointerException("Invalid id"));
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
 
         BankTransactionDTO.TransactionUser transactionUser = checkSender(getChatRoom, getUser);
         UserBankAccount myBankAccount = transactionUser.getSender().getUserBankAccount();
@@ -171,8 +171,8 @@ public class BankAccountService {
         return BankTransactionDTO.TransactionUser.builder().sender(sender).receiver(receiver).build();
     }
 
-    public APIResponse<BankAccountResponseDTO.AccountInfo> getOtherAccountInfo(BankAccountRequestDTO.CheckNickName checkNickName,String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+    public APIResponse<BankAccountResponseDTO.AccountInfo> getOtherAccountInfo(BankAccountRequestDTO.CheckNickName checkNickName,Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
         Profile receiverProfile = profileRepository.findByNickname(checkNickName.getNickname()).orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다"));
         checkBlocked(getUser,receiverProfile.getUser());
         checkWithdrawal(receiverProfile.getUser());
@@ -181,8 +181,8 @@ public class BankAccountService {
 
     }
 
-    public APIResponse<BankAccountResponseDTO.AccountInfo> createPassword(BankAccountRequestDTO.Password password, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+    public APIResponse<BankAccountResponseDTO.AccountInfo> createPassword(BankAccountRequestDTO.Password password, Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
         if(userBankAccountRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 비밀번호를 생성했습니다");
         UserBankAccount userBankAccount = createUserBankAccount("", password.getPassword(),getUser);
         userBankAccountRepository.save(userBankAccount);
@@ -192,14 +192,14 @@ public class BankAccountService {
         return APIResponse.of(SuccessCode.INSERT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(userBankAccount.getBalance()).cardName(userBankAccount.getAccountName()).build());
     }
 
-    public APIResponse<BankAccountResponseDTO.AccountInfo> getAccountInfo(String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+    public APIResponse<BankAccountResponseDTO.AccountInfo> getAccountInfo(Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
         UserBankAccount userBankAccount = userBankAccountRepository.findByUser(getUser).orElseThrow(() -> new IllegalArgumentException("아직 비밀번호 설정이 안되있습니다"));
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, BankAccountResponseDTO.AccountInfo.builder().balance(userBankAccount.getBalance()).cardName(userBankAccount.getAccountName()).build());
     }
 
-    public APIResponse<BankAccountResponseDTO.AccountInfo> updateCardName(String cardName, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+    public APIResponse<BankAccountResponseDTO.AccountInfo> updateCardName(String cardName, Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
         UserBankAccount userBankAccount = getUser.getUserBankAccount();
         userBankAccount.updateCardName(cardName);
         userBankAccountRepository.save(userBankAccount);
@@ -207,8 +207,8 @@ public class BankAccountService {
 
     }
 
-    public APIResponse validatePassword(BankAccountRequestDTO.Password password, String email) {
-        Users getUser = usersRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+    public APIResponse validatePassword(BankAccountRequestDTO.Password password, Long userId) {
+        Users getUser = usersRepository.findById(userId).orElseThrow(() -> new NullPointerException("invalid userId"));
         if(!passwordEncoder.matches(password.getPassword(),getUser.getUserBankAccount().getPassword())) throw new IllegalArgumentException("잘못된 비밀번호");
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, "validate password success");
 
