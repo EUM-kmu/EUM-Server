@@ -11,6 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 
 public class ProfileResponseDTO {
+
+    @Getter
+    @Setter
+    @Builder
+    public static class profilee{
+        String nickName;
+        Role role;
+
+    }
     @Getter
     @Setter
     @Builder
