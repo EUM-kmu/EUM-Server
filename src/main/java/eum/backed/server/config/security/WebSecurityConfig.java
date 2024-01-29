@@ -61,7 +61,7 @@ public class WebSecurityConfig  {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST,"/api/v1/profile").hasAuthority(Role.ROLE_UNPROFILE_USER.toString())
                 .requestMatchers(HttpMethod.POST,"/api/v1/bank-account/password").hasAuthority(Role.ROLE_UNPASSWORD_USER.toString())
-                .requestMatchers("/api/v1/**").hasAnyAuthority(Role.ROLE_USER.toString(),Role.TEST.toString())
+//                .requestMatchers("/api/v1/**").hasAuthority(Role.ROLE_USER.toString())
                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated());
         return http.build();

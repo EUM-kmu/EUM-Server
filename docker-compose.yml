@@ -32,5 +32,5 @@ services:
       - eum-test
 networks:
   eum-test:
-volumes:
-  mysql-data:
+#volumes:
+#  mysql-data:

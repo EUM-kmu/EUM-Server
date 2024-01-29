@@ -1,5 +1,7 @@
 package eum.backed.server.service.community;
 
+import com.google.firebase.auth.*;
+import com.google.firebase.auth.hash.HmacSha256;
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.config.jwt.JwtTokenProvider;
@@ -207,4 +209,8 @@ public class UsersService {
         Users getUser = usersRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid email"));
         return getUser;
     }
+//    public Boolean findByUid(String uid){
+//        return usersRepository.ex
+//    }
+
 }

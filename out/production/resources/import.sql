@@ -2,9 +2,7 @@ INSERT INTO market_category (category_id,contents) VALUES (1,"이동"),(2,"심�
 
 INSERT INTO branch_bank_account (branch_bank_account_id,account_name,owner,password) VALUES (1,"[햇살마을] 시작 햇살","ADMIN","admin");
 
-INSERT INTO regions (region_id,name,region_type,parent_id) values (1,"서울특별시","SI",null);
-INSERT INTO regions (region_id, name, region_type, parent_id) VALUES (2, "강남구", "GU", 1), (3, "강동구", "GU", 1), (4, "강서구", "GU", 1), (5, "강북구", "GU", 1), (6, "관악구", "GU", 1), (7, "광진구", "GU", 1), (8, "구로구", "GU", 1), (9, "금천구", "GU", 1), (10, "노원구", "GU", 1), (11, "동대문구", "GU", 1), (12, "도봉구", "GU", 1), (13, "동작구", "GU", 1), (14, "마포구", "GU", 1), (15, "서대문구", "GU", 1), (16, "성동구", "GU", 1), (17, "성북구", "GU", 1), (18, "서초구", "GU", 1), (19, "송파구", "GU", 1), (20, "영등포구", "GU", 1), (21, "용산구", "GU", 1), (22, "양천구", "GU", 1), (23, "은평구", "GU", 1), (24, "종로구", "GU", 1), (25, "중구", "GU", 1), (26, "중랑구", "GU", 1);
-INSERT INTO regions (region_id, name, region_type, parent_id) VALUES (27, "성북동", "DONG", 17), (28, "삼선동", "DONG", 17), (29, "동선동", "DONG", 17), (30, "돈암1동", "DONG", 17), (31, "돈암2동", "DONG", 17), (32, "안암동", "DONG", 17), (33, "보문동", "DONG", 17), (34, "정릉1동", "DONG", 17), (35, "정릉2동", "DONG", 17), (36, "정릉3동", "DONG", 17), (37, "정릉4동", "DONG", 17), (38, "길음1동", "DONG", 17), (39, "길음2동", "DONG", 17), (40, "종암동", "DONG", 17), (41, "월곡1동", "DONG", 17), (42, "월곡2동", "DONG", 17), (43, "장위1동", "DONG", 17), (44, "장위2동", "DONG", 17), (45, "장위3동", "DONG", 17), (46, "석관동", "DONG", 17);
+
 
 
 INSERT INTO standard (standard_id,standard,name) values (1,0,"먹구름"),(2,1000,"아기 햇님"),(3,3000,"수호 햇님"),(4,-999,"기관");

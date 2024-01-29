@@ -27,9 +27,15 @@ repositories {
 	maven {
 		url "https://maven.google.com"
 	}
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+	implementation 'com.io-informatics.oss:jackson-jsonld:0.1.1'
+	implementation 'com.toedter:spring-hateoas-jsonapi:2.0.7'
+	implementation 'javax.validation:validation-api:2.0.1.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
