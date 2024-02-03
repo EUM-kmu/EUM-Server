@@ -1,4 +1,4 @@
-package eum.backed.server.domain.community.user;
+package eum.backed.server.domain.auth.user;
 
 public enum SocialType {
     FIREBASE,KAKAO,SELF

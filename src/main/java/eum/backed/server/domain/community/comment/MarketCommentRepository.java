@@ -1,7 +1,7 @@
 package eum.backed.server.domain.community.comment;
 
 import eum.backed.server.domain.community.marketpost.MarketPost;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 

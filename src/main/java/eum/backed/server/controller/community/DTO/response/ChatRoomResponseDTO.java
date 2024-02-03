@@ -1,7 +1,7 @@
 package eum.backed.server.controller.community.DTO.response;
 
 import eum.backed.server.domain.community.chat.ChatRoom;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.service.bank.DTO.BankTransactionDTO;
 import lombok.Builder;
 import lombok.Getter;

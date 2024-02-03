@@ -6,8 +6,6 @@ import eum.backed.server.controller.community.DTO.request.CommentRequestDTO;
 import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
 import eum.backed.server.domain.auth.CustomUserDetails;
 import eum.backed.server.service.community.CommentServiceImpl;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.yaml.snakeyaml.comments.CommentType;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/market/post")
 @RequiredArgsConstructor
-@Api(tags = "market")
 @CrossOrigin("*")
 public class MarketCommentController {
     private final CommentServiceImpl commentServiceImpl;
@@ -36,7 +32,6 @@ public class MarketCommentController {
      * @param customUserDetails : jwt에 담긴 email
      * @return : 댓글 내용, 작성자 정보, 게시글 작성자/댓글 작성자 판별
      */
-    @ApiOperation(value = "댓글 조회", notes = "댓글 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -56,7 +51,6 @@ public class MarketCommentController {
      * @param customUserDetails : jwt에 담긴 email
      * @return
      */
-    @ApiOperation(value = "거래 댓글 작성", notes = "댓글 작성")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -76,7 +70,6 @@ public class MarketCommentController {
      * @param customUserDetails : jwt에 담긴 customUserDetails
      * @return
      */
-    @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -95,7 +88,6 @@ public class MarketCommentController {
      * @param customUserDetails : jwt에 담긴 email
      * @return
      */
-    @ApiOperation(value = "댓글 삭제", notes = "댓글 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),

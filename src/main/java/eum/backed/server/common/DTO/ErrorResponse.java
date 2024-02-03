@@ -1,7 +1,6 @@
 package eum.backed.server.common.DTO;
 
 import eum.backed.server.common.DTO.enums.ErrorCode;
-import io.swagger.annotations.ApiModel;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +11,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ApiModel(description = "Error response")
 public class ErrorResponse {
     private int status;                 // 에러 상태 코드
     private String divisionCode;        // 에러 구분 코드

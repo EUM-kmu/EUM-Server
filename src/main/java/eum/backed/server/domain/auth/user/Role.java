@@ -1,4 +1,4 @@
-package eum.backed.server.domain.community.user;
+package eum.backed.server.domain.auth.user;
 //프로필 생성 과정으로 바꿀예 현재느 복합적으로 사용중 
 public enum Role {
     ROLE_USER,

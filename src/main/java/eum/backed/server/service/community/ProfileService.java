@@ -1,18 +1,26 @@
 package eum.backed.server.service.community;
 
 import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.Data;
+import eum.backed.server.common.DTO.Relationships;
+import eum.backed.server.common.DTO.Response;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.DTO.request.ProfileRequestDTO;
 import eum.backed.server.controller.community.DTO.response.ProfileResponseDTO;
+import eum.backed.server.controller.community.DTO.response.UsersResponseDTO;
 import eum.backed.server.domain.community.avatar.*;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
-import eum.backed.server.domain.community.user.Role;
-import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.domain.auth.user.Role;
+import eum.backed.server.domain.auth.user.Users;
+import eum.backed.server.domain.auth.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +49,8 @@ public class ProfileService {
 
         Role role = (getUser.getRole() == Role.ROLE_ORGANIZATION) ? Role.ROLE_ORGANIZATION : Role.ROLE_UNPASSWORD_USER;
         getUser.updateRole(role);
-        Users updatedUser= userRepository.save(getUser);
 
-        ProfileResponseDTO.ProfileResponse createProfileResponse = ProfileResponseDTO.toProfileResponse(updatedUser, savedProfile);
+        ProfileResponseDTO.ProfileResponse createProfileResponse = ProfileResponseDTO.toProfileResponse(savedProfile);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,createProfileResponse);
 
     }
@@ -56,8 +63,31 @@ public class ProfileService {
     public APIResponse<ProfileResponseDTO.ProfileResponse> getMyProfile(String email) {
         Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (!profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("프로필이 없는 유저");
-        ProfileResponseDTO.ProfileResponse profileResponseDTO = ProfileResponseDTO.toProfileResponse(getUser, getUser.getProfile());
+        ProfileResponseDTO.ProfileResponse profileResponseDTO = ProfileResponseDTO.toProfileResponse( getUser.getProfile());
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);
+    }
+    public Response<ProfileResponseDTO.ProfileResponse> get(String email) {
+        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+        if (!profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("프로필이 없는 유저");
+        Profile getProfile = getUser.getProfile();
+
+        ProfileResponseDTO.ProfileResponse profileResponseDTO = ProfileResponseDTO.toProfileResponse(getProfile);
+        UsersResponseDTO.UserRole userRole = UsersResponseDTO.UserRole.builder().role(getUser.getRole()).build();
+
+        Relationships.RelationshipData user = Relationships.RelationshipData.builder().id(getUser.getUserId()).type("user").build();
+        List<Relationships.RelationshipData> relationshipData = new ArrayList<>();
+        relationshipData.add(user);
+        Relationships relationships = Relationships.of(relationshipData);
+        HashMap<String,Relationships> relationshipsHashMap  = new HashMap<>();
+        relationshipsHashMap.put("user", relationships);
+
+        List<Data> userDataList = new ArrayList<>();
+        Data userData = Data.of("user",getUser.getUserId(), userRole);
+        userDataList.add(userData);
+
+        Data profileData = Data.of("profile", getProfile.getProfileId(), profileResponseDTO, relationshipsHashMap);
+
+        return Response.of(profileData,userDataList) ;
     }
 
     /**

@@ -1,8 +1,7 @@
 package eum.backed.server.domain.community.apply;
 
 import eum.backed.server.domain.community.marketpost.MarketPost;
-import eum.backed.server.domain.community.user.Users;
-import org.checkerframework.checker.units.qual.A;
+import eum.backed.server.domain.auth.user.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

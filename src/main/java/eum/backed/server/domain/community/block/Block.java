@@ -1,6 +1,6 @@
 package eum.backed.server.domain.community.block;
 
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

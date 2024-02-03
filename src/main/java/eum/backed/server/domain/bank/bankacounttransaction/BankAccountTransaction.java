@@ -3,9 +3,11 @@ package eum.backed.server.domain.bank.bankacounttransaction;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
-import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
@@ -28,12 +30,10 @@ public class BankAccountTransaction extends BaseTimeEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    @ApiModelProperty(value = "Code", allowableValues = "SUCCESS, FAIL")
     private Code code;
 
     @Column
     @Enumerated(EnumType.STRING)
-    @ApiModelProperty(value = "Status", allowableValues = "INITIAL, TRADING, REFUND")
     private Status status;
 
     @ManyToOne

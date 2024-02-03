@@ -5,16 +5,11 @@ import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.apply.Status;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.marketpost.MarketPost;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Component
 @RequiredArgsConstructor

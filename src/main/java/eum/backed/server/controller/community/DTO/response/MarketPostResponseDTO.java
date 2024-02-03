@@ -2,11 +2,10 @@ package eum.backed.server.controller.community.DTO.response;
 
 import eum.backed.server.common.KoreaLocalDateTime;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
-import eum.backed.server.domain.community.marketpost.Slot;
+import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.community.marketpost.MarketPost;
+import eum.backed.server.domain.community.marketpost.Slot;
 import eum.backed.server.domain.community.marketpost.Status;
-import eum.backed.server.domain.community.user.Users;
-import io.swagger.annotations.ApiModel;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +17,6 @@ public class MarketPostResponseDTO {
     @Builder
     @Getter
     @AllArgsConstructor
-    @ApiModel(value = "게시글 정보 조회")
     public static class MarketPostResponse{
         private Long postId;
         private String title;
@@ -39,7 +37,6 @@ public class MarketPostResponseDTO {
     @Builder
     @Getter
     @AllArgsConstructor
-    @ApiModel(value = "id 별 게시글 + 댓글 ")
     public static class MarketPostWithComment {
         private ProfileResponseDTO.UserInfo writerInfo;
         private UserCurrentStatus userCurrentStatus;

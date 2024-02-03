@@ -1,7 +1,7 @@
 package eum.backed.server.domain.community.scrap;
 
 import eum.backed.server.domain.community.marketpost.MarketPost;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

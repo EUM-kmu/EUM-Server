@@ -2,8 +2,8 @@ package eum.backed.server.service.auth;
 
 import eum.backed.server.domain.auth.CustomUserDetails;
 import eum.backed.server.domain.auth.dto.CustomUserInfoDto;
-import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.domain.auth.user.Users;
+import eum.backed.server.domain.auth.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;

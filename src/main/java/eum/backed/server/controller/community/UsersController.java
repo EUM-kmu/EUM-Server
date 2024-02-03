@@ -9,13 +9,11 @@ import eum.backed.server.controller.community.DTO.request.UsersRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.SignInType;
 import eum.backed.server.controller.community.DTO.response.UsersResponseDTO;
 import eum.backed.server.domain.auth.CustomUserDetails;
-import eum.backed.server.domain.community.user.SocialType;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.SocialType;
+import eum.backed.server.domain.auth.user.Users;
+import eum.backed.server.service.bank.BankAccountService;
 import eum.backed.server.service.community.*;
 import eum.backed.server.service.community.DTO.KakaoDTO;
-import eum.backed.server.service.bank.BankAccountService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 @RestController
-@Api(tags = "user")
 @CrossOrigin("*")
 public class UsersController {
     private final UsersService usersService;
@@ -55,7 +52,6 @@ public class UsersController {
      *  ROLE_USER : 최종 활동이 가능한 상태
      */
 
-    @ApiOperation(value = "토큰 검증", notes = "유저 타입 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -71,7 +67,6 @@ public class UsersController {
      * @param signUp : email, password
      * @return
      */
-    @ApiOperation(value = "자체 회원가입", notes = "자체 회원가입")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -87,7 +82,6 @@ public class UsersController {
      * @param signIn  : email, password
      * @return : jwt 토큰
      */
-    @ApiOperation(value = "자체로그인", notes = "자체 앱 로그인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -97,7 +91,6 @@ public class UsersController {
     public ResponseEntity<APIResponse<UsersResponseDTO.TokenInfo>> signIn(@RequestBody @Validated UsersRequestDTO.SignIn signIn){
         return ResponseEntity.ok(usersService.signIn(signIn));
     }
-    @ApiOperation(value = "토근 갱신", notes = "토큰 갱신")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -115,7 +108,6 @@ public class UsersController {
      * @return
      * 기능 : redis에서 토큰 정보 삭제
      */
-    @ApiOperation(value = "로그아웃", notes = "엑세스 토큰 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -142,7 +134,6 @@ public class UsersController {
      * @throws IOException
      * @throws FirebaseAuthException
      */
-    @ApiOperation(value = "소셜 타입별 로그인",notes = "kakao,firebase")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -188,7 +179,6 @@ public class UsersController {
      * 로직 : 계좌 동결, 탈퇴 유저와의 채팅 block 처리, 유저정보 빈값넣기, 지원 취소 시키기
      */
     @PostMapping("/withdrawal")
-    @ApiOperation(value = "탈퇴하기")
     public ResponseEntity<APIResponse> withdrawal(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader,@RequestBody UsersRequestDTO.Withdrawal withdrawal,@AuthenticationPrincipal CustomUserDetails customUserDetails) throws FirebaseAuthException {
         Users getUser = usersService.findById(Long.valueOf(customUserDetails.getUsername()));
         bankAccountService.freezeAccount(getUser); //계좌 동결
@@ -214,7 +204,6 @@ public class UsersController {
      * @return
      */
    @PostMapping("/block")
-   @ApiOperation(value = "차단하기",notes = "동일한 메소드 한번더 보낼땐 차단해제, 클라이언트에는 현재 없는 기능이지만 테스트용으로 존재")
     public ResponseEntity<APIResponse> blockedAction(@RequestBody UsersRequestDTO.BlockedAction blockedAction, @AuthenticationPrincipal CustomUserDetails customUserDetails){
        Users blocker = usersService.findById(Long.valueOf(customUserDetails.getUsername()));
        Users blocked = usersService.findById(blockedAction.getUserId()); //차단할 유저 객체

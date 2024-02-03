@@ -2,7 +2,7 @@ package eum.backed.server.service.community;
 
 import eum.backed.server.domain.community.block.Block;
 import eum.backed.server.domain.community.block.BlockRepository;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

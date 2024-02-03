@@ -1,51 +1,39 @@
 package eum.backed.server.config;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.*;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.Collections;
+import java.awt.*;
 
 @Configuration
 public class SwaggerConfig {
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.OAS_30)
-                .ignoredParameterTypes(AuthenticationPrincipal.class)
-                .useDefaultResponseMessages(false)
-                .apiInfo(apiInfo())
-                .securitySchemes(Collections.singletonList(apiKey()))
-                .securityContexts(Collections.singletonList(securityContext()))
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("eum.backed.server"))
-                .paths(PathSelectors.any())
-                .build().pathMapping("/");
+    public OpenAPI openAPI() {
+        String securityJwtName = "JWT";
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("JWT");
+        Components components = new Components().addSecuritySchemes(securityJwtName, new SecurityScheme()
+                .name(securityJwtName)
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("Bearer")
+                .bearerFormat(securityJwtName));
+
+
+        return new OpenAPI()
+                .addSecurityItem(securityRequirement)
+                .components(components)
+                .info(apiInfo());
     }
 
-    public ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-                .title("SpringBoot Rest API Documentation")
-                .description("EUM Server: community, pay API")
-                .version("0.1")
-                .build();
+    private Info apiInfo() {
+        return new Info()
+                .title("Springdoc 테스트")
+                .description("Springdoc을 사용한 Swagger UI 테스트")
+                .version("1.0.0");
     }
-
-    private SecurityScheme apiKey() {
-        return new ApiKey("Authorization", "Authorization", "header");
-    }
-
-    private springfox.documentation.spi.service.contexts.SecurityContext securityContext() {
-        return springfox.documentation.spi.service.contexts.SecurityContext.builder()
-                .securityReferences(Collections.singletonList(new SecurityReference("Authorization", new AuthorizationScope[0])))
-                .forPaths(PathSelectors.any())
-                .build();
-    }
-
-
 }

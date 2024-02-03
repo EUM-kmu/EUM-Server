@@ -1,8 +1,7 @@
 package eum.backed.server.domain.auth.dto;
 
-import eum.backed.server.domain.community.user.Role;
+import eum.backed.server.domain.auth.user.Role;
 import lombok.*;
-import org.checkerframework.checker.units.qual.N;
 
 @Getter
 @Builder

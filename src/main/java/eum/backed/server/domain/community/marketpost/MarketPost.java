@@ -3,15 +3,17 @@ package eum.backed.server.domain.community.marketpost;
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.controller.community.DTO.request.MarketPostRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
+import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.category.MarketCategory;
 import eum.backed.server.domain.community.chat.ChatRoom;
 import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.scrap.Scrap;
-import eum.backed.server.domain.community.user.Users;
-import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,12 +49,10 @@ public class MarketPost extends BaseTimeEntity {
     private MarketType marketType;
     @Column
     @Enumerated(EnumType.STRING)
-    @ApiModelProperty(value = "Status", allowableValues = "RECRUITING, TRADING, COMPLETED")
     private Status status;
 
     @Column
     @Enumerated(EnumType.STRING)
-    @ApiModelProperty(value = "Slot", allowableValues = "AM, PM, ALL")
     private Slot slot;
 
     @ManyToOne

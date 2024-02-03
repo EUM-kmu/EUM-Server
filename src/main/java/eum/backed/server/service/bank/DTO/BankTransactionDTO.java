@@ -5,7 +5,7 @@ import eum.backed.server.domain.bank.bankacounttransaction.Status;
 import eum.backed.server.domain.bank.bankacounttransaction.TransactionType;
 import eum.backed.server.domain.bank.branchbankaccount.BranchBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

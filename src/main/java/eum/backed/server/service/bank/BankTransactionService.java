@@ -8,8 +8,8 @@ import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransactio
 import eum.backed.server.domain.bank.bankacounttransaction.TransactionType;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccountRepository;
-import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.domain.auth.user.Users;
+import eum.backed.server.domain.auth.user.UsersRepository;
 import eum.backed.server.service.bank.DTO.BankTransactionDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

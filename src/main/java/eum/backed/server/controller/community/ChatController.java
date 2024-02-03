@@ -6,14 +6,11 @@ import eum.backed.server.controller.bank.DTO.request.BankAccountRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.ChatType;
 import eum.backed.server.controller.community.DTO.response.ChatRoomResponseDTO;
 import eum.backed.server.domain.auth.CustomUserDetails;
-import eum.backed.server.domain.auth.dto.CustomUserInfoDto;
 import eum.backed.server.service.bank.BankAccountService;
-import eum.backed.server.service.bank.DTO.BankTransactionDTO;
 import eum.backed.server.service.community.ApplyService;
 import eum.backed.server.service.community.ChatService;
 import eum.backed.server.service.community.MarketPostService;
 import eum.backed.server.service.community.ProfileService;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -64,7 +61,6 @@ public class ChatController {
      */
 
     @PostMapping("/{chatRoomId}/remittance")
-    @ApiOperation(value = "채팅으로 송금하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "성공",content = @Content(schema = @Schema(implementation = APIResponse.class))),
             @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
@@ -85,12 +81,6 @@ public class ChatController {
      * @return
      */
     @DeleteMapping("{postId}/cancel/{chatId}")
-    @ApiOperation(value = "활동파기", notes = "활동 파기") @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "요청 형식 혹은 요청 콘텐츠가 올바르지 않을 때,"),
-            @ApiResponse(responseCode = "401", description = "토큰 시간 만료, 형식 오류,로그아웃한 유저 접근"),
-            @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우"),
-            @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,"),
-    })
     public ResponseEntity<APIResponse> cancelTrading(@PathVariable Long postId, @PathVariable Long chatId, @AuthenticationPrincipal CustomUserDetails customUserDetails){
         return ResponseEntity.ok(applyService.cancel(postId,chatId,Long.valueOf(customUserDetails.getUsername())));
     }

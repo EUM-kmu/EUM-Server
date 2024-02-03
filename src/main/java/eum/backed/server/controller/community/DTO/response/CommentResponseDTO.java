@@ -1,7 +1,6 @@
 package eum.backed.server.controller.community.DTO.response;
 
-import eum.backed.server.domain.community.user.Users;
-import io.swagger.annotations.ApiModel;
+import eum.backed.server.domain.auth.user.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +19,6 @@ public class CommentResponseDTO {
     @Builder
     @Getter
     @AllArgsConstructor
-    @ApiModel(value = "전체 데이터 정렬")
     public static class CommentResponse {
         private Long postId;
         private Long commentId;

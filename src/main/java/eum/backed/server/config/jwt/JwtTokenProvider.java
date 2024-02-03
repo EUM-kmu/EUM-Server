@@ -2,9 +2,8 @@ package eum.backed.server.config.jwt;
 
 import eum.backed.server.controller.community.DTO.response.UsersResponseDTO;
 import eum.backed.server.domain.auth.dto.CustomUserInfoDto;
-import eum.backed.server.domain.community.user.Role;
-import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.domain.auth.user.Role;
+import eum.backed.server.domain.auth.user.UsersRepository;
 import eum.backed.server.exception.TokenException;
 import eum.backed.server.service.auth.CustomUserDetailsService;
 import io.jsonwebtoken.*;

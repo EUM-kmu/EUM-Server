@@ -1,22 +1,20 @@
 package eum.backed.server.service.community;
 
-import com.google.firebase.auth.*;
-import com.google.firebase.auth.hash.HmacSha256;
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.config.jwt.JwtTokenProvider;
 import eum.backed.server.controller.community.DTO.request.UsersRequestDTO;
 import eum.backed.server.controller.community.DTO.response.UsersResponseDTO;
 import eum.backed.server.domain.auth.dto.CustomUserInfoDto;
-import eum.backed.server.domain.community.user.Role;
-import eum.backed.server.domain.community.user.SocialType;
-import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.domain.auth.user.Role;
+import eum.backed.server.domain.auth.user.SocialType;
+import eum.backed.server.domain.auth.user.Users;
+import eum.backed.server.domain.auth.user.UsersRepository;
 import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategory;
 import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategoryRepository;
 import eum.backed.server.domain.community.withdrawaluser.WithdrawalUser;
 import eum.backed.server.domain.community.withdrawaluser.WithdrawalUserRepository;
-import eum.backed.server.domain.community.user.Authority;
+import eum.backed.server.domain.auth.user.Authority;
 import eum.backed.server.exception.TokenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

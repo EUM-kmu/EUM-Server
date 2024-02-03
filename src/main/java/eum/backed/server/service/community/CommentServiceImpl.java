@@ -8,12 +8,11 @@ import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.comment.MarketCommentRepository;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.marketpost.MarketPostRepository;
-import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.domain.auth.user.Users;
+import eum.backed.server.domain.auth.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.comments.CommentType;
 
 import java.util.Collections;
 import java.util.List;

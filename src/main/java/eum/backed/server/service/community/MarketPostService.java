@@ -1,6 +1,7 @@
 package eum.backed.server.service.community;
 
 import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.Response;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.DTO.request.MarketPostRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
@@ -17,8 +18,8 @@ import eum.backed.server.domain.community.marketpost.MarketPostRepository;
 import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.scrap.ScrapRepository;
-import eum.backed.server.domain.community.user.Users;
-import eum.backed.server.domain.community.user.UsersRepository;
+import eum.backed.server.domain.auth.user.Users;
+import eum.backed.server.domain.auth.user.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -174,6 +175,19 @@ public class MarketPostService {
 
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,marketPostResponses);
      }
+
+//    public Response<List<MarketPostResponseDTO.MarketPostResponse>> find(String keyword, String category, MarketType marketType, Status status, Pageable pageable, List<Users> blockedUsers) {
+////        검색 키워드 있을떄
+//        if (!(keyword == null || keyword.isBlank())) {
+//            return findByKeyWord(keyword,blockedUsers);
+//        }
+//        MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElse(null);
+//
+//        List<MarketPost> marketPosts = marketPostRepository.findByFilters(marketCategory, marketType,status).orElse(Collections.emptyList()); //조건에 맞는 리스트 조회
+//        List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = getAllPostResponse(marketPosts); //리스트 dto
+//        List<CommentResponseDTO.CommentResponse> commentResponses =
+//        return APIResponse.of(SuccessCode.SELECT_SUCCESS,marketPostResponses);
+//    }
 
     /**
      * 내 게시글 활동

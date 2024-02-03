@@ -1,4 +1,4 @@
-package eum.backed.server.domain.community.user;
+package eum.backed.server.domain.auth.user;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
@@ -9,20 +9,14 @@ import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.scrap.Scrap;
 import eum.backed.server.domain.community.withdrawaluser.WithdrawalUser;
-import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Builder
@@ -48,12 +42,10 @@ public class Users extends BaseTimeEntity  {
 
     @Column
     @Enumerated(EnumType.STRING)
-    @ApiModelProperty(value = "role", allowableValues = "ROLE_USER, ROLE_TEMPORARY_USER, ROLE_AUTH_USER, ROLE_ORGANIZATION")
     private Role role;
 
     @Column
     @Enumerated(EnumType.STRING)
-    @ApiModelProperty(value = "social signIn type")
     private SocialType socialType;
 
 

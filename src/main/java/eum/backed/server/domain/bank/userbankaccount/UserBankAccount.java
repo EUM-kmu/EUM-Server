@@ -1,18 +1,19 @@
 package eum.backed.server.domain.bank.userbankaccount;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransaction;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.bank.Owner;
-import io.swagger.annotations.ApiModelProperty;
+import eum.backed.server.domain.bank.bankacounttransaction.BankAccountTransaction;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,7 +35,6 @@ public class UserBankAccount extends BaseTimeEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    @ApiModelProperty(value = "MyEnum 값", allowableValues = "USER, ADMIN, MASTER")
     private Owner owner;
 
     @OneToOne

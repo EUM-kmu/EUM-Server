@@ -3,18 +3,16 @@ package eum.backed.server.config.security;
 
 import eum.backed.server.config.jwt.JwtAuthenticationFilter;
 import eum.backed.server.config.jwt.JwtTokenProvider;
-import eum.backed.server.domain.community.user.Role;
+import eum.backed.server.domain.auth.user.Role;
 import eum.backed.server.service.auth.CustomUserDetailsService;
 import eum.backed.server.service.auth.handler.CustomAccessDenierHandler;
 import eum.backed.server.service.auth.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,7 +21,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -36,7 +33,7 @@ public class WebSecurityConfig  {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     private static final String[] AUTH_WHITELIST ={
-            "/","/api/v1/user/auth/**","/api/v1/auth/**","/index.html","/api/docs/v1/**","/v3/**"
+            "/","/swagger-ui/index.html","/api/v1/user/auth/**","/api/v1/auth/**","**/index.html","/api/docs/v1/**","/v3/**","/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"
              };
     private final RedisTemplate redisTemplate;
 
@@ -59,8 +56,8 @@ public class WebSecurityConfig  {
         );
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(HttpMethod.POST,"/api/v1/profile").hasAuthority(Role.ROLE_UNPROFILE_USER.toString())
-                .requestMatchers(HttpMethod.POST,"/api/v1/bank-account/password").hasAuthority(Role.ROLE_UNPASSWORD_USER.toString())
+//                .requestMatchers(HttpMethod.POST,"/api/v1/profile").hasAuthority(Role.ROLE_UNPROFILE_USER.toString())
+//                .requestMatchers(HttpMethod.POST,"/api/v1/bank-account/password").hasAuthority(Role.ROLE_UNPASSWORD_USER.toString())
 //                .requestMatchers("/api/v1/**").hasAuthority(Role.ROLE_USER.toString())
                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 .anyRequest().authenticated());

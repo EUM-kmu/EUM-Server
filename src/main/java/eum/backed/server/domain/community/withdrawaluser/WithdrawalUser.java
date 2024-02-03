@@ -1,7 +1,7 @@
 package eum.backed.server.domain.community.withdrawaluser;
 
 import eum.backed.server.common.BaseTimeEntity;
-import eum.backed.server.domain.community.user.Users;
+import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.community.withdrawalcategory.WithdrawalCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
