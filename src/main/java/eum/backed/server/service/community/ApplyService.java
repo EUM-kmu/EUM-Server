@@ -131,7 +131,7 @@ public class ApplyService {
      * @return
      */
     public APIResponse unApply(Long postId, Long applyId, Long userId) {
-        Users getUser = usersRepository.findById(userId). orElseThrow(() -> new NullPointerException("Invalid email"));
+        Users getUser = usersRepository.findById(userId). orElseThrow(() -> new NullPointerException("Invalid userId"));
         Apply getApply = applyRepository.findById(applyId).orElseThrow(() -> new NullPointerException("invalid applyId"));
 
         if(getApply.getMarketPost().getMarketPostId() != postId) throw new IllegalArgumentException("invalid postId");

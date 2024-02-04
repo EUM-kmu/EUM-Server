@@ -1,4 +1,4 @@
-package eum.backed.server.controller.admin;
+package eum.backed.server.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

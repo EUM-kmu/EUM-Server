@@ -1,11 +1,10 @@
 package eum.backed.server.domain.community.avatar;
 
-import eum.backed.server.domain.community.profile.Profile;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
 @NoArgsConstructor
@@ -24,11 +23,6 @@ public class Avatar {
     @Column
     @Enumerated(EnumType.STRING)
     private AvatarName avatarName;
-
-
-    @OneToMany(mappedBy = "avatar")
-    private List<Profile> profiles = new ArrayList<>();
-
 
 
 }

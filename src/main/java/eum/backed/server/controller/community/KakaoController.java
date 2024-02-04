@@ -8,7 +8,7 @@ import eum.backed.server.domain.auth.user.SocialType;
 import eum.backed.server.service.auth.FirebaseAuthService;
 import eum.backed.server.service.community.DTO.KakaoDTO;
 import eum.backed.server.service.community.KakaoService;
-import eum.backed.server.service.community.UsersService;
+import eum.backed.server.service.auth.UsersService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

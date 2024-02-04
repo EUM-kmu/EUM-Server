@@ -1,4 +1,4 @@
-package eum.backed.server.service.community;
+package eum.backed.server.service.auth;
 
 import eum.backed.server.common.DTO.APIResponse;
 import eum.backed.server.common.DTO.enums.SuccessCode;

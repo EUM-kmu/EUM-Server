@@ -11,6 +11,7 @@ import eum.backed.server.controller.community.DTO.response.UsersResponseDTO;
 import eum.backed.server.domain.auth.CustomUserDetails;
 import eum.backed.server.domain.auth.user.SocialType;
 import eum.backed.server.domain.auth.user.Users;
+import eum.backed.server.service.auth.UsersService;
 import eum.backed.server.service.bank.BankAccountService;
 import eum.backed.server.service.community.*;
 import eum.backed.server.service.community.DTO.KakaoDTO;
