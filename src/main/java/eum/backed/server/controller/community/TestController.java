@@ -17,16 +17,9 @@ import java.util.List;
 @RequestMapping("/api/v1/test")
 @RequiredArgsConstructor
 public class TestController {
-//    @Autowired
-//    private BucketService bucketService;
     @Autowired
     private FileService fileService;
 
-//    @GetMapping("/bucket")
-//    public String create() {
-//        bucketService.createBucket();
-//        return "ok";
-//    }
     @PostMapping("/upload")
     public ResponseEntity<Object> uploadFilesSample(
             @RequestPart(value = "files") List<MultipartFile> multipartFiles) {

@@ -152,18 +152,17 @@ public class UsersService {
      * @param socialType
      * @return
      */
-    public APIResponse<UsersResponseDTO.TokenInfo> getToken(String email, String uid, SocialType socialType){
+    public APIResponse<UsersResponseDTO.TokenInfo> getToken(String email,String uid, SocialType socialType){
         UsersResponseDTO.TokenInfo tokenInfo = null;
-        if(email.isBlank()) throw new IllegalArgumentException("email is empty");
         Role role;
-        if(usersRepository.existsByEmail(email)){
-            Users getUser = usersRepository.findByEmail(email).get();
+        if(usersRepository.existsByUid(uid)){
+            Users getUser = usersRepository.findByUid(uid).get();
             CustomUserInfoDto info = modelMapper.map(getUser, CustomUserInfoDto.class);
-            if(usersRepository.existsByEmailAndRole(email,Role.ROLE_USER)){ //활동 가능한 유저
+            if(usersRepository.existsByUidAndRole(uid,Role.ROLE_USER)){ //활동 가능한 유저
                 role = Role.ROLE_USER;
                 tokenInfo = jwtTokenProvider.generateToken(info,role);
-            } else if (usersRepository.existsByEmailAndRole(email,Role.ROLE_UNPROFILE_USER) ||usersRepository.existsByEmailAndRole(email,Role.ROLE_UNPASSWORD_USER )) {
-                role = usersRepository.findByEmail(email).get().getRole();
+            } else if (usersRepository.existsByUidAndRole(uid,Role.ROLE_UNPROFILE_USER) ||usersRepository.existsByUidAndRole(uid,Role.ROLE_UNPASSWORD_USER )) {
+                role = usersRepository.findByUid(uid).get().getRole();
                 tokenInfo = jwtTokenProvider.generateToken(info,role);
             }
         }else{ //이메일이 없으면 최초 가입 유저 == 프로필이 없는 상태

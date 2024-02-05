@@ -61,7 +61,7 @@ public class   ProfileController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     public ResponseEntity<APIResponse<ProfileResponseDTO.ProfileResponse>> getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails){
-        return ResponseEntity.ok(profileService.getMyProfile(userDetails.getCustomUserInfo().getEmail()));
+        return ResponseEntity.ok(profileService.getMyProfile( Long.valueOf(userDetails.getUsername())));
     }
 
     @PutMapping("/profile")

@@ -55,7 +55,7 @@ public class MarketPost extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Slot slot;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="user_id")
     private Users user;
 

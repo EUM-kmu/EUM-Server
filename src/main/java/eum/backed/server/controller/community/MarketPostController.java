@@ -10,6 +10,7 @@ import eum.backed.server.controller.community.DTO.response.MarketPostResponseDTO
 import eum.backed.server.domain.auth.CustomUserDetails;
 import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.community.marketpost.Status;
+import eum.backed.server.service.FileService;
 import eum.backed.server.service.auth.UsersService;
 import eum.backed.server.service.community.*;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,10 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.ParseException;
 import java.util.List;
@@ -39,6 +42,7 @@ public class  MarketPostController {
     private final CommentService commentService;
     private final BlockService blockService;
     private final UsersService usersService;
+    private final FileService fileService;
 
     /**
      * 거래 게시글 작성
@@ -53,8 +57,9 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "403", description = "헤더에 토큰이 들어가있지 않은 경우",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
-    @PostMapping()
-    public ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> create(@RequestBody @Validated MarketPostRequestDTO.MarketCreate marketCreate, @AuthenticationPrincipal  CustomUserDetails customUserDetails ) throws ParseException {
+    @PostMapping(consumes =  {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> create(@RequestPart(value = "request") @Validated MarketPostRequestDTO.MarketCreate marketCreate, @RequestPart(value = "files") List<MultipartFile> multipartFiles, @AuthenticationPrincipal  CustomUserDetails customUserDetails ) throws ParseException {
+        fileService.uploadFiles(multipartFiles);
         return new ResponseEntity<>(marketPostService.create(marketCreate, Long.valueOf(customUserDetails.getUsername())), HttpStatus.CREATED);
     }
 
@@ -150,7 +155,7 @@ public class  MarketPostController {
             @ApiResponse(responseCode = "500", description = "외부 API 요청 실패, 정상적 수행을 할 수 없을 때,",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping("")
-    public  ResponseEntity<APIResponse<List<MarketPostResponseDTO.MarketPostResponse>>> findByFilter(@RequestParam(name = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category,
+    public  ResponseEntity<APIResponse<List<MarketPostResponseDTO.MarketPostResponse>>> findByFilter(@RequestParam(value = "search",required = false) String keyword, @RequestParam(name = "category",required = false) String category,
                                                                                                @RequestParam(name = "marketType",required = false) MarketType marketType, @RequestParam(name = "status",required = false) Status status,
                                                                                                      @PageableDefault Pageable pageable, @AuthenticationPrincipal CustomUserDetails customUserDetails){
         Users getUser = usersService.findById(Long.valueOf(customUserDetails.getUsername()));

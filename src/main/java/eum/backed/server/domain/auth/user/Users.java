@@ -33,6 +33,7 @@ public class Users extends BaseTimeEntity  {
     private String email;
     private String password;
     private String phone;
+    private String bankAccount;
     private Boolean isBanned;
     private boolean isDeleted;
 

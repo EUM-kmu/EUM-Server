@@ -22,11 +22,11 @@ public class FileService {
 
     private String bucketName="k-eum";
 
-    private String filePath = "board";
+    private String filePath = "marketpost";
 
     public String getUuidFileName(String fileName) {
         String ext = fileName.substring(fileName.indexOf(".") + 1);
-        return UUID.randomUUID().toString() + "." + ext;
+        return UUID.randomUUID() + "." + ext;
     }
     public List<FileDto> uploadFiles(List<MultipartFile> multipartFiles) {
 

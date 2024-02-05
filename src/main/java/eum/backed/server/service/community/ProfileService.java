@@ -14,7 +14,6 @@ import eum.backed.server.domain.community.profile.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Service
 @RequiredArgsConstructor
@@ -50,11 +49,11 @@ public class ProfileService {
 
     /**
      * 프로필 조회
-     * @param email
+     * @param userId
      * @return
      */
-    public APIResponse<ProfileResponseDTO.ProfileResponse> getMyProfile(String email) {
-        Users getUser = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
+    public APIResponse<ProfileResponseDTO.ProfileResponse> getMyProfile(Long userId) {
+        Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid argument"));
         if (!profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("프로필이 없는 유저");
         ProfileResponseDTO.ProfileResponse profileResponseDTO = ProfileResponseDTO.toProfileResponse( getUser.getProfile());
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, profileResponseDTO);

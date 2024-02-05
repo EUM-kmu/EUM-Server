@@ -1,7 +1,6 @@
 package eum.backed.server.service.community;
 
 import eum.backed.server.common.DTO.APIResponse;
-import eum.backed.server.common.DTO.Response;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.DTO.request.MarketPostRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
@@ -24,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -163,31 +163,19 @@ public class MarketPostService {
      * @param blockedUsers : 차단한, 차단된 유저들은 제외하고 조회
      * @return : 검색어(게시글 전체) > 카테고리 > 카테고리 내 게시글 유형 , 카테고리 내 모집중
      */
+    @Transactional
     public  APIResponse<List<MarketPostResponseDTO.MarketPostResponse>> findByFilter(String keyword, String category, MarketType marketType, Status status, Pageable pageable, List<Users> blockedUsers) {
 //        검색 키워드 있을떄
         if (!(keyword == null || keyword.isBlank())) {
             return findByKeyWord(keyword,blockedUsers);
         }
         MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElse(null);
-
-        List<MarketPost> marketPosts = marketPostRepository.findByFilters(marketCategory, marketType,status).orElse(Collections.emptyList()); //조건에 맞는 리스트 조회
+        List<MarketPost> marketPosts = (blockedUsers.isEmpty()) ? marketPostRepository.findByFilters(marketCategory, marketType, status).orElse(Collections.emptyList()) :marketPostRepository.findByFiltersWithoutBlocked(marketCategory, marketType,status,blockedUsers).orElse(Collections.emptyList()); //조건에 맞는 리스트 조회
         List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = getAllPostResponse(marketPosts); //리스트 dto
 
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,marketPostResponses);
      }
 
-//    public Response<List<MarketPostResponseDTO.MarketPostResponse>> find(String keyword, String category, MarketType marketType, Status status, Pageable pageable, List<Users> blockedUsers) {
-////        검색 키워드 있을떄
-//        if (!(keyword == null || keyword.isBlank())) {
-//            return findByKeyWord(keyword,blockedUsers);
-//        }
-//        MarketCategory marketCategory = marketCategoryRepository.findByContents(category).orElse(null);
-//
-//        List<MarketPost> marketPosts = marketPostRepository.findByFilters(marketCategory, marketType,status).orElse(Collections.emptyList()); //조건에 맞는 리스트 조회
-//        List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = getAllPostResponse(marketPosts); //리스트 dto
-//        List<CommentResponseDTO.CommentResponse> commentResponses =
-//        return APIResponse.of(SuccessCode.SELECT_SUCCESS,marketPostResponses);
-//    }
 
     /**
      * 내 게시글 활동
@@ -258,7 +246,8 @@ public class MarketPostService {
      * @return
      */
     private APIResponse<List<MarketPostResponseDTO.MarketPostResponse>> findByKeyWord(String keyWord, List<Users> blockedUsers) {
-        List<MarketPost> marketPosts = marketPostRepository.findByKeywords(keyWord,blockedUsers).orElse(Collections.emptyList());
+
+        List<MarketPost> marketPosts = (blockedUsers.isEmpty()) ? marketPostRepository.findByKeywords(keyWord).orElse(Collections.emptyList()):marketPostRepository.findByKeywordsWithoutBlocked(keyWord,blockedUsers).orElse(Collections.emptyList());
         List<MarketPostResponseDTO.MarketPostResponse> transactionPostDTOs = getAllPostResponse(marketPosts);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, transactionPostDTOs);
     }

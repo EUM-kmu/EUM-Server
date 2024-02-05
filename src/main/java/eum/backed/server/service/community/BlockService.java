@@ -5,6 +5,7 @@ import eum.backed.server.domain.community.block.BlockRepository;
 import eum.backed.server.domain.auth.user.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
