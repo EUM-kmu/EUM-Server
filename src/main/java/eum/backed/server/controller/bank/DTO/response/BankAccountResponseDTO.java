@@ -34,7 +34,7 @@ public class BankAccountResponseDTO {
     private static class OpponentInfo{
         private String nickName;
         private String cardName;
-        private String avatarPhotoUrl;
+        private String profileImage;
     }
 
 
@@ -70,15 +70,15 @@ public class BankAccountResponseDTO {
         String formattedDateTime = koreaZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
         if(bankAccountTransaction.getTransactionType() == TransactionType.WITHDRAW){
             String receiverNickName = bankAccountTransaction.getReceiverBankAccount().getUser().getProfile().getNickname();
-            String avatarPhotoUrl =  bankAccountTransaction.getReceiverBankAccount().getUser().getProfile().getAvatar().getSimpleAvatarPhotoUrl();
+            String profileImage =  bankAccountTransaction.getReceiverBankAccount().getUser().getProfile().getProfileImage();
             String cardName = bankAccountTransaction.getReceiverBankAccount().getAccountName();
-            OpponentInfo receiverInfo = OpponentInfo.builder().nickName(receiverNickName).avatarPhotoUrl(avatarPhotoUrl).cardName(cardName).build();
+            OpponentInfo receiverInfo = OpponentInfo.builder().nickName(receiverNickName).profileImage(profileImage).cardName(cardName).build();
             return new History(TransactionType.WITHDRAW, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
         }
         String senderNickName = (bankAccountTransaction.getSenderBankAccount() == null) ?  bankAccountTransaction.getBranchBankAccount().getAccountName():bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getNickname();
         String cardName = (bankAccountTransaction.getSenderBankAccount() == null) ?  "":bankAccountTransaction.getSenderBankAccount().getAccountName();
-        String avatarPhotoUrl = (bankAccountTransaction.getSenderBankAccount() == null) ? SYSTEM_PHOTO_URL : bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getAvatar().getSimpleAvatarPhotoUrl();
-        OpponentInfo receiverInfo = OpponentInfo.builder().nickName(senderNickName).cardName(cardName).avatarPhotoUrl(avatarPhotoUrl).build();
+        String profileImage = (bankAccountTransaction.getSenderBankAccount() == null) ? SYSTEM_PHOTO_URL : bankAccountTransaction.getSenderBankAccount().getUser().getProfile().getProfileImage();
+        OpponentInfo receiverInfo = OpponentInfo.builder().nickName(senderNickName).cardName(cardName).profileImage(profileImage).build();
         return new History(TransactionType.DEPOSIT, receiverInfo, bankAccountTransaction.getMyCurrentBalance(), bankAccountTransaction.getAmount(), formattedDateTime);
 
     }

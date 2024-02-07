@@ -26,7 +26,7 @@ public class ApplyResponseDTO {
         private Boolean isAccepted;
     }
     public ApplyListResponse newApplyListResponse(MarketPost marketPost, Users applicant, Profile profile, Apply apply){
-        ProfileResponseDTO.UserInfo applicantInfo = ProfileResponseDTO.UserInfo.builder().userId(applicant.getUserId()).avatarPhotoUrl(profile.getAvatar().getSimpleAvatarPhotoUrl()).nickName(profile.getNickname()).address(profile.getAddress()).build();
+        ProfileResponseDTO.UserInfo applicantInfo = ProfileResponseDTO.UserInfo.builder().userId(applicant.getUserId()).profileImage(profile.getProfileImage()).nickName(profile.getNickname()).address(profile.getAddress()).build();
         // 한국 시간대로 포맷팅
         String formattedCreateTime = KoreaLocalDateTime.localDateTimeToKoreaZoned(apply.getCreateDate());
         return ApplyListResponse.builder()

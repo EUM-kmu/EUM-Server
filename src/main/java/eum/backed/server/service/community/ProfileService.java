@@ -7,8 +7,6 @@ import eum.backed.server.controller.community.DTO.response.ProfileResponseDTO;
 import eum.backed.server.domain.auth.user.Role;
 import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.auth.user.UsersRepository;
-import eum.backed.server.domain.community.avatar.Avatar;
-import eum.backed.server.domain.community.avatar.AvatarRepository;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProfileService {
     private final ProfileRepository profileRepository;
     private final UsersRepository userRepository;
-    private final AvatarRepository avatarRepository;
 
     /**
      * 프로필 생성
@@ -33,10 +30,9 @@ public class ProfileService {
         Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
 
-        Avatar getAvatar = avatarRepository.findByAvatarId(createProfile.getAvatarId()).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
         validateNickname(createProfile.getNickname());
 
-        Profile profile = Profile.toEntity(createProfile, getAvatar,getUser);
+        Profile profile = Profile.toEntity(createProfile,getUser);
         Profile savedProfile = profileRepository.save(profile);
 
         Role role = (getUser.getRole() == Role.ROLE_ORGANIZATION) ? Role.ROLE_ORGANIZATION : Role.ROLE_UNPASSWORD_USER;
@@ -77,13 +73,9 @@ public class ProfileService {
         Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
 
-        Avatar getAvatar = (getUser.getRole() == Role.ROLE_ORGANIZATION)
-                ? avatarRepository.findById(13L).orElseThrow(()->new IllegalArgumentException("초기데이터 미세팅"))
-                :avatarRepository.findByAvatarId(updateProfile.getAvatarId()).orElseThrow(()->new IllegalArgumentException("초기 데이터 세팅 안되있어요"));
 
         validateNickname(updateProfile.getNickname());
         getProfile.updateNickName(updateProfile.getNickname());
-        getProfile.upDateAvatar(getAvatar);
         profileRepository.save(getProfile);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS);
     }

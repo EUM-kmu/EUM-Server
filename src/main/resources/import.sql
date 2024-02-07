@@ -3,15 +3,13 @@ INSERT INTO market_category (category_id,contents) VALUES (1,"이동"),(2,"심�
 INSERT INTO branch_bank_account (branch_bank_account_id,account_name,owner,password) VALUES (1,"[햇살마을] 시작 햇살","ADMIN","admin");
 
 
-INSERT INTO avatar (avatar_id,avatar_name,avatar_photo_url) values (1,"CLOUD_YOUNG","https://kr.object.ncloudstorage.com/k-eum/characterAsset/cloud_youth.png"),(2,"BABYSUN_YOUNG","https://kr.object.ncloudstorage.com/k-eum/characterAsset/babysun_young.png"),(3,"SUN_YOUNG","https://kr.object.ncloudstorage.com/k-eum/characterAsset/sun_young.png"),(4,"CLOUD_YOUTH","https://kr.object.ncloudstorage.com/k-eum/characterAsset/cloud_youth.png"),(5,"BABYSUN_YOUTH","https://kr.object.ncloudstorage.com/k-eum/characterAsset/babysun_youth.png"),(6,"SUN_YOUTH","https://kr.object.ncloudstorage.com/k-eum/characterAsset/sun_youth.png"),(7,"CLOUD_MIDDLE","https://kr.object.ncloudstorage.com/k-eum/characterAsset/cloud_middle.png"),(8,"BABYSUN_MIDDLE","https://kr.object.ncloudstorage.com/k-eum/characterAsset/babysun_middle.png"),(9,"SUN_MIDDLE","https://kr.object.ncloudstorage.com/k-eum/characterAsset/sun_middle.png"),(10,"CLOUD_OLD","https://kr.object.ncloudstorage.com/k-eum/characterAsset/cloud_old.png"),(11,"BABAYSUN_OLD","https://kr.object.ncloudstorage.com/k-eum/characterAsset/babysun_old.png"),(12,"SUN_OLD","https://kr.object.ncloudstorage.com/k-eum/characterAsset/sun_old.png");
-INSERT INTO avatar (avatar_id,avatar_name,avatar_photo_url) values (13,"ORGANIZATION","https://kr.object.ncloudstorage.com/k-eum/characterAsset/organization.png");
 
 INSERT INTO users(user_id,email,password,role,is_banned,is_deleted) values (1,"test@email","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","TEST",0,0),(2,"test2@email","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","TEST",0,0);
 INSERT INTO users(user_id,email,password,role,is_banned,is_deleted) values (4,"student@email","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","ROLE_USER",0,0);
 INSERT INTO users(user_id,email,password,role,is_banned,is_deleted) values (3,"Jeong3Organization","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","ROLE_ORGANIZATION",0,0);
 
-insert into profile(profile_id,nickname,avatar_id,user_id)values (1,"세윤",1,1),(2,"정환",4,2);
-insert into profile(profile_id,nickname,avatar_id,user_id)values (3,"[정릉3동]주민센터",13,3);
+insert into profile(profile_id,nickname,user_id)values (1,"세윤",1),(2,"정환",2);
+insert into profile(profile_id,nickname,user_id)values (3,"[정릉3동]주민센터",3);
 
 insert into user_bank_account(user_bank_account_id,account_name,balance,password,owner,user_id,is_freeze)values (1,"세윤황","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","USER",1,0),(2,"정환박","300","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","USER",2,0);
 insert into user_bank_account(user_bank_account_id,account_name,balance,password,owner,user_id,is_freeze)values (3,"[정릉3동]주민센터","100000","$2a$10$iPFzYQC.Yw/fESftpYk.TOBQqIX18dD14E7A6y.eV/BrTSxCDKvI.","USER",3,0);
@@ -29,29 +27,21 @@ insert into market_post(market_post_id, content, current_accepted_people, locati
 insert into market_post(market_post_id, content, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id,  user_id, status,create_date,is_deleted)values (7, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "PM", "2024-08-13 00:00:00", "심부름", "30", 4, 1, "RECRUITING",now(),0);
 insert into market_post(market_post_id, content, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id,  user_id, status,create_date,is_deleted)values (8, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "PROVIDE_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "구걸", "30", 5, 2, "RECRUITING",now(),0);
 insert into market_post(market_post_id, content, current_accepted_people, location, market_type, max_num_of_people,pay, slot, start_date, title, volunteer_time, category_id,  user_id, status,create_date,is_deleted)values (19, "바퀴벌레 잡아 줄 사람 구해요", 0, "국민 빌라", "REQUEST_HELP", 1, 30, "ALL", "2024-08-13 00:00:00", "모기박멸", "30", 4, 2, "RECRUITING",now(),0);
---
--- insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (1,now(),"얼죽아 회원 모집합니다.관심 있으신분",0,"얼죽아 회원",10,1);
--- insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (2,now(),"집에 가고싶어요",0,"집",10,2);
--- insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (3,now(),"피곤합니다",0,"커피 수혈해서 다닐까",10,2);
--- insert into opinion_post(opinion_post_id,create_date,content,like_count,title,region_id,user_id) values (4,now(),"학교를 왜 와야하는 걸까요 휴강해주세요",0,"i'm 휴강 원해요",10,1);
---
--- insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (1,now(),3,"학교에서 꼭 와야하는가",10,"2020-11-13 18:14:48","학교에 와야할까요",13,10,1);
--- insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (2,now(),10,"당신은 지금 졸린가요",2,"2020-11-13 18:14:48","학교에 와야할까요",12,10,2);
--- insert into vote_post(vote_post_id,create_date,agree_count,content,disagree_count,end_time,title,total,region_id,user_id) values (3,now(),10,"학교에서 꼭 와야하는가",10,"2020-11-13 18:14:48","학교에 와야할까요",20,10,1);
 
-update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_young.png" where avatar_id = 1;
-update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_young.png" where avatar_id = 2;
-update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_sun_young.png" where avatar_id = 3;
-update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_youth.png" where avatar_id =4;
-update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_youth.png" where avatar_id=5;
-update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_sun_youth.png" where avatar_id = 6;
-update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_middle.png" where avatar_id = 7;
-update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_middle.png" where avatar_id = 8;
-update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_sun_middle.png" where avatar_id = 9;
-update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_old.png" where avatar_id = 10;
-update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_old.png" where avatar_id = 11;
-update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_sun_old.png" where avatar_id = 12;
-update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simeple_organization.png" where avatar_id =13;
-update avatar set avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/characterAsset/organization.png" where avatar_id = 13;
+
+-- update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_young.png" where avatar_id = 1;
+-- update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_young.png" where avatar_id = 2;
+-- update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_sun_young.png" where avatar_id = 3;
+-- update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_youth.png" where avatar_id =4;
+-- update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_youth.png" where avatar_id=5;
+-- update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_sun_youth.png" where avatar_id = 6;
+-- update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_middle.png" where avatar_id = 7;
+-- update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_middle.png" where avatar_id = 8;
+-- update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_sun_middle.png" where avatar_id = 9;
+-- update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_cloud_old.png" where avatar_id = 10;
+-- update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_babaysun_old.png" where avatar_id = 11;
+-- update avatar set simple_avatar_photo_url ="https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simple_sun_old.png" where avatar_id = 12;
+-- update avatar set simple_avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/simpleCharaterAsset/simeple_organization.png" where avatar_id =13;
+-- update avatar set avatar_photo_url = "https://kr.object.ncloudstorage.com/k-eum/characterAsset/organization.png" where avatar_id = 13;
 
 insert into withdrawal_category(withdrawal_category_id,content) VALUES (1,"앱을 쓰지 않아요"),(2,"알림이 너무 많이 와요"),(3,"비매너 사용자를 만났어요"),(4,"새 계정을 만들고 싶어요"),(5,"기타");

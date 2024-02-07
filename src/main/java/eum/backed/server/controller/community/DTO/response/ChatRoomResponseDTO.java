@@ -31,7 +31,7 @@ public class ChatRoomResponseDTO {
                 .myInfo(ProfileResponseDTO.toUserInfo(mine))
                 .opponentInfo(ProfileResponseDTO.toUserInfo(opponent))
                 .chatRoomKeyFB(chatRoom.getChatRoomKeyFB())
-                .marketPostInfo(MarketPostResponseDTO.toMarketPostResponse(chatRoom.getMarketPost(),chatRoom.getMarketPost().getMarketComments().size(),chatRoom.getMarketPost().getApplies().size()))
+                .marketPostInfo(MarketPostResponseDTO.toMarketPostResponse(chatRoom.getMarketPost(),chatRoom.getMarketPost().getApplies().size()))
                 .isPostDeleted(chatRoom.getMarketPost().isDeleted())
                 .isRemittanceButton(mine == transactionUser.getSender())
                 .isWriter(mine == chatRoom.getPostWriter())

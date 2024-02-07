@@ -7,16 +7,18 @@ import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.category.MarketCategory;
 import eum.backed.server.domain.community.chat.ChatRoom;
-import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.scrap.Scrap;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +46,10 @@ public class MarketPost extends BaseTimeEntity {
     private Date startDate;
     private boolean isDeleted;
 
+    @CreationTimestamp
+    @Column
+    private LocalDateTime pullUpDate;
+
     @Column
     @Enumerated(EnumType.STRING)
     private MarketType marketType;
@@ -70,8 +76,6 @@ public class MarketPost extends BaseTimeEntity {
     private List<Scrap> scraps = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "marketPost",orphanRemoval = true)
-    private List<MarketComment> marketComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "marketPost")
     private List<ChatRoom> chatRooms  = new ArrayList<>();

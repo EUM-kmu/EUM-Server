@@ -2,10 +2,12 @@ package eum.backed.server.domain.community.profile;
 
 import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.controller.community.DTO.request.ProfileRequestDTO;
-import eum.backed.server.domain.community.avatar.Avatar;
 import eum.backed.server.domain.auth.user.Users;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
@@ -21,12 +23,10 @@ public class Profile extends BaseTimeEntity {
     private String name;
     private String nickname;
     private String address;
+    private String profileImage;
 
 
 
-    @ManyToOne
-    @JoinColumn(name="avatar_id")
-    private Avatar avatar;
 
     @OneToOne
     @JoinColumn(name="user_id")
@@ -42,15 +42,11 @@ public class Profile extends BaseTimeEntity {
     }
 
 
-    public void upDateAvatar(Avatar avatar) {
-        this.avatar = avatar;
-    }
 
 
-    public static Profile toEntity(ProfileRequestDTO.CreateProfile createProfile, Avatar avatar, Users user){
+    public static Profile toEntity(ProfileRequestDTO.CreateProfile createProfile, Users user){
         return Profile.builder()
                 .nickname(createProfile.getNickname())
-                .avatar(avatar)
                 .user(user)
                 .build();
     }

@@ -5,14 +5,15 @@ import eum.backed.server.common.DTO.ErrorResponse;
 import eum.backed.server.controller.community.DTO.request.MarketPostRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
 import eum.backed.server.controller.community.DTO.request.enums.ServiceType;
-import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
 import eum.backed.server.controller.community.DTO.response.MarketPostResponseDTO;
 import eum.backed.server.domain.auth.CustomUserDetails;
 import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.community.marketpost.Status;
 import eum.backed.server.service.FileService;
 import eum.backed.server.service.auth.UsersService;
-import eum.backed.server.service.community.*;
+import eum.backed.server.service.community.BlockService;
+import eum.backed.server.service.community.MarketPostService;
+import eum.backed.server.service.community.ScrapService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,7 +40,6 @@ import java.util.List;
 public class  MarketPostController {
     private final MarketPostService marketPostService;
     private final ScrapService scrapService;
-    private final CommentService commentService;
     private final BlockService blockService;
     private final UsersService usersService;
     private final FileService fileService;
@@ -134,8 +134,7 @@ public class  MarketPostController {
     })
     @GetMapping("{postId}")
     public  ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostWithComment>> findById(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails customUserDetails, Pageable pageable){
-        List<CommentResponseDTO.CommentResponse> commentResponses = commentService.getComments(postId, Long.valueOf(customUserDetails.getUsername()),pageable);
-        return ResponseEntity.ok(marketPostService.getMarketPostWithComment(postId,Long.valueOf(customUserDetails.getUsername()),commentResponses));
+        return ResponseEntity.ok(marketPostService.getMarketPostWithComment(postId,Long.valueOf(customUserDetails.getUsername())));
     }
 
     /**

@@ -4,7 +4,6 @@ import eum.backed.server.common.BaseTimeEntity;
 import eum.backed.server.domain.bank.userbankaccount.UserBankAccount;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.block.Block;
-import eum.backed.server.domain.community.comment.MarketComment;
 import eum.backed.server.domain.community.marketpost.MarketPost;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.scrap.Scrap;
@@ -74,8 +73,6 @@ public class Users extends BaseTimeEntity  {
 
 
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<MarketComment> marketComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Scrap> scraps = new ArrayList<>();
@@ -86,41 +83,7 @@ public class Users extends BaseTimeEntity  {
 
     @OneToOne(mappedBy = "user", orphanRemoval = true)
     private WithdrawalUser withdrawalUser;
-
-
-
-
-//    @Override
-//    public String getUsername() {
-//        return email;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return true;
-//    }
-//
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return this.authorities.stream()
-//                .map(SimpleGrantedAuthority::new)
-//                .collect(Collectors.toList());
-//    }
+    
 
     public void updateRole(Role role) {
         this.role = role;

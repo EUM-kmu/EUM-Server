@@ -5,7 +5,6 @@ import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.DTO.request.MarketPostRequestDTO;
 import eum.backed.server.controller.community.DTO.request.enums.MarketType;
 import eum.backed.server.controller.community.DTO.request.enums.ServiceType;
-import eum.backed.server.controller.community.DTO.response.CommentResponseDTO;
 import eum.backed.server.controller.community.DTO.response.MarketPostResponseDTO;
 import eum.backed.server.domain.community.apply.Apply;
 import eum.backed.server.domain.community.apply.ApplyRepository;
@@ -61,7 +60,7 @@ public class MarketPostService {
         MarketPost marketPost = MarketPost.toEntity(marketCreate,pay,user,getMarketCategory);
         MarketPost getMarketPost = marketPostRepository.save(marketPost);
 
-        MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(getMarketPost,0,0);
+        MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(getMarketPost,0);
         return APIResponse.of(SuccessCode.INSERT_SUCCESS,marketPostResponse);
     }
 
@@ -108,7 +107,7 @@ public class MarketPostService {
         getMarketPost.updatePay(pay);
 
         MarketPost updatedMarketPost = marketPostRepository.save(getMarketPost);
-        MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(updatedMarketPost,updatedMarketPost.getMarketComments().size(),updatedMarketPost.getApplies().size());
+        MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(updatedMarketPost,updatedMarketPost.getApplies().size());
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS,marketPostResponse);
 
     }
@@ -133,10 +132,9 @@ public class MarketPostService {
     /**
      * 게시글 정보 + 해당 게시글 댓글 들 조회
      * @param postId
-     * @param commentResponses
      * @return 게시글 정보 + 댓글 리스트 조회 , 로그인한 유저 활동 조회(스크랩 여부, 지원여부, 작성자 여부)
      */
-    public  APIResponse<MarketPostResponseDTO.MarketPostWithComment> getMarketPostWithComment(Long postId, Long userId, List<CommentResponseDTO.CommentResponse> commentResponses) {
+    public  APIResponse<MarketPostResponseDTO.MarketPostWithComment> getMarketPostWithComment(Long postId, Long userId) {
         Users user = usersRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         MarketPost getMarketPost = marketPostRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Invalid postId"));
 
@@ -148,7 +146,7 @@ public class MarketPostService {
         if(isApply){
             tradingStatus = applyRepository.findByUserAndMarketPost(user,getMarketPost).get().getStatus();
         }
-        MarketPostResponseDTO.MarketPostWithComment singlePostResponse = marketPostResponseDTO.toMarketPostWithComment(user,getMarketPost,commentResponses,isApply,isScrap,tradingStatus);
+        MarketPostResponseDTO.MarketPostWithComment singlePostResponse = marketPostResponseDTO.toMarketPostWithComment(user,getMarketPost,isApply,isScrap,tradingStatus);
         return APIResponse.of(SuccessCode.SELECT_SUCCESS,singlePostResponse);
 
     }
@@ -202,7 +200,7 @@ public class MarketPostService {
     private List<MarketPostResponseDTO.MarketPostResponse> getAllPostResponse(List<MarketPost> marketPosts){
         List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = new ArrayList<>();
         for (MarketPost marketPost : marketPosts) {
-            MarketPostResponseDTO.MarketPostResponse marketPostResponse = marketPostResponseDTO.toMarketPostResponse(marketPost,marketPost.getMarketComments().size(),marketPost.getApplies().size());
+            MarketPostResponseDTO.MarketPostResponse marketPostResponse = marketPostResponseDTO.toMarketPostResponse(marketPost,marketPost.getApplies().size());
             marketPostResponses.add(marketPostResponse);
         }
         return marketPostResponses;
@@ -220,7 +218,7 @@ public class MarketPostService {
         List<MarketPostResponseDTO.MarketPostResponse> marketPostResponses = new ArrayList<>();
         for (Scrap scrap : scraps) {
             MarketPost marketPost = scrap.getMarketPost();
-            MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(marketPost,marketPost.getMarketComments().size(),marketPost.getApplies().size());
+            MarketPostResponseDTO.MarketPostResponse marketPostResponse = MarketPostResponseDTO.toMarketPostResponse(marketPost,marketPost.getApplies().size());
             marketPostResponses.add(marketPostResponse);
         }
         return APIResponse.of(SuccessCode.SELECT_SUCCESS, marketPostResponses);

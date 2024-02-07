@@ -12,7 +12,6 @@ public class ProfileRequestDTO {
         @NotEmpty(message = "닉네임을 입력하세요")
         private String nickname;
 
-        private Long avatarId;
 
     }
     @Getter
@@ -20,7 +19,6 @@ public class ProfileRequestDTO {
     public static class UpdateProfile{
         @NotEmpty(message = "닉네임을 입력하세요")
         private String nickname;
-        private Long avatarId;
 
     }
 
