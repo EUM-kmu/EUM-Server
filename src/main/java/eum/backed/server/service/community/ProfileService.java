@@ -1,6 +1,7 @@
 package eum.backed.server.service.community;
 
 import eum.backed.server.common.DTO.APIResponse;
+import eum.backed.server.common.DTO.FileDto;
 import eum.backed.server.common.DTO.enums.SuccessCode;
 import eum.backed.server.controller.community.DTO.request.ProfileRequestDTO;
 import eum.backed.server.controller.community.DTO.response.ProfileResponseDTO;
@@ -9,9 +10,11 @@ import eum.backed.server.domain.auth.user.Users;
 import eum.backed.server.domain.auth.user.UsersRepository;
 import eum.backed.server.domain.community.profile.Profile;
 import eum.backed.server.domain.community.profile.ProfileRepository;
+import eum.backed.server.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final UsersRepository userRepository;
 
+    private final FileService fileService;
     /**
      * 프로필 생성
      * @param createProfile
@@ -26,20 +30,20 @@ public class ProfileService {
      * @return
      */
     @Transactional
-    public APIResponse<ProfileResponseDTO.ProfileResponse> create(ProfileRequestDTO.CreateProfile createProfile, Long userId) {
+    public ProfileResponseDTO.ProfileResponse create(ProfileRequestDTO.CreateProfile createProfile, Long userId, MultipartFile multipartFile) {
         Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         if (profileRepository.existsByUser(getUser)) throw new IllegalArgumentException("이미 프로필이 있는 회원");
 
         validateNickname(createProfile.getNickname());
-
-        Profile profile = Profile.toEntity(createProfile,getUser);
+        FileDto fileDto = fileService.uploadFile(multipartFile, "profile");
+        Profile profile = Profile.toEntity(createProfile,getUser,fileDto.getUploadFileUrl(),fileDto.getUploadFileName());
         Profile savedProfile = profileRepository.save(profile);
 
         Role role = (getUser.getRole() == Role.ROLE_ORGANIZATION) ? Role.ROLE_ORGANIZATION : Role.ROLE_UNPASSWORD_USER;
         getUser.updateRole(role);
 
         ProfileResponseDTO.ProfileResponse createProfileResponse = ProfileResponseDTO.toProfileResponse(savedProfile);
-        return APIResponse.of(SuccessCode.INSERT_SUCCESS,createProfileResponse);
+        return createProfileResponse;
 
     }
 
@@ -69,13 +73,19 @@ public class ProfileService {
      * @param userId
      * @return
      */
-    public APIResponse updateMyProfile(ProfileRequestDTO.UpdateProfile updateProfile,Long userId) {
+    @Transactional
+    public APIResponse updateMyProfile(ProfileRequestDTO.UpdateProfile updateProfile,Long userId,MultipartFile multipartFile) {
         Users getUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("invalid userId"));
         Profile getProfile = profileRepository.findByUser(getUser).orElseThrow(() -> new NullPointerException("프로필이 없습니다"));
-
-
         validateNickname(updateProfile.getNickname());
+
+        fileService.deleteFile("profile",getProfile.getFileName());
+        FileDto fileDto = fileService.uploadFile(multipartFile,"profile");
+
         getProfile.updateNickName(updateProfile.getNickname());
+        getProfile.updateProfileImage(fileDto.getUploadFileUrl());
+        getProfile.updateFileName(fileDto.getUploadFileName());
+
         profileRepository.save(getProfile);
         return APIResponse.of(SuccessCode.UPDATE_SUCCESS);
     }

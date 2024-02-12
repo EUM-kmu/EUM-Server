@@ -24,6 +24,7 @@ public class Profile extends BaseTimeEntity {
     private String nickname;
     private String address;
     private String profileImage;
+    private String fileName;
 
 
 
@@ -37,6 +38,14 @@ public class Profile extends BaseTimeEntity {
         this.nickname = nickname;
     }
 
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public void updateFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
     public void updateAddress(String address) {
         this.address = address;
     }
@@ -44,10 +53,12 @@ public class Profile extends BaseTimeEntity {
 
 
 
-    public static Profile toEntity(ProfileRequestDTO.CreateProfile createProfile, Users user){
+    public static Profile toEntity(ProfileRequestDTO.CreateProfile createProfile, Users user, String profileImage, String fileName){
         return Profile.builder()
                 .nickname(createProfile.getNickname())
                 .user(user)
+                .profileImage(profileImage)
+                .fileName(fileName)
                 .build();
     }
 

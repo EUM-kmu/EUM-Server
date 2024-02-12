@@ -1,6 +1,8 @@
 package eum.backed.server.service;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -22,49 +24,62 @@ public class FileService {
 
     private String bucketName="k-eum";
 
-    private String filePath = "marketpost";
+//    private String filePath = "marketpost";
 
     public String getUuidFileName(String fileName) {
         String ext = fileName.substring(fileName.indexOf(".") + 1);
         return UUID.randomUUID() + "." + ext;
     }
-    public List<FileDto> uploadFiles(List<MultipartFile> multipartFiles) {
+    public FileDto uploadFile(MultipartFile multipartFile,String filePath){
+        String originalFileName = multipartFile.getOriginalFilename();
+        String uploadFileName = getUuidFileName(originalFileName);
+        String uploadFileUrl = "";
+
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
+        String keyName ="" ;
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+
+            keyName = filePath + "/" + uploadFileName;
+
+            // S3에 폴더 및 파일 업로드
+            amazonS3Client.putObject(
+                    new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata)
+                            .withCannedAcl(CannedAccessControlList.PublicRead));
+
+            // S3에 업로드한 폴더 및 파일 URL
+            uploadFileUrl = "https://kr.object.ncloudstorage.com/"+ bucketName + "/" + keyName;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return FileDto.builder().originalFileName(originalFileName)
+                .uploadFileName(uploadFileName)
+                .uploadFilePath(filePath)
+                .uploadFileUrl(uploadFileUrl)
+                .build();
+
+    }
+    public void deleteFile(String filePath, String fileName){
+        String keyName = filePath + "/" + fileName;
+        try{
+            amazonS3Client.deleteObject(bucketName,keyName);
+        } catch (AmazonS3Exception e) {
+            e.printStackTrace();
+        } catch(SdkClientException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public List<FileDto> uploadFiles(List<MultipartFile> multipartFiles,String filePath) {
 
 
         List<FileDto> s3files = new ArrayList<>();
 
         for (MultipartFile multipartFile : multipartFiles) {
-
-            String originalFileName = multipartFile.getOriginalFilename();
-            String uploadFileName = getUuidFileName(originalFileName);
-            String uploadFileUrl = "";
-
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(multipartFile.getSize());
-            objectMetadata.setContentType(multipartFile.getContentType());
-
-            try (InputStream inputStream = multipartFile.getInputStream()) {
-
-                String keyName = filePath + "/" + uploadFileName;
-
-                // S3에 폴더 및 파일 업로드
-                amazonS3Client.putObject(
-                        new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata)
-                                .withCannedAcl(CannedAccessControlList.PublicRead));
-
-                // S3에 업로드한 폴더 및 파일 URL
-                uploadFileUrl = "https://kr.object.ncloudstorage.com/"+ bucketName + "/" + keyName;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            s3files.add(
-                    FileDto.builder()
-                            .originalFileName(originalFileName)
-                            .uploadFileName(uploadFileName)
-                            .uploadFilePath(filePath)
-                            .uploadFileUrl(uploadFileUrl)
-                            .build());
+            FileDto fileDto = uploadFile(multipartFile,filePath);
+            s3files.add(fileDto);
         }
 
         return s3files;

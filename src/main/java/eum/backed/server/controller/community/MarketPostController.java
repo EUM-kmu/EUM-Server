@@ -59,7 +59,7 @@ public class  MarketPostController {
     })
     @PostMapping(consumes =  {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<APIResponse<MarketPostResponseDTO.MarketPostResponse>> create(@RequestPart(value = "request") @Validated MarketPostRequestDTO.MarketCreate marketCreate, @RequestPart(value = "files") List<MultipartFile> multipartFiles, @AuthenticationPrincipal  CustomUserDetails customUserDetails ) throws ParseException {
-        fileService.uploadFiles(multipartFiles);
+        fileService.uploadFiles(multipartFiles,"marketpost");
         return new ResponseEntity<>(marketPostService.create(marketCreate, Long.valueOf(customUserDetails.getUsername())), HttpStatus.CREATED);
     }
 
